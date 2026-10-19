@@ -24,17 +24,30 @@ def new_lot(product_id: str = "tucuma", operator: str = "Ana", request_id: str |
 # ---------------------------------------------------------------- status and products
 
 
-def test_initial_status_never_claims_absent_equipment(client: TestClient):
+def test_simulated_mode_reports_the_simulated_bench(client: TestClient):
     status = client.get("/api/status").json()
     assert status["mode"] == "simulado"
+    assert status["machine"]["state"] == "DISARMED"
+    assert status["machine"]["link"]["connected"] is True
+    assert status["machine"]["link"]["port"] == "simulador"
+    assert status["machine"]["running"] is False
+    assert status["camera"]["status"] == "ok"
+    assert status["camera"]["source"] == "simulada"
+    assert status["model"]["status"] == "not_loaded"
+    assert status["storage"]["status"] in {"ok", "low_space"}
+    assert status["active_lot"] is None
+    assert status["current_cycle"] is None
+    assert status["control_locked"] is False
+    assert status["control_holder"] is None
+
+
+def test_real_mode_never_claims_absent_equipment(settings: Settings):
+    with TestClient(create_app(settings.model_copy(update={"mode": RunMode.REAL}))) as client:
+        status = client.get("/api/status").json()
     assert status["machine"]["state"] is None
     assert status["machine"]["link"]["connected"] is False
     assert status["camera"]["status"] == "unavailable"
     assert status["model"]["status"] == "not_loaded"
-    assert status["storage"]["status"] in {"ok", "low_space"}
-    assert status["active_lot"] is None
-    assert status["control_locked"] is False
-    assert status["control_holder"] is None
 
 
 def test_products_lists_initial_profiles(client: TestClient):
@@ -199,12 +212,13 @@ def test_operator_actions_are_recorded(client: TestClient, control):
     client.post(f"/api/lots/{lot['id']}/close", headers=control)
     client.post("/api/control/claim", json={"operator": "Bruno", "takeover": True})
     events = client.get("/api/diagnostics/events").json()
-    assert [e["type"] for e in events] == [
+    assert [e["type"] for e in events if e["source"] == "operator"] == [
         "CONTROL_TAKEOVER",
         "LOT_CLOSED",
         "LOT_OPENED",
         "CONTROL_CLAIMED",
     ]
+    assert events[-1]["type"] == "DEVICE_SESSION_OPENED"
     warnings = client.get("/api/diagnostics/events?severity=warning").json()
     assert [e["type"] for e in warnings] == ["CONTROL_TAKEOVER"]
     assert warnings[0]["data"] == {"operator": "Bruno", "previous": "Ana"}

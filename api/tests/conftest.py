@@ -11,6 +11,11 @@ TEST_HOSTS = ["testserver", "127.0.0.1", "localhost"]
 
 
 @pytest.fixture
+def anyio_backend() -> str:
+    return "asyncio"
+
+
+@pytest.fixture
 def settings(tmp_path: Path) -> Settings:
     return Settings(
         _env_file=None,

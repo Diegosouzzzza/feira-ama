@@ -118,5 +118,6 @@ PC  → cmd START_CYCLE lot 3, cycle 41             ESP → ack;      evt STATE_
                                                   ESP → evt STATE_CHANGED → INSPECTING; evt CAPTURE_READY 41
 PC  (captura, classifica, aplica a política)
 PC  → cmd DECISION 41 REJECTED                    ESP → ack;      evt STATE_CHANGED → TO_S2 … SORTING … RELEASING
-                                                  ESP → evt CYCLE_COMPLETED 41 REJECTED; STATE_CHANGED → READY
+                                                  ESP → evt STATE_CHANGED → READY; evt CYCLE_COMPLETED 41 REJECTED
+PC  (só depois de CYCLE_COMPLETED) → cmd START_CYCLE lot 3, cycle 42 …
 ```

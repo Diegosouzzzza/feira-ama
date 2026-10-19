@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     control_ttl_minutes: int = 30
     low_disk_bytes: int = 1_000_000_000
     log_to_file: bool = True
+    device_silence_ms: int = 3_000
+    sim_speed: float = 1.0
+    sim_seed: int | None = None
 
     @model_validator(mode="after")
     def _default_data_dir(self) -> Self:

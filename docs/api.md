@@ -29,14 +29,14 @@ Situação: rotas marcadas com ✅ estão implementadas e testadas. As demais en
 | `GET /api/lots/{id}` | — | `LotOut` | 3 ✅ | não |
 | `GET /api/lots/{id}/summary` | — | `LotSummary` | 3 ✅ | não |
 | `POST /api/lots/{id}/close` | — | `LotOut` (encerrar de novo devolve o mesmo lote) | 3 ✅ | sim |
-| `POST /api/machine/start` | `MachineCommandRequest` | `MachineCommandResult` | 4 | sim |
-| `POST /api/machine/pause` | `MachineCommandRequest` | `MachineCommandResult` | 4 | sim |
-| `POST /api/machine/stop` | `MachineCommandRequest` | `MachineCommandResult` | 4 | sim |
-| `POST /api/machine/rearm` | `MachineCommandRequest` | `MachineCommandResult` | 4 | sim |
+| `POST /api/machine/start` | `MachineCommandRequest` | `MachineCommandResult` | 4 ✅ | sim |
+| `POST /api/machine/pause` | `MachineCommandRequest` | `MachineCommandResult` | 4 ✅ | sim |
+| `POST /api/machine/stop` | `MachineCommandRequest` | `MachineCommandResult` | 4 ✅ | sim |
+| `POST /api/machine/rearm` | `MachineCommandRequest` | `MachineCommandResult` | 4 ✅ | sim |
 | `GET /api/inspections` | `?lot_id&product_id&grade&decision&from&to&limit&offset` | `InspectionPage` | 9 | não |
-| `GET /api/inspections/{id}` | — | `InspectionOut` | 9 | não |
-| `GET /api/inspections/{id}/image` | — | JPEG | 4 | não |
-| `POST /api/inspections/{id}/review` | `InspectionReviewCreate` | `ReviewOut` (201) | 4 | sim |
+| `GET /api/inspections/{id}` | — | `InspectionOut` | 4 ✅ | não |
+| `GET /api/inspections/{id}/image` | — | PNG (simulado) ou JPEG | 4 ✅ | não |
+| `POST /api/inspections/{id}/review` | `InspectionReviewCreate` | `ReviewOut` (201; 200 se `request_id` repetido) | 4 ✅ | sim |
 | `GET /api/exports/inspections.csv` | mesmos filtros | CSV UTF-8 com BOM | 9 | não |
 | `GET /api/camera/stream` | — | MJPEG (canal separado) | 7 | não |
 | `POST /api/dataset/capture` | (Bloco 7) | (Bloco 7) | 7 | sim |
@@ -47,11 +47,13 @@ Situação: rotas marcadas com ✅ estão implementadas e testadas. As demais en
 
 Regras de estado das rotas de controle:
 
-- Criar lote: sem lote aberto e máquina sem ciclo ativo. O produto define o modelo carregado; trocar de produto = encerrar o lote e abrir outro.
+- Criar/encerrar lote: máquina parada (sem operação automática nem ciclo em andamento). Abrir o lote carrega o modelo do produto; encerrar descarrega. Trocar de produto = encerrar o lote e abrir outro.
+- `start`: exige placa conectada, lote aberto, modelo pronto, câmera ok, banco saudável e nenhuma peça aguardando revisão (`409 REVIEW_REQUIRED`). Se a placa estiver desarmada, envia `CONFIGURE` + `ARM`. Liga a **operação automática**: um ciclo após o outro até `pause`, `stop` ou falha.
 - `pause`: termina o ciclo já autorizado e não inicia o próximo.
-- `stop`: parada por software imediata (`STOP` na placa).
-- `rearm`: `CLEAR_FAULT` + `ARM`, nunca movimenta sozinho.
-- `review`: só para inspeção com `auto_decision = REVIEW` ainda sem decisão, ou correção posterior (gera nova revisão, a previsão original fica intacta).
+- `stop`: parada por software imediata (`STOP` na placa); o ciclo em andamento é registrado como interrompido.
+- `rearm`: `CLEAR_FAULT` (se em falha) + `CONFIGURE` + `ARM` (se houver lote aberto). **Nunca** liga a operação automática nem move a esteira. Recusado com peça sobre sensor ou emergência acionada.
+- Qualquer interrupção de ciclo (falha, parada, emergência, reinício da placa, placa muda, câmera/modelo/gravação com falha) desliga a operação automática.
+- `review`: decide a peça inconclusiva parada em `REVIEW_HOLD` (a decisão é entregue à placa **antes** de ser registrada) ou corrige uma decisão anterior sem mover nada. A previsão original fica intacta; cada revisão é um registro novo.
 
 ## WebSocket `/api/events`
 

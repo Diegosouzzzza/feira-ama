@@ -602,6 +602,489 @@
         }
       }
     },
+    "/api/machine/start": {
+      "post": {
+        "tags": [
+          "máquina"
+        ],
+        "summary": "Start",
+        "description": "Arma (se preciso) e liga a operação automática: um ciclo após o outro.",
+        "operationId": "start_api_machine_start_post",
+        "parameters": [
+          {
+            "name": "X-Control-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token de controle do operador",
+              "title": "X-Control-Token"
+            },
+            "description": "Token de controle do operador"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MachineCommandRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MachineCommandResult"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/machine/pause": {
+      "post": {
+        "tags": [
+          "máquina"
+        ],
+        "summary": "Pause",
+        "description": "Termina o ciclo já autorizado e não inicia o próximo.",
+        "operationId": "pause_api_machine_pause_post",
+        "parameters": [
+          {
+            "name": "X-Control-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token de controle do operador",
+              "title": "X-Control-Token"
+            },
+            "description": "Token de controle do operador"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MachineCommandRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MachineCommandResult"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/machine/stop": {
+      "post": {
+        "tags": [
+          "máquina"
+        ],
+        "summary": "Stop",
+        "description": "Parada por software imediata: interrompe o ciclo e desarma.",
+        "operationId": "stop_api_machine_stop_post",
+        "parameters": [
+          {
+            "name": "X-Control-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token de controle do operador",
+              "title": "X-Control-Token"
+            },
+            "description": "Token de controle do operador"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MachineCommandRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MachineCommandResult"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/machine/rearm": {
+      "post": {
+        "tags": [
+          "máquina"
+        ],
+        "summary": "Rearm",
+        "description": "Limpa a falha e arma de novo, sem iniciar movimento.",
+        "operationId": "rearm_api_machine_rearm_post",
+        "parameters": [
+          {
+            "name": "X-Control-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token de controle do operador",
+              "title": "X-Control-Token"
+            },
+            "description": "Token de controle do operador"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MachineCommandRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MachineCommandResult"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/inspections/{inspection_id}": {
+      "get": {
+        "tags": [
+          "inspeções"
+        ],
+        "summary": "Inspection",
+        "operationId": "inspection_api_inspections__inspection_id__get",
+        "parameters": [
+          {
+            "name": "inspection_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Inspection Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionOut"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/inspections/{inspection_id}/image": {
+      "get": {
+        "tags": [
+          "inspeções"
+        ],
+        "summary": "Inspection Image",
+        "operationId": "inspection_image_api_inspections__inspection_id__image_get",
+        "parameters": [
+          {
+            "name": "inspection_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Inspection Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "image/png": {},
+              "image/jpeg": {}
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/inspections/{inspection_id}/review": {
+      "post": {
+        "tags": [
+          "inspeções"
+        ],
+        "summary": "Review",
+        "description": "Decide uma peça inconclusiva ou corrige uma decisão anterior (sem apagar a previsão).",
+        "operationId": "review_api_inspections__inspection_id__review_post",
+        "parameters": [
+          {
+            "name": "inspection_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Inspection Id"
+            }
+          },
+          {
+            "name": "X-Control-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token de controle do operador",
+              "title": "X-Control-Token"
+            },
+            "description": "Token de controle do operador"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InspectionReviewCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewOut"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Mesma solicitação repetida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/diagnostics/events": {
       "get": {
         "tags": [
@@ -727,6 +1210,15 @@
         ],
         "title": "ApiErrorBody",
         "description": "Every non-2xx response from /api uses this body."
+      },
+      "AutoDecision": {
+        "type": "string",
+        "enum": [
+          "APPROVED",
+          "REJECTED",
+          "REVIEW"
+        ],
+        "title": "AutoDecision"
       },
       "CameraInfo": {
         "properties": {
@@ -909,6 +1401,14 @@
           "aborted"
         ],
         "title": "CycleStatus"
+      },
+      "DecidedBy": {
+        "type": "string",
+        "enum": [
+          "auto",
+          "operator"
+        ],
+        "title": "DecidedBy"
       },
       "Destination": {
         "type": "string",
@@ -1117,6 +1617,189 @@
           "mode"
         ],
         "title": "HealthResponse"
+      },
+      "InspectionOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Id"
+          },
+          "cycle_id": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Cycle Id"
+          },
+          "lot_id": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Lot Id"
+          },
+          "product_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{1,31}$",
+            "title": "Product Id"
+          },
+          "captured_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Captured At"
+          },
+          "image_url": {
+            "type": "string",
+            "title": "Image Url"
+          },
+          "model_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Id"
+          },
+          "predicted_grade": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Grade"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scores": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "propertyNames": {
+                  "$ref": "#/components/schemas/Grade"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scores"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence",
+            "description": "Confiança estimada do modelo, não taxa de acerto"
+          },
+          "latency_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latency Ms"
+          },
+          "auto_decision": {
+            "$ref": "#/components/schemas/AutoDecision"
+          },
+          "review_reason": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReviewReason"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "final_decision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Destination"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "decided_by": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecidedBy"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cycle_status": {
+            "$ref": "#/components/schemas/CycleStatus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "cycle_id",
+          "lot_id",
+          "product_id",
+          "captured_at",
+          "image_url",
+          "model_id",
+          "predicted_grade",
+          "scores",
+          "confidence",
+          "latency_ms",
+          "auto_decision",
+          "review_reason",
+          "final_decision",
+          "decided_by",
+          "cycle_status"
+        ],
+        "title": "InspectionOut"
+      },
+      "InspectionReviewCreate": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Request Id"
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Destination"
+          },
+          "reviewer": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Reviewer"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 3,
+            "title": "Reason"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id",
+          "decision",
+          "reviewer",
+          "reason"
+        ],
+        "title": "InspectionReviewCreate"
       },
       "LotCreate": {
         "properties": {
@@ -1338,6 +2021,61 @@
         "title": "LotSummary",
         "description": "Counters derived from stored records, never from client-side increments."
       },
+      "MachineCommandRequest": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Request Id",
+            "description": "Repetir o mesmo id devolve o resultado original"
+          },
+          "expected_state": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MachineState"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Recusa com INVALID_STATE se o estado atual for outro"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id"
+        ],
+        "title": "MachineCommandRequest"
+      },
+      "MachineCommandResult": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Request Id"
+          },
+          "accepted": {
+            "type": "boolean",
+            "title": "Accepted"
+          },
+          "duplicate": {
+            "type": "boolean",
+            "title": "Duplicate"
+          },
+          "state": {
+            "$ref": "#/components/schemas/MachineState"
+          }
+        },
+        "type": "object",
+        "required": [
+          "request_id",
+          "accepted",
+          "duplicate",
+          "state"
+        ],
+        "title": "MachineCommandResult"
+      },
       "MachineInfo": {
         "properties": {
           "state": {
@@ -1373,6 +2111,23 @@
           },
           "link": {
             "$ref": "#/components/schemas/DeviceLink"
+          },
+          "running": {
+            "type": "boolean",
+            "title": "Running",
+            "description": "Operação automática ativa: novos ciclos são iniciados"
+          },
+          "pending_review_inspection_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pending Review Inspection Id",
+            "description": "Inspeção inconclusiva aguardando decisão do operador"
           }
         },
         "type": "object",
@@ -1380,7 +2135,9 @@
           "state",
           "fault",
           "sensors",
-          "link"
+          "link",
+          "running",
+          "pending_review_inspection_id"
         ],
         "title": "MachineInfo"
       },
@@ -1501,6 +2258,66 @@
           "version"
         ],
         "title": "ProductOut"
+      },
+      "ReviewOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Id"
+          },
+          "inspection_id": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Inspection Id"
+          },
+          "reviewer": {
+            "type": "string",
+            "title": "Reviewer"
+          },
+          "previous_decision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Destination"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "new_decision": {
+            "$ref": "#/components/schemas/Destination"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "inspection_id",
+          "reviewer",
+          "previous_decision",
+          "new_decision",
+          "reason",
+          "created_at"
+        ],
+        "title": "ReviewOut"
+      },
+      "ReviewReason": {
+        "type": "string",
+        "enum": [
+          "LOW_CONFIDENCE",
+          "AMBIGUOUS",
+          "INVALID_IMAGE"
+        ],
+        "title": "ReviewReason"
       },
       "RunMode": {
         "type": "string",
@@ -1665,67 +2482,6 @@
         ],
         "title": "SystemStatus"
       },
-      "MachineCommandRequest": {
-        "additionalProperties": false,
-        "properties": {
-          "request_id": {
-            "description": "Repetir o mesmo id devolve o resultado original",
-            "format": "uuid",
-            "title": "Request Id",
-            "type": "string"
-          },
-          "expected_state": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/MachineState"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Recusa com INVALID_STATE se o estado atual for outro"
-          }
-        },
-        "required": [
-          "request_id"
-        ],
-        "title": "MachineCommandRequest",
-        "type": "object"
-      },
-      "InspectionReviewCreate": {
-        "additionalProperties": false,
-        "properties": {
-          "request_id": {
-            "format": "uuid",
-            "title": "Request Id",
-            "type": "string"
-          },
-          "decision": {
-            "$ref": "#/components/schemas/Destination"
-          },
-          "reviewer": {
-            "maxLength": 60,
-            "minLength": 1,
-            "title": "Reviewer",
-            "type": "string"
-          },
-          "reason": {
-            "maxLength": 200,
-            "minLength": 3,
-            "title": "Reason",
-            "type": "string"
-          }
-        },
-        "required": [
-          "request_id",
-          "decision",
-          "reviewer",
-          "reason"
-        ],
-        "title": "InspectionReviewCreate",
-        "type": "object"
-      },
       "ModelValidationStatus": {
         "enum": [
           "pending",
@@ -1797,210 +2553,6 @@
         "title": "ModelOut",
         "type": "object"
       },
-      "MachineCommandResult": {
-        "properties": {
-          "request_id": {
-            "format": "uuid",
-            "title": "Request Id",
-            "type": "string"
-          },
-          "accepted": {
-            "title": "Accepted",
-            "type": "boolean"
-          },
-          "duplicate": {
-            "title": "Duplicate",
-            "type": "boolean"
-          },
-          "state": {
-            "$ref": "#/components/schemas/MachineState"
-          }
-        },
-        "required": [
-          "request_id",
-          "accepted",
-          "duplicate",
-          "state"
-        ],
-        "title": "MachineCommandResult",
-        "type": "object"
-      },
-      "AutoDecision": {
-        "enum": [
-          "APPROVED",
-          "REJECTED",
-          "REVIEW"
-        ],
-        "title": "AutoDecision",
-        "type": "string"
-      },
-      "DecidedBy": {
-        "enum": [
-          "auto",
-          "operator"
-        ],
-        "title": "DecidedBy",
-        "type": "string"
-      },
-      "ReviewReason": {
-        "enum": [
-          "LOW_CONFIDENCE",
-          "AMBIGUOUS",
-          "INVALID_IMAGE"
-        ],
-        "title": "ReviewReason",
-        "type": "string"
-      },
-      "InspectionOut": {
-        "properties": {
-          "id": {
-            "minimum": 1,
-            "title": "Id",
-            "type": "integer"
-          },
-          "cycle_id": {
-            "minimum": 1,
-            "title": "Cycle Id",
-            "type": "integer"
-          },
-          "lot_id": {
-            "minimum": 1,
-            "title": "Lot Id",
-            "type": "integer"
-          },
-          "product_id": {
-            "pattern": "^[a-z][a-z0-9_]{1,31}$",
-            "title": "Product Id",
-            "type": "string"
-          },
-          "captured_at": {
-            "format": "date-time",
-            "title": "Captured At",
-            "type": "string"
-          },
-          "image_url": {
-            "title": "Image Url",
-            "type": "string"
-          },
-          "model_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Model Id"
-          },
-          "predicted_grade": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/Grade"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "scores": {
-            "anyOf": [
-              {
-                "additionalProperties": {
-                  "type": "number"
-                },
-                "propertyNames": {
-                  "$ref": "#/components/schemas/Grade"
-                },
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Scores"
-          },
-          "confidence": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Confiança estimada do modelo, não taxa de acerto",
-            "title": "Confidence"
-          },
-          "latency_ms": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Latency Ms"
-          },
-          "auto_decision": {
-            "$ref": "#/components/schemas/AutoDecision"
-          },
-          "review_reason": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ReviewReason"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "final_decision": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/Destination"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "decided_by": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/DecidedBy"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "cycle_status": {
-            "$ref": "#/components/schemas/CycleStatus"
-          }
-        },
-        "required": [
-          "id",
-          "cycle_id",
-          "lot_id",
-          "product_id",
-          "captured_at",
-          "image_url",
-          "model_id",
-          "predicted_grade",
-          "scores",
-          "confidence",
-          "latency_ms",
-          "auto_decision",
-          "review_reason",
-          "final_decision",
-          "decided_by",
-          "cycle_status"
-        ],
-        "title": "InspectionOut",
-        "type": "object"
-      },
       "InspectionPage": {
         "properties": {
           "items": {
@@ -2034,57 +2586,6 @@
           "offset"
         ],
         "title": "InspectionPage",
-        "type": "object"
-      },
-      "ReviewOut": {
-        "properties": {
-          "id": {
-            "minimum": 1,
-            "title": "Id",
-            "type": "integer"
-          },
-          "inspection_id": {
-            "minimum": 1,
-            "title": "Inspection Id",
-            "type": "integer"
-          },
-          "reviewer": {
-            "title": "Reviewer",
-            "type": "string"
-          },
-          "previous_decision": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/Destination"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "new_decision": {
-            "$ref": "#/components/schemas/Destination"
-          },
-          "reason": {
-            "title": "Reason",
-            "type": "string"
-          },
-          "created_at": {
-            "format": "date-time",
-            "title": "Created At",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "inspection_id",
-          "reviewer",
-          "previous_decision",
-          "new_decision",
-          "reason",
-          "created_at"
-        ],
-        "title": "ReviewOut",
         "type": "object"
       },
       "Component": {

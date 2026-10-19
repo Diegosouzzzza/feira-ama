@@ -158,6 +158,140 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/machine/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start
+         * @description Arma (se preciso) e liga a operação automática: um ciclo após o outro.
+         */
+        post: operations["start_api_machine_start_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/machine/pause": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pause
+         * @description Termina o ciclo já autorizado e não inicia o próximo.
+         */
+        post: operations["pause_api_machine_pause_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/machine/stop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Stop
+         * @description Parada por software imediata: interrompe o ciclo e desarma.
+         */
+        post: operations["stop_api_machine_stop_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/machine/rearm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rearm
+         * @description Limpa a falha e arma de novo, sem iniciar movimento.
+         */
+        post: operations["rearm_api_machine_rearm_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/inspections/{inspection_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Inspection */
+        get: operations["inspection_api_inspections__inspection_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/inspections/{inspection_id}/image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Inspection Image */
+        get: operations["inspection_image_api_inspections__inspection_id__image_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/inspections/{inspection_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Review
+         * @description Decide uma peça inconclusiva ou corrige uma decisão anterior (sem apagar a previsão).
+         */
+        post: operations["review_api_inspections__inspection_id__review_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/diagnostics/events": {
         parameters: {
             query?: never;
@@ -201,6 +335,11 @@ export interface components {
              */
             trace_id: string;
         };
+        /**
+         * AutoDecision
+         * @enum {string}
+         */
+        AutoDecision: "APPROVED" | "REJECTED" | "REVIEW";
         /** CameraInfo */
         CameraInfo: {
             /**
@@ -265,6 +404,11 @@ export interface components {
          * @enum {string}
          */
         CycleStatus: "running" | "completed" | "aborted";
+        /**
+         * DecidedBy
+         * @enum {string}
+         */
+        DecidedBy: "auto" | "operator";
         /**
          * Destination
          * @enum {string}
@@ -338,6 +482,56 @@ export interface components {
             /** Version */
             version: string;
             mode: components["schemas"]["RunMode"];
+        };
+        /** InspectionOut */
+        InspectionOut: {
+            /** Id */
+            id: number;
+            /** Cycle Id */
+            cycle_id: number;
+            /** Lot Id */
+            lot_id: number;
+            /** Product Id */
+            product_id: string;
+            /**
+             * Captured At
+             * Format: date-time
+             */
+            captured_at: string;
+            /** Image Url */
+            image_url: string;
+            /** Model Id */
+            model_id: string | null;
+            predicted_grade: components["schemas"]["Grade"] | null;
+            /** Scores */
+            scores: {
+                [key: string]: number;
+            } | null;
+            /**
+             * Confidence
+             * @description Confiança estimada do modelo, não taxa de acerto
+             */
+            confidence: number | null;
+            /** Latency Ms */
+            latency_ms: number | null;
+            auto_decision: components["schemas"]["AutoDecision"];
+            review_reason: components["schemas"]["ReviewReason"] | null;
+            final_decision: components["schemas"]["Destination"] | null;
+            decided_by: components["schemas"]["DecidedBy"] | null;
+            cycle_status: components["schemas"]["CycleStatus"];
+        };
+        /** InspectionReviewCreate */
+        InspectionReviewCreate: {
+            /**
+             * Request Id
+             * Format: uuid
+             */
+            request_id: string;
+            decision: components["schemas"]["Destination"];
+            /** Reviewer */
+            reviewer: string;
+            /** Reason */
+            reason: string;
         };
         /** LotCreate */
         LotCreate: {
@@ -432,6 +626,30 @@ export interface components {
             /** Approval Rate Denominator */
             approval_rate_denominator: number;
         };
+        /** MachineCommandRequest */
+        MachineCommandRequest: {
+            /**
+             * Request Id
+             * Format: uuid
+             * @description Repetir o mesmo id devolve o resultado original
+             */
+            request_id: string;
+            /** @description Recusa com INVALID_STATE se o estado atual for outro */
+            expected_state?: components["schemas"]["MachineState"] | null;
+        };
+        /** MachineCommandResult */
+        MachineCommandResult: {
+            /**
+             * Request Id
+             * Format: uuid
+             */
+            request_id: string;
+            /** Accepted */
+            accepted: boolean;
+            /** Duplicate */
+            duplicate: boolean;
+            state: components["schemas"]["MachineState"];
+        };
         /** MachineInfo */
         MachineInfo: {
             /** @description Nulo se a placa nunca respondeu */
@@ -439,6 +657,16 @@ export interface components {
             fault: components["schemas"]["FaultCode"] | null;
             sensors: components["schemas"]["SensorSnapshot"] | null;
             link: components["schemas"]["DeviceLink"];
+            /**
+             * Running
+             * @description Operação automática ativa: novos ciclos são iniciados
+             */
+            running: boolean;
+            /**
+             * Pending Review Inspection Id
+             * @description Inspeção inconclusiva aguardando decisão do operador
+             */
+            pending_review_inspection_id: number | null;
         };
         /**
          * MachineState
@@ -475,6 +703,29 @@ export interface components {
             /** Version */
             version: number;
         };
+        /** ReviewOut */
+        ReviewOut: {
+            /** Id */
+            id: number;
+            /** Inspection Id */
+            inspection_id: number;
+            /** Reviewer */
+            reviewer: string;
+            previous_decision: components["schemas"]["Destination"] | null;
+            new_decision: components["schemas"]["Destination"];
+            /** Reason */
+            reason: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * ReviewReason
+         * @enum {string}
+         */
+        ReviewReason: "LOW_CONFIDENCE" | "AMBIGUOUS" | "INVALID_IMAGE";
         /**
          * RunMode
          * @enum {string}
@@ -535,33 +786,6 @@ export interface components {
             active_lot_summary: components["schemas"]["LotSummary"] | null;
             current_cycle: components["schemas"]["CycleOut"] | null;
         };
-        /** MachineCommandRequest */
-        MachineCommandRequest: {
-            /**
-             * Request Id
-             * Format: uuid
-             * @description Repetir o mesmo id devolve o resultado original
-             */
-            request_id: string;
-            /**
-             * @description Recusa com INVALID_STATE se o estado atual for outro
-             * @default null
-             */
-            expected_state: components["schemas"]["MachineState"] | null;
-        };
-        /** InspectionReviewCreate */
-        InspectionReviewCreate: {
-            /**
-             * Request Id
-             * Format: uuid
-             */
-            request_id: string;
-            decision: components["schemas"]["Destination"];
-            /** Reviewer */
-            reviewer: string;
-            /** Reason */
-            reason: string;
-        };
         /**
          * ModelValidationStatus
          * @enum {string}
@@ -590,71 +814,6 @@ export interface components {
              */
             created_at: string;
         };
-        /** MachineCommandResult */
-        MachineCommandResult: {
-            /**
-             * Request Id
-             * Format: uuid
-             */
-            request_id: string;
-            /** Accepted */
-            accepted: boolean;
-            /** Duplicate */
-            duplicate: boolean;
-            state: components["schemas"]["MachineState"];
-        };
-        /**
-         * AutoDecision
-         * @enum {string}
-         */
-        AutoDecision: "APPROVED" | "REJECTED" | "REVIEW";
-        /**
-         * DecidedBy
-         * @enum {string}
-         */
-        DecidedBy: "auto" | "operator";
-        /**
-         * ReviewReason
-         * @enum {string}
-         */
-        ReviewReason: "LOW_CONFIDENCE" | "AMBIGUOUS" | "INVALID_IMAGE";
-        /** InspectionOut */
-        InspectionOut: {
-            /** Id */
-            id: number;
-            /** Cycle Id */
-            cycle_id: number;
-            /** Lot Id */
-            lot_id: number;
-            /** Product Id */
-            product_id: string;
-            /**
-             * Captured At
-             * Format: date-time
-             */
-            captured_at: string;
-            /** Image Url */
-            image_url: string;
-            /** Model Id */
-            model_id: string | null;
-            predicted_grade: components["schemas"]["Grade"] | null;
-            /** Scores */
-            scores: {
-                [key: string]: number;
-            } | null;
-            /**
-             * Confidence
-             * @description Confiança estimada do modelo, não taxa de acerto
-             */
-            confidence: number | null;
-            /** Latency Ms */
-            latency_ms: number | null;
-            auto_decision: components["schemas"]["AutoDecision"];
-            review_reason: components["schemas"]["ReviewReason"] | null;
-            final_decision: components["schemas"]["Destination"] | null;
-            decided_by: components["schemas"]["DecidedBy"] | null;
-            cycle_status: components["schemas"]["CycleStatus"];
-        };
         /** InspectionPage */
         InspectionPage: {
             /** Items */
@@ -665,24 +824,6 @@ export interface components {
             limit: number;
             /** Offset */
             offset: number;
-        };
-        /** ReviewOut */
-        ReviewOut: {
-            /** Id */
-            id: number;
-            /** Inspection Id */
-            inspection_id: number;
-            /** Reviewer */
-            reviewer: string;
-            previous_decision: components["schemas"]["Destination"] | null;
-            new_decision: components["schemas"]["Destination"];
-            /** Reason */
-            reason: string;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
         };
         /**
          * Component
@@ -1503,6 +1644,323 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LotOut"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    start_api_machine_start_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MachineCommandRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MachineCommandResult"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    pause_api_machine_pause_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MachineCommandRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MachineCommandResult"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    stop_api_machine_stop_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MachineCommandRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MachineCommandResult"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    rearm_api_machine_rearm_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MachineCommandRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MachineCommandResult"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    inspection_api_inspections__inspection_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                inspection_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InspectionOut"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    inspection_image_api_inspections__inspection_id__image_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                inspection_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
+                    "image/jpeg": unknown;
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    review_api_inspections__inspection_id__review_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path: {
+                inspection_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InspectionReviewCreate"];
+            };
+        };
+        responses: {
+            /** @description Mesma solicitação repetida */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewOut"];
+                };
+            };
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewOut"];
                 };
             };
             /** @description Erro da requisição */

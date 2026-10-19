@@ -10,7 +10,16 @@ from amazonvision.config import Settings
 from amazonvision.core.logs import setup_logging
 from amazonvision.http_errors import ERROR_RESPONSES, install_error_handlers
 from amazonvision.openapi import install_openapi
-from amazonvision.routes import control, diagnostics, health, lots, status, ws
+from amazonvision.routes import (
+    control,
+    diagnostics,
+    health,
+    inspections,
+    lots,
+    machine,
+    status,
+    ws,
+)
 from amazonvision.services.container import Services
 from amazonvision.web import mount_web
 
@@ -48,7 +57,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # Rejects requests whose Host is not local (protects against DNS rebinding).
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.allowed_hosts)
     install_error_handlers(app)
-    for router in (health.router, status.router, control.router, lots.router, diagnostics.router):
+    for router in (
+        health.router,
+        status.router,
+        control.router,
+        lots.router,
+        machine.router,
+        inspections.router,
+        diagnostics.router,
+    ):
         app.include_router(router, prefix="/api", responses=ERROR_RESPONSES)
     app.include_router(ws.router, prefix="/api")
     mount_web(app, settings.web_dist)

@@ -1,5 +1,5 @@
 import sqlite3
-from collections.abc import Awaitable, Callable
+from collections.abc import Callable
 from typing import Any
 
 from amazonvision.config import RunMode, Settings
@@ -34,19 +34,23 @@ class LotService:
         settings: Settings,
         db: Database,
         bus: EventBus,
-        machine_busy: Callable[[], Awaitable[bool]] | None = None,
+        machine_busy: Callable[[], bool] | None = None,
+        on_opened: Callable[[LotOut], None] | None = None,
+        on_closed: Callable[[LotOut], None] | None = None,
     ) -> None:
         self._settings = settings
         self._db = db
         self._bus = bus
         self._machine_busy = machine_busy
+        self._on_opened = on_opened
+        self._on_closed = on_closed
 
     async def _ensure_machine_idle(self) -> None:
-        if self._machine_busy is not None and await self._machine_busy():
+        if self._machine_busy is not None and self._machine_busy():
             raise ApiError(
                 ErrorCode.INVALID_STATE,
-                "A máquina está com um ciclo em andamento.",
-                "Aguarde o fim do ciclo ou pare a máquina.",
+                "A máquina está em operação ou com um ciclo em andamento.",
+                "Pause a operação e aguarde o fim do ciclo.",
             )
 
     def _config_snapshot(self, product: sqlite3.Row) -> dict[str, Any]:
@@ -135,6 +139,8 @@ class LotService:
 
         lot, created = await self._db.run(tx)
         if created:
+            if self._on_opened is not None:
+                self._on_opened(lot)
             await self.publish_update(lot)
         return lot, created
 
@@ -172,6 +178,8 @@ class LotService:
 
         lot, changed = await self._db.run(tx)
         if changed:
+            if self._on_closed is not None:
+                self._on_closed(lot)
             await self.publish_update(lot)
         return lot
 

@@ -241,6 +241,10 @@ class MachineInfo(BaseModel):
     fault: FaultCode | None
     sensors: SensorSnapshot | None
     link: DeviceLink
+    running: bool = Field(description="Operação automática ativa: novos ciclos são iniciados")
+    pending_review_inspection_id: int | None = Field(
+        description="Inspeção inconclusiva aguardando decisão do operador"
+    )
 
 
 class CameraInfo(BaseModel):

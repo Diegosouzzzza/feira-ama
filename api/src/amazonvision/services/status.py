@@ -1,21 +1,15 @@
 import shutil
 import sqlite3
 
+from amazonvision.camera.base import Camera
 from amazonvision.config import Settings
 from amazonvision.core.clock import utc_now
 from amazonvision.core.control import ControlManager
-from amazonvision.schemas.api import (
-    CameraInfo,
-    DeviceLink,
-    LotOut,
-    LotSummary,
-    MachineInfo,
-    ModelInfo,
-    StorageInfo,
-    SystemStatus,
-)
+from amazonvision.machine.coordinator import Coordinator
+from amazonvision.schemas.api import LotOut, LotSummary, StorageInfo, SystemStatus
 from amazonvision.storage.db import Database
 from amazonvision.storage.lots import get_open_lot, get_summary
+from amazonvision.vision.classifier import ModelManager
 
 
 def _read_active_lot(conn: sqlite3.Connection) -> tuple[LotOut | None, LotSummary | None]:
@@ -24,10 +18,21 @@ def _read_active_lot(conn: sqlite3.Connection) -> tuple[LotOut | None, LotSummar
 
 
 class StatusService:
-    def __init__(self, settings: Settings, db: Database, control: ControlManager) -> None:
+    def __init__(
+        self,
+        settings: Settings,
+        db: Database,
+        control: ControlManager,
+        coordinator: Coordinator,
+        camera: Camera,
+        models: ModelManager,
+    ) -> None:
         self._settings = settings
         self._db = db
         self._control = control
+        self._coordinator = coordinator
+        self._camera = camera
+        self._models = models
 
     def storage_info(self) -> StorageInfo:
         if not self._db.healthy:
@@ -42,30 +47,17 @@ class StatusService:
     async def build(self, state_version: int) -> SystemStatus:
         lot, summary = await self._db.run(_read_active_lot)
         holder = self._control.holder
-        # Machine, camera and model are reported as absent until their components exist
-        # (Blocks 4, 7 and 8): never claim a connection that was not observed.
         return SystemStatus(
             mode=self._settings.mode,
             generated_at=utc_now(),
             state_version=state_version,
-            machine=MachineInfo(
-                state=None,
-                fault=None,
-                sensors=None,
-                link=DeviceLink(
-                    connected=False,
-                    port=None,
-                    boot_id=None,
-                    firmware_version=None,
-                    last_seen_at=None,
-                ),
-            ),
-            camera=CameraInfo(status="unavailable", source=None, last_frame_at=None),
-            model=ModelInfo(status="not_loaded", model_id=None, product_id=None),
+            machine=self._coordinator.machine_info(),
+            camera=self._camera.info(),
+            model=self._models.info(),
             storage=self.storage_info(),
             control_locked=holder is not None,
             control_holder=holder,
             active_lot=lot,
             active_lot_summary=summary,
-            current_cycle=None,
+            current_cycle=await self._coordinator.current_cycle(),
         )

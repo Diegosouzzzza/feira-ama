@@ -55,7 +55,7 @@ pio device monitor      # monitor serial (115200)
 
 ## Situação
 
-Blocos 1 (fundação), 2 (contratos) e 3 (núcleo da API: banco, lotes, controle de operador, WebSocket) concluídos. Plano completo e auditoria: `Plano_Inicio_Projeto_AmazonVision.md` na pasta da feira. Decisões em `docs/adr/`, pendências em `docs/pendencias.md`.
+Blocos 1 (fundação), 2 (contratos), 3 (núcleo da API) e 4 (coordenador do ciclo com bancada simulada) concluídos. No modo simulado, o sistema já executa ciclos completos: placa ESP32, câmera e classificador simulados, revisão de inconclusivos e tratamento de falhas. A tela de operação entra no Bloco 5. Plano completo e auditoria: `Plano_Inicio_Projeto_AmazonVision.md` na pasta da feira. Decisões em `docs/adr/`, pendências em `docs/pendencias.md`.
 
 | Contrato | Documento | Código |
 |---|---|---|

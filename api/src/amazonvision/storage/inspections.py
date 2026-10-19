@@ -93,6 +93,21 @@ def get_inspection(conn: sqlite3.Connection, inspection_id: int) -> InspectionOu
     return _to_inspection(row) if row else None
 
 
+def list_inspections(
+    conn: sqlite3.Connection, *, lot_id: int | None, limit: int, offset: int
+) -> tuple[list[InspectionOut], int]:
+    where, params = ("WHERE c.lot_id = ?", [lot_id]) if lot_id is not None else ("", [])
+    total = conn.execute(
+        f"SELECT COUNT(*) FROM inspections i JOIN cycles c ON c.id = i.cycle_id {where}",  # noqa: S608
+        params,
+    ).fetchone()[0]
+    rows = conn.execute(
+        f"{_SELECT} {where} ORDER BY i.id DESC LIMIT ? OFFSET ?",  # noqa: S608
+        [*params, limit, offset],
+    ).fetchall()
+    return [_to_inspection(r) for r in rows], total
+
+
 def get_inspection_by_cycle(conn: sqlite3.Connection, cycle_id: int) -> InspectionOut | None:
     row = conn.execute(_SELECT + " WHERE i.cycle_id = ?", (cycle_id,)).fetchone()
     return _to_inspection(row) if row else None

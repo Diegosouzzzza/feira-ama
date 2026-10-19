@@ -238,6 +238,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/inspections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Inspections Route
+         * @description Mais recentes primeiro. Filtros de período, classe e decisão entram no Bloco 9.
+         */
+        get: operations["list_inspections_route_api_inspections_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/inspections/{inspection_id}": {
         parameters: {
             query?: never;
@@ -520,6 +540,17 @@ export interface components {
             decided_by: components["schemas"]["DecidedBy"] | null;
             cycle_status: components["schemas"]["CycleStatus"];
         };
+        /** InspectionPage */
+        InspectionPage: {
+            /** Items */
+            items: components["schemas"]["InspectionOut"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+        };
         /** InspectionReviewCreate */
         InspectionReviewCreate: {
             /**
@@ -655,6 +686,16 @@ export interface components {
             /** @description Nulo se a placa nunca respondeu */
             state: components["schemas"]["MachineState"] | null;
             fault: components["schemas"]["FaultCode"] | null;
+            /**
+             * Fault Message
+             * @description Texto da falha para o operador
+             */
+            fault_message?: string | null;
+            /**
+             * Fault Recovery
+             * @description Ação sugerida para a falha
+             */
+            fault_recovery?: string | null;
             sensors: components["schemas"]["SensorSnapshot"] | null;
             link: components["schemas"]["DeviceLink"];
             /**
@@ -813,17 +854,6 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
-        };
-        /** InspectionPage */
-        InspectionPage: {
-            /** Items */
-            items: components["schemas"]["InspectionOut"][];
-            /** Total */
-            total: number;
-            /** Limit */
-            limit: number;
-            /** Offset */
-            offset: number;
         };
         /**
          * Component
@@ -1824,6 +1854,48 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MachineCommandResult"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    list_inspections_route_api_inspections_get: {
+        parameters: {
+            query?: {
+                lot_id?: number | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InspectionPage"];
                 };
             };
             /** @description Erro da requisição */

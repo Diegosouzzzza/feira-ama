@@ -1,9 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "@fontsource-variable/inter";
+@import "@fontsource-variable/archivo/wdth.css";
 
 :root {
-  --radius: 0.75rem;
+  --radius: 0.5rem;
 
   /* AmazonVision palette (spec §21) */
   --background: #f4f6f2;
@@ -43,7 +43,7 @@
 }
 
 @theme inline {
-  --font-sans: "Inter Variable", "Segoe UI", system-ui, sans-serif;
+  --font-sans: "Archivo Variable", "Segoe UI", system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -89,8 +89,47 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-feature-settings: "tnum" 1;
+    font-variant-numeric: tabular-nums;
   }
+  :focus-visible {
+    outline: 3px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+/* Expanded heavy Archivo: grade letters and large figures, read from a distance. */
+@utility font-display {
+  font-stretch: 125%;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+}
+
+/* Slightly wide Archivo for headings and labels. */
+@utility font-wide {
+  font-stretch: 112%;
+}
+
+/* Fair mode surfaces (dark brand green). */
+.feira {
+  --background: #0d241c;
+  --foreground: #eef5ef;
+  --card: #133126;
+  --card-foreground: #eef5ef;
+  --muted: #1a3a2e;
+  --muted-foreground: #a9c2b3;
+  --border: #23493a;
+  --grade-a: #47d18e;
+  --grade-a-soft: #173f2d;
+  --grade-b: #f2b34c;
+  --grade-b-soft: #3d3016;
+  --grade-c: #ff7a6b;
+  --grade-c-soft: #43211d;
+  --review: #9fb3ff;
+  --review-soft: #232c4d;
+  --fault: #ff8f8f;
+  --fault-soft: #4a1b1b;
+  --stale: #8a9a90;
 }
 
 @media (prefers-reduced-motion: reduce) {

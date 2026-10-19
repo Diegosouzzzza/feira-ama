@@ -5,7 +5,7 @@ import struct
 import zlib
 from functools import lru_cache
 
-WIDTH, HEIGHT = 240, 180
+WIDTH, HEIGHT = 400, 300
 
 _BELT = (214, 209, 196)
 _BELT_STRIPE = (204, 199, 186)
@@ -37,23 +37,30 @@ def render(drawn_as: str, variant: int) -> bytes:
     """Belt with one item drawn as grade A/B/C, or an empty belt ('empty')."""
     rng = random.Random(f"{drawn_as}-{variant}")
     style = _STYLES.get(drawn_as)
-    cx = WIDTH / 2 + rng.uniform(-12, 12)
-    cy = HEIGHT / 2 + rng.uniform(-8, 8)
+    k = WIDTH / 240  # item geometry is specified for a 240 px wide frame
+    cx = WIDTH / 2 + rng.uniform(-12, 12) * k
+    cy = HEIGHT / 2 + rng.uniform(-8, 8) * k
     spots = (
         [
-            (cx + rng.uniform(-30, 30), cy + rng.uniform(-18, 18), rng.uniform(5, 9))
+            (
+                cx + rng.uniform(-30, 30) * k,
+                cy + rng.uniform(-18, 18) * k,
+                rng.uniform(5, 9) * k,
+            )
             for _ in range(style["spots"])
         ]
         if style
         else []
     )
+    rx, ry = (style["rx"] * k, style["ry"] * k) if style else (1.0, 1.0)
+    stripe = int(12 * k)
     rows = []
     for y in range(HEIGHT):
         row = bytearray()
         for x in range(WIDTH):
-            color = _BELT_STRIPE if (x // 12) % 2 else _BELT
+            color = _BELT_STRIPE if (x // stripe) % 2 else _BELT
             if style:
-                dx, dy = (x - cx) / style["rx"], (y - cy) / style["ry"]
+                dx, dy = (x - cx) / rx, (y - cy) / ry
                 d = dx * dx + dy * dy
                 if d <= 1.0:
                     shade = 1.0 - 0.35 * d

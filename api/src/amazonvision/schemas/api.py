@@ -239,6 +239,8 @@ class DeviceLink(BaseModel):
 class MachineInfo(BaseModel):
     state: MachineState | None = Field(description="Nulo se a placa nunca respondeu")
     fault: FaultCode | None
+    fault_message: str | None = Field(default=None, description="Texto da falha para o operador")
+    fault_recovery: str | None = Field(default=None, description="Ação sugerida para a falha")
     sensors: SensorSnapshot | None
     link: DeviceLink
     running: bool = Field(description="Operação automática ativa: novos ciclos são iniciados")

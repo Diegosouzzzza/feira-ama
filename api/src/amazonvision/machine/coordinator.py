@@ -264,9 +264,12 @@ class Coordinator:
         pending = None
         if self.cycle is not None and self.cycle.awaiting_review:
             pending = self.cycle.inspection_id
+        fault_text = FAULT_TEXT.get(self.fault) if self.fault else None
         return MachineInfo(
             state=self.state,
             fault=self.fault,
+            fault_message=fault_text[0] if fault_text else None,
+            fault_recovery=fault_text[1] if fault_text else None,
             sensors=self.sensors,
             link=DeviceLink(
                 connected=self.connected,

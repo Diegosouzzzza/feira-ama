@@ -890,6 +890,90 @@
         }
       }
     },
+    "/api/inspections": {
+      "get": {
+        "tags": [
+          "inspeções"
+        ],
+        "summary": "List Inspections Route",
+        "description": "Mais recentes primeiro. Filtros de período, classe e decisão entram no Bloco 9.",
+        "operationId": "list_inspections_route_api_inspections_get",
+        "parameters": [
+          {
+            "name": "lot_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lot Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionPage"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/inspections/{inspection_id}": {
       "get": {
         "tags": [
@@ -1768,6 +1852,41 @@
         ],
         "title": "InspectionOut"
       },
+      "InspectionPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/InspectionOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "maximum": 200.0,
+            "minimum": 1.0,
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "InspectionPage"
+      },
       "InspectionReviewCreate": {
         "properties": {
           "request_id": {
@@ -2098,6 +2217,30 @@
                 "type": "null"
               }
             ]
+          },
+          "fault_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fault Message",
+            "description": "Texto da falha para o operador"
+          },
+          "fault_recovery": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fault Recovery",
+            "description": "Ação sugerida para a falha"
           },
           "sensors": {
             "anyOf": [
@@ -2551,41 +2694,6 @@
           "created_at"
         ],
         "title": "ModelOut",
-        "type": "object"
-      },
-      "InspectionPage": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/InspectionOut"
-            },
-            "title": "Items",
-            "type": "array"
-          },
-          "total": {
-            "minimum": 0,
-            "title": "Total",
-            "type": "integer"
-          },
-          "limit": {
-            "maximum": 200,
-            "minimum": 1,
-            "title": "Limit",
-            "type": "integer"
-          },
-          "offset": {
-            "minimum": 0,
-            "title": "Offset",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "items",
-          "total",
-          "limit",
-          "offset"
-        ],
-        "title": "InspectionPage",
         "type": "object"
       },
       "Component": {

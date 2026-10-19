@@ -112,6 +112,11 @@ def test_approved_cycle_end_to_end(bench: TestClient, operator):
     assert inspection["cycle_status"] == "completed"
     assert inspection["confidence"] == pytest.approx(0.92)
 
+    page = bench.get(f"/api/inspections?lot_id={lot['id']}").json()
+    assert page["total"] == 1
+    assert page["items"] == [inspection]
+    assert bench.get("/api/inspections?lot_id=999").json()["total"] == 0
+
     image = bench.get(inspection["image_url"])
     assert image.status_code == 200
     assert image.headers["content-type"] == "image/png"
@@ -289,6 +294,8 @@ def test_missing_s1_faults_then_rearm_without_motion(bench: TestClient, operator
     machine(bench, operator, "start")
     faulted = wait_for(bench, lambda s: s["machine"]["state"] == "FAULT")
     assert faulted["machine"]["fault"] == "S1_TIMEOUT"
+    assert "S1" in faulted["machine"]["fault_message"]
+    assert faulted["machine"]["fault_recovery"]
     final = wait_for(bench, idle)
     assert final["active_lot_summary"]["cycles_aborted"] == 1
 

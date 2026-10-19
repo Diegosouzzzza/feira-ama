@@ -20,7 +20,10 @@ async def create_lot(
     body: LotCreate, services: ServicesDep, _: ControlDep, response: Response
 ) -> LotOut:
     lot, created = await services.lots.create(body)
-    if not created:
+    if created:
+        # The product's model was loaded: a change outside the event stream.
+        await services.resync_all()
+    else:
         response.status_code = status.HTTP_200_OK
     return lot
 
@@ -47,4 +50,6 @@ async def lot_summary(lot_id: LotId, services: ServicesDep) -> LotSummary:
 
 @router.post("/{lot_id}/close", response_model=LotOut)
 async def close_lot(lot_id: LotId, services: ServicesDep, grant: ControlDep) -> LotOut:
-    return await services.lots.close(lot_id, grant.operator)
+    lot = await services.lots.close(lot_id, grant.operator)
+    await services.resync_all()
+    return lot

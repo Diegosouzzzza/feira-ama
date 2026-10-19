@@ -14,13 +14,19 @@ def save_image(
     target.parent.mkdir(parents=True, exist_ok=True)
     if target.exists():
         raise FileExistsError(f"imagem do ciclo {cycle_id} já existe")
+    write_atomic(target, data)
+    return relative.as_posix(), hashlib.sha256(data).hexdigest()
+
+
+def write_atomic(target: Path, data: bytes) -> None:
+    """Write to a temporary file, flush to disk, then rename: readers never see a partial file."""
+    target.parent.mkdir(parents=True, exist_ok=True)
     temporary = target.with_suffix(target.suffix + ".tmp")
     with open(temporary, "wb") as handle:
         handle.write(data)
         handle.flush()
         os.fsync(handle.fileno())
     os.replace(temporary, target)
-    return relative.as_posix(), hashlib.sha256(data).hexdigest()
 
 
 def resolve_image(data_root: Path, relative: str) -> Path | None:

@@ -4,7 +4,13 @@ from dataclasses import dataclass
 
 from amazonvision.core.clock import from_db
 from amazonvision.domain.quality import AutoDecision, Destination, Grade, ReviewReason
-from amazonvision.schemas.api import CycleStatus, DecidedBy, InspectionOut, ReviewOut
+from amazonvision.schemas.api import (
+    CycleStatus,
+    DecidedBy,
+    InspectionOut,
+    InspectionOutcome,
+    ReviewOut,
+)
 
 _SELECT = """
 SELECT i.*, c.lot_id AS lot_id, c.status AS cycle_status, l.product_id AS product_id
@@ -93,12 +99,50 @@ def get_inspection(conn: sqlite3.Connection, inspection_id: int) -> InspectionOu
     return _to_inspection(row) if row else None
 
 
+@dataclass(frozen=True)
+class InspectionFilters:
+    lot_id: int | None = None
+    product_id: str | None = None
+    grade: Grade | None = None
+    outcome: InspectionOutcome | None = None
+    captured_from: str | None = None  # database timestamps (UTC)
+    captured_to: str | None = None
+
+
+_OUTCOME_SQL: dict[InspectionOutcome, str] = {
+    InspectionOutcome.APPROVED: "i.final_decision = 'APPROVED'",
+    InspectionOutcome.REJECTED: "i.final_decision = 'REJECTED'",
+    InspectionOutcome.PENDING_REVIEW: "i.auto_decision = 'REVIEW' AND i.final_decision IS NULL",
+    InspectionOutcome.INCONCLUSIVE: "i.auto_decision = 'REVIEW'",
+    InspectionOutcome.REVIEWED: "i.decided_by = 'operator'",
+}
+
+
+def _where(filters: InspectionFilters) -> tuple[str, list[object]]:
+    clauses: list[str] = []
+    params: list[object] = []
+    for clause, value in (
+        ("c.lot_id = ?", filters.lot_id),
+        ("l.product_id = ?", filters.product_id),
+        ("i.predicted_grade = ?", filters.grade.value if filters.grade else None),
+        ("i.captured_at >= ?", filters.captured_from),
+        ("i.captured_at < ?", filters.captured_to),
+    ):
+        if value is not None:
+            clauses.append(clause)
+            params.append(value)
+    if filters.outcome is not None:
+        clauses.append(_OUTCOME_SQL[filters.outcome])
+    return (f"WHERE {' AND '.join(clauses)}" if clauses else ""), params
+
+
 def list_inspections(
-    conn: sqlite3.Connection, *, lot_id: int | None, limit: int, offset: int
+    conn: sqlite3.Connection, filters: InspectionFilters, *, limit: int, offset: int
 ) -> tuple[list[InspectionOut], int]:
-    where, params = ("WHERE c.lot_id = ?", [lot_id]) if lot_id is not None else ("", [])
+    where, params = _where(filters)
     total = conn.execute(
-        f"SELECT COUNT(*) FROM inspections i JOIN cycles c ON c.id = i.cycle_id {where}",  # noqa: S608
+        "SELECT COUNT(*) FROM inspections i JOIN cycles c ON c.id = i.cycle_id "  # noqa: S608
+        f"JOIN lots l ON l.id = c.lot_id {where}",
         params,
     ).fetchone()[0]
     rows = conn.execute(
@@ -106,6 +150,15 @@ def list_inspections(
         [*params, limit, offset],
     ).fetchall()
     return [_to_inspection(r) for r in rows], total
+
+
+def export_rows(conn: sqlite3.Connection, filters: InspectionFilters) -> list[sqlite3.Row]:
+    """Every matching inspection, oldest first, with what the CSV export shows."""
+    where, params = _where(filters)
+    return conn.execute(
+        f"{_SELECT} {where} ORDER BY i.id",  # noqa: S608
+        params,
+    ).fetchall()
 
 
 def get_inspection_by_cycle(conn: sqlite3.Connection, cycle_id: int) -> InspectionOut | None:

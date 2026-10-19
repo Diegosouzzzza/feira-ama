@@ -2,7 +2,7 @@
 
 import time
 import uuid
-from collections.abc import Callable, Iterator
+from collections.abc import Callable
 from typing import Any
 
 import pytest
@@ -13,19 +13,6 @@ from amazonvision.domain.quality import Grade
 from amazonvision.main import create_app
 from amazonvision.services.container import Simulation
 from amazonvision.simulation.scenario import confident, invalid_image, uncertain
-
-
-@pytest.fixture
-def bench(settings: Settings) -> Iterator[TestClient]:
-    fast = settings.model_copy(update={"sim_speed": 50.0, "device_silence_ms": 1500})
-    with TestClient(create_app(fast)) as client:
-        yield client
-
-
-@pytest.fixture
-def operator(bench: TestClient) -> dict[str, str]:
-    token = bench.post("/api/control/claim", json={"operator": "Ana"}).json()["token"]
-    return {"X-Control-Token": token}
 
 
 def sim(client: TestClient) -> Simulation:

@@ -43,15 +43,27 @@ export function apiGet<T>(path: string, init?: RequestInit): Promise<T> {
   return request<T>(path, { ...init, headers: { Accept: "application/json" } });
 }
 
-export function apiPost<T>(path: string, body?: unknown, token?: string | null): Promise<T> {
+function send<T>(method: string, path: string, body: unknown, token: string | null | undefined): Promise<T> {
   const headers: Record<string, string> = {
     Accept: "application/json",
     "Content-Type": "application/json",
   };
   if (token) headers["X-Control-Token"] = token;
   return request<T>(path, {
-    method: "POST",
+    method,
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),
   });
+}
+
+export function apiPost<T>(path: string, body?: unknown, token?: string | null): Promise<T> {
+  return send<T>("POST", path, body, token);
+}
+
+export function apiPatch<T>(path: string, body: unknown, token?: string | null): Promise<T> {
+  return send<T>("PATCH", path, body, token);
+}
+
+export function apiPut<T>(path: string, body: unknown, token?: string | null): Promise<T> {
+  return send<T>("PUT", path, body, token);
 }

@@ -1,7 +1,12 @@
 from fastapi import APIRouter
 
 from amazonvision.routes.deps import ControlDep, ServicesDep
-from amazonvision.schemas.api import MachineCommandRequest, MachineCommandResult
+from amazonvision.schemas.api import (
+    MachineCommandRequest,
+    MachineCommandResult,
+    MotorTestRequest,
+    ServoTestRequest,
+)
 
 router = APIRouter(prefix="/machine", tags=["máquina"])
 
@@ -47,4 +52,56 @@ async def rearm(
     result = await services.coordinator.execute("rearm", body.request_id, body.expected_state)
     if not result.duplicate:
         await services.record("MACHINE_REARM", data={"operator": grant.operator})
+    return result
+
+
+@router.post("/maintenance/enter", response_model=MachineCommandResult)
+async def maintenance_enter(
+    body: MachineCommandRequest, services: ServicesDep, grant: ControlDep
+) -> MachineCommandResult:
+    """Modo manutenção: libera os testes manuais de motor e servo. Exige a esteira parada."""
+    result = await services.coordinator.execute(
+        "maintenance_enter", body.request_id, body.expected_state
+    )
+    if not result.duplicate:
+        await services.record("MAINTENANCE_ENTER", data={"operator": grant.operator})
+    return result
+
+
+@router.post("/maintenance/exit", response_model=MachineCommandResult)
+async def maintenance_exit(
+    body: MachineCommandRequest, services: ServicesDep, grant: ControlDep
+) -> MachineCommandResult:
+    result = await services.coordinator.execute(
+        "maintenance_exit", body.request_id, body.expected_state
+    )
+    if not result.duplicate:
+        await services.record("MAINTENANCE_EXIT", data={"operator": grant.operator})
+    return result
+
+
+@router.post("/maintenance/test-motor", response_model=MachineCommandResult)
+async def test_motor(
+    body: MotorTestRequest, services: ServicesDep, grant: ControlDep
+) -> MachineCommandResult:
+    """Liga a esteira pelo tempo pedido (só em manutenção)."""
+    result = await services.coordinator.execute(
+        "test_motor", body.request_id, None, {"run_ms": body.run_ms}
+    )
+    if not result.duplicate:
+        await services.record(
+            "TEST_MOTOR", data={"operator": grant.operator, "run_ms": body.run_ms}
+        )
+    return result
+
+
+@router.post("/maintenance/test-servo", response_model=MachineCommandResult)
+async def test_servo(
+    body: ServoTestRequest, services: ServicesDep, grant: ControlDep
+) -> MachineCommandResult:
+    """Move o servo ao ângulo pedido e volta ao repouso (só em manutenção)."""
+    params = {"angle_deg": body.angle_deg, "hold_ms": body.hold_ms}
+    result = await services.coordinator.execute("test_servo", body.request_id, None, params)
+    if not result.duplicate:
+        await services.record("TEST_SERVO", data={"operator": grant.operator, **params})
     return result

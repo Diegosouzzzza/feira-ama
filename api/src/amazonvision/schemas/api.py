@@ -10,6 +10,7 @@ from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StringConstrai
 from amazonvision.config import RunMode
 from amazonvision.domain.machine import FaultCode, MachineState
 from amazonvision.domain.quality import AutoDecision, Destination, Grade, ReviewReason
+from amazonvision.machine.protocol import ConfigurePayload
 
 DbId = Annotated[int, Field(ge=1)]
 ProductId = Annotated[str, StringConstraints(pattern=r"^[a-z][a-z0-9_]{1,31}$")]
@@ -187,6 +188,14 @@ class InspectionOut(BaseModel):
     cycle_status: CycleStatus
 
 
+class InspectionOutcome(StrEnum):
+    APPROVED = "approved"  # final decision: approved
+    REJECTED = "rejected"  # final decision: rejected
+    PENDING_REVIEW = "pending_review"  # inconclusive, still waiting for the operator
+    INCONCLUSIVE = "inconclusive"  # sent to review by the policy (decided or not)
+    REVIEWED = "reviewed"  # decided or corrected by a person
+
+
 class InspectionReviewCreate(_In):
     request_id: UUID
     decision: Destination
@@ -297,3 +306,117 @@ class SystemStatus(BaseModel):
     active_lot: LotOut | None
     active_lot_summary: LotSummary | None
     current_cycle: CycleOut | None
+
+
+# ---------------------------------------------------------------- photo collection (dataset)
+
+# Ends up in file names and in the training manifest: letters, digits, "-" and "_" only.
+CollectionTag = Annotated[str, StringConstraints(pattern=r"^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$")]
+
+
+class SampleStatus(StrEnum):
+    PENDING = "pending"  # photographed, not labeled yet
+    LABELED = "labeled"
+    AMBIGUOUS = "ambiguous"  # the team could not agree: kept out of training
+    UNUSABLE = "unusable"  # blurred, cut off, wrong piece: kept out of training
+
+
+class DatasetCapture(_In):
+    product_id: ProductId
+    physical_sample_id: CollectionTag = Field(description="Etiqueta da peça física (ex.: T-0042)")
+    collection_session: CollectionTag = Field(
+        description="Sessão de coleta (ex.: 2026-10-19-manha)"
+    )
+    label: Grade | None = Field(default=None, description="Vazio: rotular depois")
+
+
+class DatasetSampleOut(BaseModel):
+    id: DbId
+    product_id: ProductId
+    physical_sample_id: str
+    collection_session: str
+    image_url: str
+    label: Grade | None
+    label_author: str | None
+    status: SampleStatus
+    reviewed_by: str | None
+    created_at: AwareDatetime
+    updated_at: AwareDatetime
+
+
+class DatasetSampleUpdate(_In):
+    status: SampleStatus
+    label: Grade | None = Field(default=None, description="Obrigatório quando status = labeled")
+
+
+class DatasetSamplePage(BaseModel):
+    items: list[DatasetSampleOut]
+    total: int = Field(ge=0)
+    limit: int = Field(ge=1, le=200)
+    offset: int = Field(ge=0)
+
+
+class DatasetClassCount(BaseModel):
+    label: Grade
+    photos: int = Field(ge=0)
+    pieces: int = Field(ge=0, description="Peças físicas distintas")
+
+
+class DatasetSummary(BaseModel):
+    product_id: ProductId
+    target_photos_per_class: int
+    classes: list[DatasetClassCount]
+    pending: int = Field(ge=0)
+    ambiguous: int = Field(ge=0)
+    unusable: int = Field(ge=0)
+    total: int = Field(ge=0)
+
+
+class DatasetExport(_In):
+    product_id: ProductId
+
+
+class DatasetExportOut(BaseModel):
+    product_id: ProductId
+    manifest_path: str = Field(description="Arquivo CSV no formato do treinamento")
+    photos: int = Field(ge=0)
+    pieces: int = Field(ge=0)
+    command: str = Field(description="Comando para treinar a partir deste manifesto")
+
+
+# ---------------------------------------------------------------- product configuration
+
+
+class ProductConfigOut(BaseModel):
+    product: ProductOut
+    bench: ConfigurePayload = Field(description="Tempos e posições da bancada")
+    bench_is_default: bool = Field(
+        description="Ainda não calibrado: valores de partida da bancada simulada. No modo real a "
+        "bancada só arma depois que uma calibração for salva"
+    )
+    editable: bool
+    locked_reason: str | None = Field(description="Por que não pode ser alterado agora")
+
+
+class ProductConfigUpdate(_In):
+    expected_version: int = Field(ge=1, description="Versão lida; outra versão → CONFLICT")
+    presentation: Annotated[str, StringConstraints(strip_whitespace=True, max_length=60)] | None = (
+        None
+    )
+    # Same range the training searches when calibrating (training/evaluate.py).
+    decision_threshold: float = Field(ge=0.4, le=0.99)
+    bench: ConfigurePayload
+
+
+# ---------------------------------------------------------------- maintenance
+
+
+class MotorTestRequest(_In):
+    request_id: UUID
+    run_ms: int = Field(ge=100, le=5_000, description="Tempo com o motor ligado")
+
+
+class ServoTestRequest(_In):
+    request_id: UUID
+    angle_deg: int = Field(ge=0, le=180)
+    hold_ms: int = Field(ge=0, le=5_000, description="Tempo na posição antes de voltar ao repouso")

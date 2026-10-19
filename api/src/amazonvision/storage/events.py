@@ -42,13 +42,29 @@ def add_event(
 
 
 def list_events(
-    conn: sqlite3.Connection, *, limit: int, offset: int, severity: Severity | None = None
+    conn: sqlite3.Connection,
+    *,
+    limit: int,
+    offset: int,
+    severity: Severity | None = None,
+    source: EventSource | None = None,
+    type: str | None = None,
+    lot_id: int | None = None,
 ) -> list[EventOut]:
     sql = "SELECT * FROM events"
+    where: list[str] = []
     params: list[Any] = []
-    if severity is not None:
-        sql += " WHERE severity = ?"
-        params.append(severity.value)
+    for clause, value in (
+        ("severity = ?", severity.value if severity else None),
+        ("source = ?", source.value if source else None),
+        ("type = ?", type),
+        ("lot_id = ?", lot_id),
+    ):
+        if value is not None:
+            where.append(clause)
+            params.append(value)
+    if where:
+        sql += " WHERE " + " AND ".join(where)
     sql += " ORDER BY id DESC LIMIT ? OFFSET ?"
     params += [limit, offset]
     return [

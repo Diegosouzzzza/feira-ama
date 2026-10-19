@@ -55,6 +55,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/products/{product_id}/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Product Config */
+        get: operations["product_config_api_products__product_id__config_get"];
+        /**
+         * Update Product Config
+         * @description Salva o perfil do produto. Vale a partir do próximo lote; recusado em operação.
+         */
+        put: operations["update_product_config_api_products__product_id__config_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/control/claim": {
         parameters: {
             query?: never;
@@ -238,6 +259,83 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/machine/maintenance/enter": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Maintenance Enter
+         * @description Modo manutenção: libera os testes manuais de motor e servo. Exige a esteira parada.
+         */
+        post: operations["maintenance_enter_api_machine_maintenance_enter_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/machine/maintenance/exit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Maintenance Exit */
+        post: operations["maintenance_exit_api_machine_maintenance_exit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/machine/maintenance/test-motor": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Test Motor
+         * @description Liga a esteira pelo tempo pedido (só em manutenção).
+         */
+        post: operations["test_motor_api_machine_maintenance_test_motor_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/machine/maintenance/test-servo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Test Servo
+         * @description Move o servo ao ângulo pedido e volta ao repouso (só em manutenção).
+         */
+        post: operations["test_servo_api_machine_maintenance_test_servo_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/models": {
         parameters: {
             query?: never;
@@ -341,7 +439,7 @@ export interface paths {
         };
         /**
          * List Inspections Route
-         * @description Mais recentes primeiro. Filtros de período, classe e decisão entram no Bloco 9.
+         * @description Mais recentes primeiro. Período em `from` (inclusive) e `to` (exclusivo).
          */
         get: operations["list_inspections_route_api_inspections_get"];
         put?: never;
@@ -423,6 +521,180 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/camera/snapshot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Snapshot
+         * @description Imagem mais recente da câmera (visualização; não é uma foto de inspeção).
+         */
+        get: operations["snapshot_api_camera_snapshot_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/camera/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Stream
+         * @description Vídeo ao vivo (MJPEG). Canal separado das mensagens de estado da máquina.
+         */
+        get: operations["stream_api_camera_stream_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dataset/capture": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Capture
+         * @description Fotografa a peça parada sob a câmera e guarda a foto na coleta de treinamento.
+         */
+        post: operations["capture_api_dataset_capture_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dataset/samples": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Samples */
+        get: operations["list_samples_api_dataset_samples_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dataset/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Summary
+         * @description Fotos e peças físicas por classe, comparadas com a meta de treinamento.
+         */
+        get: operations["summary_api_dataset_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dataset/samples/{sample_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Sample
+         * @description Rotula, corrige a classe ou separa a foto como ambígua ou inutilizável.
+         */
+        patch: operations["update_sample_api_dataset_samples__sample_id__patch"];
+        trace?: never;
+    };
+    "/api/dataset/samples/{sample_id}/image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Sample Image */
+        get: operations["sample_image_api_dataset_samples__sample_id__image_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dataset/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Export
+         * @description Gera o manifesto CSV das fotos rotuladas, no formato lido pelo treinamento.
+         */
+        post: operations["export_api_dataset_export_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/exports/inspections.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Inspections Csv
+         * @description Histórico em CSV (UTF-8 com BOM, separador ";"), com os mesmos filtros da listagem.
+         */
+        get: operations["inspections_csv_api_exports_inspections_csv_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -465,6 +737,38 @@ export interface components {
             source: string | null;
             /** Last Frame At */
             last_frame_at: string | null;
+        };
+        /**
+         * ConfigurePayload
+         * @description Bench timing and actuator parameters. All values are calibrated per profile.
+         */
+        ConfigurePayload: {
+            /** Sensor Debounce Ms */
+            sensor_debounce_ms: number;
+            /** S1 Timeout Ms */
+            s1_timeout_ms: number;
+            /** Settle Ms */
+            settle_ms: number;
+            /** Decision Timeout Ms */
+            decision_timeout_ms: number;
+            /** S2 Timeout Ms */
+            s2_timeout_ms: number;
+            /** Servo Rest Deg */
+            servo_rest_deg: number;
+            /** Servo Reject Deg */
+            servo_reject_deg: number;
+            /** Reject Hold Ms */
+            reject_hold_ms: number;
+            /** Reject Motor Ms */
+            reject_motor_ms: number;
+            /** Release Ms */
+            release_ms: number;
+            /** Release Max Ms */
+            release_max_ms: number;
+            /** Link Timeout Ms */
+            link_timeout_ms: number;
+            /** Motor Power Pct */
+            motor_power_pct?: number | null;
         };
         /** ControlClaim */
         ControlClaim: {
@@ -518,6 +822,121 @@ export interface components {
          * @enum {string}
          */
         CycleStatus: "running" | "completed" | "aborted";
+        /** DatasetCapture */
+        DatasetCapture: {
+            /** Product Id */
+            product_id: string;
+            /**
+             * Physical Sample Id
+             * @description Etiqueta da peça física (ex.: T-0042)
+             */
+            physical_sample_id: string;
+            /**
+             * Collection Session
+             * @description Sessão de coleta (ex.: 2026-10-19-manha)
+             */
+            collection_session: string;
+            /** @description Vazio: rotular depois */
+            label?: components["schemas"]["Grade"] | null;
+        };
+        /** DatasetClassCount */
+        DatasetClassCount: {
+            label: components["schemas"]["Grade"];
+            /** Photos */
+            photos: number;
+            /**
+             * Pieces
+             * @description Peças físicas distintas
+             */
+            pieces: number;
+        };
+        /** DatasetExport */
+        DatasetExport: {
+            /** Product Id */
+            product_id: string;
+        };
+        /** DatasetExportOut */
+        DatasetExportOut: {
+            /** Product Id */
+            product_id: string;
+            /**
+             * Manifest Path
+             * @description Arquivo CSV no formato do treinamento
+             */
+            manifest_path: string;
+            /** Photos */
+            photos: number;
+            /** Pieces */
+            pieces: number;
+            /**
+             * Command
+             * @description Comando para treinar a partir deste manifesto
+             */
+            command: string;
+        };
+        /** DatasetSampleOut */
+        DatasetSampleOut: {
+            /** Id */
+            id: number;
+            /** Product Id */
+            product_id: string;
+            /** Physical Sample Id */
+            physical_sample_id: string;
+            /** Collection Session */
+            collection_session: string;
+            /** Image Url */
+            image_url: string;
+            label: components["schemas"]["Grade"] | null;
+            /** Label Author */
+            label_author: string | null;
+            status: components["schemas"]["SampleStatus"];
+            /** Reviewed By */
+            reviewed_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** DatasetSamplePage */
+        DatasetSamplePage: {
+            /** Items */
+            items: components["schemas"]["DatasetSampleOut"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+        };
+        /** DatasetSampleUpdate */
+        DatasetSampleUpdate: {
+            status: components["schemas"]["SampleStatus"];
+            /** @description Obrigatório quando status = labeled */
+            label?: components["schemas"]["Grade"] | null;
+        };
+        /** DatasetSummary */
+        DatasetSummary: {
+            /** Product Id */
+            product_id: string;
+            /** Target Photos Per Class */
+            target_photos_per_class: number;
+            /** Classes */
+            classes: components["schemas"]["DatasetClassCount"][];
+            /** Pending */
+            pending: number;
+            /** Ambiguous */
+            ambiguous: number;
+            /** Unusable */
+            unusable: number;
+            /** Total */
+            total: number;
+        };
         /**
          * DecidedBy
          * @enum {string}
@@ -634,6 +1053,11 @@ export interface components {
             decided_by: components["schemas"]["DecidedBy"] | null;
             cycle_status: components["schemas"]["CycleStatus"];
         };
+        /**
+         * InspectionOutcome
+         * @enum {string}
+         */
+        InspectionOutcome: "approved" | "rejected" | "pending_review" | "inconclusive" | "reviewed";
         /** InspectionPage */
         InspectionPage: {
             /** Items */
@@ -881,6 +1305,50 @@ export interface components {
             /** Reviewer */
             reviewer: string;
         };
+        /** MotorTestRequest */
+        MotorTestRequest: {
+            /**
+             * Request Id
+             * Format: uuid
+             */
+            request_id: string;
+            /**
+             * Run Ms
+             * @description Tempo com o motor ligado
+             */
+            run_ms: number;
+        };
+        /** ProductConfigOut */
+        ProductConfigOut: {
+            product: components["schemas"]["ProductOut"];
+            /** @description Tempos e posições da bancada */
+            bench: components["schemas"]["ConfigurePayload"];
+            /**
+             * Bench Is Default
+             * @description Ainda não calibrado: valores de partida da bancada simulada. No modo real a bancada só arma depois que uma calibração for salva
+             */
+            bench_is_default: boolean;
+            /** Editable */
+            editable: boolean;
+            /**
+             * Locked Reason
+             * @description Por que não pode ser alterado agora
+             */
+            locked_reason: string | null;
+        };
+        /** ProductConfigUpdate */
+        ProductConfigUpdate: {
+            /**
+             * Expected Version
+             * @description Versão lida; outra versão → CONFLICT
+             */
+            expected_version: number;
+            /** Presentation */
+            presentation?: string | null;
+            /** Decision Threshold */
+            decision_threshold: number;
+            bench: components["schemas"]["ConfigurePayload"];
+        };
         /** ProductOut */
         ProductOut: {
             /** Id */
@@ -927,6 +1395,11 @@ export interface components {
          * @enum {string}
          */
         RunMode: "simulado" | "real";
+        /**
+         * SampleStatus
+         * @enum {string}
+         */
+        SampleStatus: "pending" | "labeled" | "ambiguous" | "unusable";
         /** SensorSnapshot */
         SensorSnapshot: {
             /** S1 */
@@ -935,6 +1408,21 @@ export interface components {
             s2: boolean;
             /** Estop */
             estop: boolean;
+        };
+        /** ServoTestRequest */
+        ServoTestRequest: {
+            /**
+             * Request Id
+             * Format: uuid
+             */
+            request_id: string;
+            /** Angle Deg */
+            angle_deg: number;
+            /**
+             * Hold Ms
+             * @description Tempo na posição antes de voltar ao repouso
+             */
+            hold_ms: number;
         };
         /**
          * Severity
@@ -1520,6 +2008,93 @@ export interface operations {
             };
         };
     };
+    product_config_api_products__product_id__config_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductConfigOut"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    update_product_config_api_products__product_id__config_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductConfigUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductConfigOut"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
     claim_api_control_claim_post: {
         parameters: {
             query?: never;
@@ -2003,6 +2578,186 @@ export interface operations {
             };
         };
     };
+    maintenance_enter_api_machine_maintenance_enter_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MachineCommandRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MachineCommandResult"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    maintenance_exit_api_machine_maintenance_exit_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MachineCommandRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MachineCommandResult"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    test_motor_api_machine_maintenance_test_motor_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotorTestRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MachineCommandResult"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    test_servo_api_machine_maintenance_test_servo_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ServoTestRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MachineCommandResult"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
     list_models_api_models_get: {
         parameters: {
             query?: {
@@ -2230,9 +2985,15 @@ export interface operations {
     list_inspections_route_api_inspections_get: {
         parameters: {
             query?: {
-                lot_id?: number | null;
                 limit?: number;
                 offset?: number;
+                lot_id?: number | null;
+                product_id?: string | null;
+                /** @description Classe prevista pelo modelo */
+                grade?: components["schemas"]["Grade"] | null;
+                outcome?: components["schemas"]["InspectionOutcome"] | null;
+                from?: string | null;
+                to?: string | null;
             };
             header?: never;
             path?: never;
@@ -2412,6 +3173,10 @@ export interface operations {
                 limit?: number;
                 offset?: number;
                 severity?: components["schemas"]["Severity"] | null;
+                source?: components["schemas"]["EventSource"] | null;
+                /** @description Ex.: FAULT, CONFIG_CHANGED */
+                type?: string | null;
+                lot_id?: number | null;
             };
             header?: never;
             path?: never;
@@ -2426,6 +3191,393 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EventOut"][];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    snapshot_api_camera_snapshot_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                    "image/jpeg": unknown;
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    stream_api_camera_stream_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                    "multipart/x-mixed-replace": unknown;
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    capture_api_dataset_capture_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DatasetCapture"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DatasetSampleOut"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    list_samples_api_dataset_samples_get: {
+        parameters: {
+            query?: {
+                product_id?: string | null;
+                status?: components["schemas"]["SampleStatus"] | null;
+                label?: components["schemas"]["Grade"] | null;
+                physical_sample_id?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DatasetSamplePage"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    summary_api_dataset_summary_get: {
+        parameters: {
+            query: {
+                product_id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DatasetSummary"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    update_sample_api_dataset_samples__sample_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path: {
+                sample_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DatasetSampleUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DatasetSampleOut"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    sample_image_api_dataset_samples__sample_id__image_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sample_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
+                    "image/jpeg": unknown;
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    export_api_dataset_export_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DatasetExport"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DatasetExportOut"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    inspections_csv_api_exports_inspections_csv_get: {
+        parameters: {
+            query?: {
+                lot_id?: number | null;
+                product_id?: string | null;
+                /** @description Classe prevista pelo modelo */
+                grade?: components["schemas"]["Grade"] | null;
+                outcome?: components["schemas"]["InspectionOutcome"] | null;
+                from?: string | null;
+                to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": unknown;
                 };
             };
             /** @description Erro da requisição */

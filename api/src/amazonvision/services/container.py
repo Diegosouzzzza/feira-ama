@@ -6,6 +6,7 @@ from fastapi import Request
 from starlette.requests import HTTPConnection
 
 from amazonvision.camera.base import Camera, NoCamera
+from amazonvision.camera.opencv_camera import OpenCvCamera
 from amazonvision.camera.simulated import SimulatedCamera
 from amazonvision.config import RunMode, Settings
 from amazonvision.core.bus import EventBus
@@ -17,8 +18,10 @@ from amazonvision.machine.process_link import ProcessLink
 from amazonvision.machine.simulated_device import SimulatedDevice
 from amazonvision.schemas.api import EventSource, Severity, SystemStatus
 from amazonvision.schemas.events import SnapshotEvent
+from amazonvision.services.dataset import DatasetService
 from amazonvision.services.lots import LotService
 from amazonvision.services.models import ModelService
+from amazonvision.services.products import ProductConfigService
 from amazonvision.services.reviews import ReviewService
 from amazonvision.services.status import StatusService
 from amazonvision.simulation.scenario import Scenario
@@ -31,7 +34,7 @@ from amazonvision.vision.classifier import ModelManager
 class Simulation:
     """Handles to the simulated bench (simulated mode only): scenario and fault injection."""
 
-    camera: SimulatedCamera
+    camera: SimulatedCamera | None  # None when a real camera is configured
     scenario: Scenario
     device: SimulatedDevice | None = None  # Python simulator of the board
     native: ProcessLink | None = None  # or the firmware logic compiled for the PC
@@ -76,6 +79,8 @@ class Services:
     lots: LotService
     reviews: ReviewService
     model_registry: ModelService
+    dataset: DatasetService
+    product_config: ProductConfigService
     status: StatusService
     record: Recorder
     simulation: Simulation | None
@@ -92,10 +97,18 @@ class Services:
         link: Link | None = None
         camera: Camera = NoCamera()
         port_label: str | None = None
+        if settings.camera_source:
+            camera = OpenCvCamera(
+                settings.camera_source,
+                width=settings.camera_width,
+                height=settings.camera_height,
+                exposure=settings.camera_exposure,
+            )
         if settings.mode is RunMode.SIMULADO:
             scenario = Scenario(settings.sim_seed)
-            sim_camera = SimulatedCamera(scenario)
-            camera = sim_camera
+            sim_camera = None if settings.camera_source else SimulatedCamera(scenario)
+            if sim_camera is not None:
+                camera = sim_camera
             if settings.firmware_harness:
                 native = ProcessLink(settings.firmware_harness)
                 simulation = Simulation(camera=sim_camera, scenario=scenario, native=native)
@@ -104,7 +117,7 @@ class Services:
                 device = SimulatedDevice(speed=settings.sim_speed)
                 simulation = Simulation(camera=sim_camera, scenario=scenario, device=device)
                 link, port_label = device, "simulador"
-        # Real mode: serial link (Block 6) and real camera (Block 7) are not wired yet.
+        # Real mode: the serial link to the ESP32 is not wired yet (Block 6).
 
         coordinator = Coordinator(settings, db, bus, link, camera, models, record, port_label)
         lots = LotService(
@@ -126,6 +139,8 @@ class Services:
             lots=lots,
             reviews=ReviewService(db, bus, coordinator),
             model_registry=ModelService(settings, db),
+            dataset=DatasetService(settings, db, camera, coordinator.busy),
+            product_config=ProductConfigService(settings, db, coordinator.busy),
             status=StatusService(settings, db, control, coordinator, camera, models),
             record=record,
             simulation=simulation,
@@ -135,10 +150,12 @@ class Services:
 
     async def start(self) -> None:
         await self.db.open()
+        self.camera.start()
         await self.coordinator.start()
 
     async def stop(self) -> None:
         await self.coordinator.stop()
+        self.camera.stop()
         await self.db.close()
 
     async def current_status(self) -> SystemStatus:

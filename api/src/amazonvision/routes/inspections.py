@@ -1,18 +1,28 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Path, Query, Response, status
+from fastapi import APIRouter, Depends, Path, Query, Response, status
 from fastapi.responses import FileResponse
+from pydantic import AwareDatetime
 
+from amazonvision.core.clock import to_db
+from amazonvision.domain.quality import Grade
 from amazonvision.routes.deps import ControlDep, ServicesDep
 from amazonvision.schemas.api import (
     InspectionOut,
+    InspectionOutcome,
     InspectionPage,
     InspectionReviewCreate,
+    ProductId,
     ReviewOut,
 )
 from amazonvision.schemas.errors import ApiError, ErrorCode
 from amazonvision.storage.images import resolve_image
-from amazonvision.storage.inspections import get_image_path, get_inspection, list_inspections
+from amazonvision.storage.inspections import (
+    InspectionFilters,
+    get_image_path,
+    get_inspection,
+    list_inspections,
+)
 
 router = APIRouter(prefix="/inspections", tags=["inspeções"])
 
@@ -24,16 +34,39 @@ def _not_found() -> ApiError:
     return ApiError(ErrorCode.NOT_FOUND, "Inspeção não encontrada.")
 
 
+def inspection_filters(
+    lot_id: Annotated[int | None, Query(ge=1)] = None,
+    product_id: Annotated[ProductId | None, Query()] = None,
+    grade: Annotated[Grade | None, Query(description="Classe prevista pelo modelo")] = None,
+    outcome: Annotated[InspectionOutcome | None, Query()] = None,
+    captured_from: Annotated[AwareDatetime | None, Query(alias="from")] = None,
+    captured_to: Annotated[AwareDatetime | None, Query(alias="to")] = None,
+) -> InspectionFilters:
+    if captured_from and captured_to and captured_to <= captured_from:
+        raise ApiError(ErrorCode.VALIDATION_ERROR, "O fim do período deve ser depois do início.")
+    return InspectionFilters(
+        lot_id=lot_id,
+        product_id=product_id,
+        grade=grade,
+        outcome=outcome,
+        captured_from=to_db(captured_from) if captured_from else None,
+        captured_to=to_db(captured_to) if captured_to else None,
+    )
+
+
+FiltersDep = Annotated[InspectionFilters, Depends(inspection_filters)]
+
+
 @router.get("", response_model=InspectionPage)
 async def list_inspections_route(
     services: ServicesDep,
-    lot_id: Annotated[int | None, Query(ge=1)] = None,
+    filters: FiltersDep,
     limit: Annotated[int, Query(ge=1, le=200)] = 20,
     offset: Annotated[int, Query(ge=0)] = 0,
 ) -> InspectionPage:
-    """Mais recentes primeiro. Filtros de período, classe e decisão entram no Bloco 9."""
+    """Mais recentes primeiro. Período em `from` (inclusive) e `to` (exclusivo)."""
     items, total = await services.db.run(
-        lambda conn: list_inspections(conn, lot_id=lot_id, limit=limit, offset=offset)
+        lambda conn: list_inspections(conn, filters, limit=limit, offset=offset)
     )
     return InspectionPage(items=items, total=total, limit=limit, offset=offset)
 

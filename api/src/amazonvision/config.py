@@ -39,6 +39,11 @@ class Settings(BaseSettings):
     # Simulated mode only: run this command as the device instead of the Python simulator
     # (e.g. the native build of the firmware logic). JSON list in AV_FIRMWARE_HARNESS.
     firmware_harness: list[str] | None = None
+    # Camera: index ("0") or stream URL. Unset: simulated camera in simulated mode, none in real.
+    camera_source: str | None = None
+    camera_width: int = 1280
+    camera_height: int = 720
+    camera_exposure: float | None = None  # driver units; None keeps the camera's own setting
 
     @model_validator(mode="after")
     def _default_data_dir(self) -> Self:

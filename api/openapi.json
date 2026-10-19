@@ -134,6 +134,141 @@
         }
       }
     },
+    "/api/products/{product_id}/config": {
+      "get": {
+        "tags": [
+          "sistema",
+          "produtos"
+        ],
+        "summary": "Product Config",
+        "operationId": "product_config_api_products__product_id__config_get",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{1,31}$",
+              "title": "Product Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductConfigOut"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "sistema",
+          "produtos"
+        ],
+        "summary": "Update Product Config",
+        "description": "Salva o perfil do produto. Vale a partir do próximo lote; recusado em operação.",
+        "operationId": "update_product_config_api_products__product_id__config_put",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{1,31}$",
+              "title": "Product Id"
+            }
+          },
+          {
+            "name": "X-Control-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token de controle do operador",
+              "title": "X-Control-Token"
+            },
+            "description": "Token de controle do operador"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductConfigUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductConfigOut"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/control/claim": {
       "post": {
         "tags": [
@@ -890,6 +1025,293 @@
         }
       }
     },
+    "/api/machine/maintenance/enter": {
+      "post": {
+        "tags": [
+          "máquina"
+        ],
+        "summary": "Maintenance Enter",
+        "description": "Modo manutenção: libera os testes manuais de motor e servo. Exige a esteira parada.",
+        "operationId": "maintenance_enter_api_machine_maintenance_enter_post",
+        "parameters": [
+          {
+            "name": "X-Control-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token de controle do operador",
+              "title": "X-Control-Token"
+            },
+            "description": "Token de controle do operador"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MachineCommandRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MachineCommandResult"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/machine/maintenance/exit": {
+      "post": {
+        "tags": [
+          "máquina"
+        ],
+        "summary": "Maintenance Exit",
+        "operationId": "maintenance_exit_api_machine_maintenance_exit_post",
+        "parameters": [
+          {
+            "name": "X-Control-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token de controle do operador",
+              "title": "X-Control-Token"
+            },
+            "description": "Token de controle do operador"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MachineCommandRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MachineCommandResult"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/machine/maintenance/test-motor": {
+      "post": {
+        "tags": [
+          "máquina"
+        ],
+        "summary": "Test Motor",
+        "description": "Liga a esteira pelo tempo pedido (só em manutenção).",
+        "operationId": "test_motor_api_machine_maintenance_test_motor_post",
+        "parameters": [
+          {
+            "name": "X-Control-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token de controle do operador",
+              "title": "X-Control-Token"
+            },
+            "description": "Token de controle do operador"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MotorTestRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MachineCommandResult"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/machine/maintenance/test-servo": {
+      "post": {
+        "tags": [
+          "máquina"
+        ],
+        "summary": "Test Servo",
+        "description": "Move o servo ao ângulo pedido e volta ao repouso (só em manutenção).",
+        "operationId": "test_servo_api_machine_maintenance_test_servo_post",
+        "parameters": [
+          {
+            "name": "X-Control-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token de controle do operador",
+              "title": "X-Control-Token"
+            },
+            "description": "Token de controle do operador"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServoTestRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MachineCommandResult"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/models": {
       "get": {
         "tags": [
@@ -1246,26 +1668,9 @@
           "inspeções"
         ],
         "summary": "List Inspections Route",
-        "description": "Mais recentes primeiro. Filtros de período, classe e decisão entram no Bloco 9.",
+        "description": "Mais recentes primeiro. Período em `from` (inclusive) e `to` (exclusivo).",
         "operationId": "list_inspections_route_api_inspections_get",
         "parameters": [
-          {
-            "name": "lot_id",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "integer",
-                  "minimum": 1
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Lot Id"
-            }
-          },
           {
             "name": "limit",
             "in": "query",
@@ -1287,6 +1692,108 @@
               "minimum": 0,
               "default": 0,
               "title": "Offset"
+            }
+          },
+          {
+            "name": "lot_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lot Id"
+            }
+          },
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{1,31}$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Product Id"
+            }
+          },
+          {
+            "name": "grade",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Grade"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Classe prevista pelo modelo",
+              "title": "Grade"
+            },
+            "description": "Classe prevista pelo modelo"
+          },
+          {
+            "name": "outcome",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/InspectionOutcome"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Outcome"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
             }
           }
         ],
@@ -1565,6 +2072,58 @@
               ],
               "title": "Severity"
             }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EventSource"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Source"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Ex.: FAULT, CONFIG_CHANGED",
+              "title": "Type"
+            },
+            "description": "Ex.: FAULT, CONFIG_CHANGED"
+          },
+          {
+            "name": "lot_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lot Id"
+            }
           }
         ],
         "responses": {
@@ -1580,6 +2139,692 @@
                   "title": "Response Events Api Diagnostics Events Get"
                 }
               }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/camera/snapshot": {
+      "get": {
+        "tags": [
+          "câmera"
+        ],
+        "summary": "Snapshot",
+        "description": "Imagem mais recente da câmera (visualização; não é uma foto de inspeção).",
+        "operationId": "snapshot_api_camera_snapshot_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              },
+              "image/jpeg": {}
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/camera/stream": {
+      "get": {
+        "tags": [
+          "câmera"
+        ],
+        "summary": "Stream",
+        "description": "Vídeo ao vivo (MJPEG). Canal separado das mensagens de estado da máquina.",
+        "operationId": "stream_api_camera_stream_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              },
+              "multipart/x-mixed-replace": {}
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dataset/capture": {
+      "post": {
+        "tags": [
+          "coleta"
+        ],
+        "summary": "Capture",
+        "description": "Fotografa a peça parada sob a câmera e guarda a foto na coleta de treinamento.",
+        "operationId": "capture_api_dataset_capture_post",
+        "parameters": [
+          {
+            "name": "X-Control-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token de controle do operador",
+              "title": "X-Control-Token"
+            },
+            "description": "Token de controle do operador"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatasetCapture"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetSampleOut"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dataset/samples": {
+      "get": {
+        "tags": [
+          "coleta"
+        ],
+        "summary": "List Samples",
+        "operationId": "list_samples_api_dataset_samples_get",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{1,31}$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Product Id"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/SampleStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "label",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Grade"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Label"
+            }
+          },
+          {
+            "name": "physical_sample_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Physical Sample Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 60,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetSamplePage"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dataset/summary": {
+      "get": {
+        "tags": [
+          "coleta"
+        ],
+        "summary": "Summary",
+        "description": "Fotos e peças físicas por classe, comparadas com a meta de treinamento.",
+        "operationId": "summary_api_dataset_summary_get",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{1,31}$",
+              "title": "Product Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetSummary"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dataset/samples/{sample_id}": {
+      "patch": {
+        "tags": [
+          "coleta"
+        ],
+        "summary": "Update Sample",
+        "description": "Rotula, corrige a classe ou separa a foto como ambígua ou inutilizável.",
+        "operationId": "update_sample_api_dataset_samples__sample_id__patch",
+        "parameters": [
+          {
+            "name": "sample_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Sample Id"
+            }
+          },
+          {
+            "name": "X-Control-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token de controle do operador",
+              "title": "X-Control-Token"
+            },
+            "description": "Token de controle do operador"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatasetSampleUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetSampleOut"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dataset/samples/{sample_id}/image": {
+      "get": {
+        "tags": [
+          "coleta"
+        ],
+        "summary": "Sample Image",
+        "operationId": "sample_image_api_dataset_samples__sample_id__image_get",
+        "parameters": [
+          {
+            "name": "sample_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Sample Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "image/png": {},
+              "image/jpeg": {}
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dataset/export": {
+      "post": {
+        "tags": [
+          "coleta"
+        ],
+        "summary": "Export",
+        "description": "Gera o manifesto CSV das fotos rotuladas, no formato lido pelo treinamento.",
+        "operationId": "export_api_dataset_export_post",
+        "parameters": [
+          {
+            "name": "X-Control-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token de controle do operador",
+              "title": "X-Control-Token"
+            },
+            "description": "Token de controle do operador"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatasetExport"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetExportOut"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/exports/inspections.csv": {
+      "get": {
+        "tags": [
+          "exportação"
+        ],
+        "summary": "Inspections Csv",
+        "description": "Histórico em CSV (UTF-8 com BOM, separador \";\"), com os mesmos filtros da listagem.",
+        "operationId": "inspections_csv_api_exports_inspections_csv_get",
+        "parameters": [
+          {
+            "name": "lot_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lot Id"
+            }
+          },
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{1,31}$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Product Id"
+            }
+          },
+          {
+            "name": "grade",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Grade"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Classe prevista pelo modelo",
+              "title": "Grade"
+            },
+            "description": "Classe prevista pelo modelo"
+          },
+          {
+            "name": "outcome",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/InspectionOutcome"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Outcome"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/csv": {}
             }
           },
           "4XX": {
@@ -1696,6 +2941,113 @@
           "last_frame_at"
         ],
         "title": "CameraInfo"
+      },
+      "ConfigurePayload": {
+        "properties": {
+          "sensor_debounce_ms": {
+            "type": "integer",
+            "maximum": 200.0,
+            "minimum": 1.0,
+            "title": "Sensor Debounce Ms"
+          },
+          "s1_timeout_ms": {
+            "type": "integer",
+            "maximum": 30000.0,
+            "minimum": 500.0,
+            "title": "S1 Timeout Ms"
+          },
+          "settle_ms": {
+            "type": "integer",
+            "maximum": 5000.0,
+            "minimum": 0.0,
+            "title": "Settle Ms"
+          },
+          "decision_timeout_ms": {
+            "type": "integer",
+            "maximum": 30000.0,
+            "minimum": 500.0,
+            "title": "Decision Timeout Ms"
+          },
+          "s2_timeout_ms": {
+            "type": "integer",
+            "maximum": 30000.0,
+            "minimum": 500.0,
+            "title": "S2 Timeout Ms"
+          },
+          "servo_rest_deg": {
+            "type": "integer",
+            "maximum": 180.0,
+            "minimum": 0.0,
+            "title": "Servo Rest Deg"
+          },
+          "servo_reject_deg": {
+            "type": "integer",
+            "maximum": 180.0,
+            "minimum": 0.0,
+            "title": "Servo Reject Deg"
+          },
+          "reject_hold_ms": {
+            "type": "integer",
+            "maximum": 5000.0,
+            "minimum": 100.0,
+            "title": "Reject Hold Ms"
+          },
+          "reject_motor_ms": {
+            "type": "integer",
+            "maximum": 10000.0,
+            "minimum": 0.0,
+            "title": "Reject Motor Ms"
+          },
+          "release_ms": {
+            "type": "integer",
+            "maximum": 10000.0,
+            "minimum": 0.0,
+            "title": "Release Ms"
+          },
+          "release_max_ms": {
+            "type": "integer",
+            "maximum": 30000.0,
+            "minimum": 500.0,
+            "title": "Release Max Ms"
+          },
+          "link_timeout_ms": {
+            "type": "integer",
+            "maximum": 10000.0,
+            "minimum": 500.0,
+            "title": "Link Timeout Ms"
+          },
+          "motor_power_pct": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 100.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motor Power Pct"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "sensor_debounce_ms",
+          "s1_timeout_ms",
+          "settle_ms",
+          "decision_timeout_ms",
+          "s2_timeout_ms",
+          "servo_rest_deg",
+          "servo_reject_deg",
+          "reject_hold_ms",
+          "reject_motor_ms",
+          "release_ms",
+          "release_max_ms",
+          "link_timeout_ms"
+        ],
+        "title": "ConfigurePayload",
+        "description": "Bench timing and actuator parameters. All values are calibrated per profile."
       },
       "ControlClaim": {
         "properties": {
@@ -1835,6 +3187,320 @@
           "aborted"
         ],
         "title": "CycleStatus"
+      },
+      "DatasetCapture": {
+        "properties": {
+          "product_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{1,31}$",
+            "title": "Product Id"
+          },
+          "physical_sample_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$",
+            "title": "Physical Sample Id",
+            "description": "Etiqueta da peça física (ex.: T-0042)"
+          },
+          "collection_session": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$",
+            "title": "Collection Session",
+            "description": "Sessão de coleta (ex.: 2026-10-19-manha)"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Grade"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Vazio: rotular depois"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "product_id",
+          "physical_sample_id",
+          "collection_session"
+        ],
+        "title": "DatasetCapture"
+      },
+      "DatasetClassCount": {
+        "properties": {
+          "label": {
+            "$ref": "#/components/schemas/Grade"
+          },
+          "photos": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Photos"
+          },
+          "pieces": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Pieces",
+            "description": "Peças físicas distintas"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "photos",
+          "pieces"
+        ],
+        "title": "DatasetClassCount"
+      },
+      "DatasetExport": {
+        "properties": {
+          "product_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{1,31}$",
+            "title": "Product Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "product_id"
+        ],
+        "title": "DatasetExport"
+      },
+      "DatasetExportOut": {
+        "properties": {
+          "product_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{1,31}$",
+            "title": "Product Id"
+          },
+          "manifest_path": {
+            "type": "string",
+            "title": "Manifest Path",
+            "description": "Arquivo CSV no formato do treinamento"
+          },
+          "photos": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Photos"
+          },
+          "pieces": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Pieces"
+          },
+          "command": {
+            "type": "string",
+            "title": "Command",
+            "description": "Comando para treinar a partir deste manifesto"
+          }
+        },
+        "type": "object",
+        "required": [
+          "product_id",
+          "manifest_path",
+          "photos",
+          "pieces",
+          "command"
+        ],
+        "title": "DatasetExportOut"
+      },
+      "DatasetSampleOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Id"
+          },
+          "product_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{1,31}$",
+            "title": "Product Id"
+          },
+          "physical_sample_id": {
+            "type": "string",
+            "title": "Physical Sample Id"
+          },
+          "collection_session": {
+            "type": "string",
+            "title": "Collection Session"
+          },
+          "image_url": {
+            "type": "string",
+            "title": "Image Url"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Grade"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "label_author": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label Author"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SampleStatus"
+          },
+          "reviewed_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed By"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "product_id",
+          "physical_sample_id",
+          "collection_session",
+          "image_url",
+          "label",
+          "label_author",
+          "status",
+          "reviewed_by",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "DatasetSampleOut"
+      },
+      "DatasetSamplePage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DatasetSampleOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "maximum": 200.0,
+            "minimum": 1.0,
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "DatasetSamplePage"
+      },
+      "DatasetSampleUpdate": {
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/SampleStatus"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Grade"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Obrigatório quando status = labeled"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "DatasetSampleUpdate"
+      },
+      "DatasetSummary": {
+        "properties": {
+          "product_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{1,31}$",
+            "title": "Product Id"
+          },
+          "target_photos_per_class": {
+            "type": "integer",
+            "title": "Target Photos Per Class"
+          },
+          "classes": {
+            "items": {
+              "$ref": "#/components/schemas/DatasetClassCount"
+            },
+            "type": "array",
+            "title": "Classes"
+          },
+          "pending": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Pending"
+          },
+          "ambiguous": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Ambiguous"
+          },
+          "unusable": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Unusable"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "product_id",
+          "target_photos_per_class",
+          "classes",
+          "pending",
+          "ambiguous",
+          "unusable",
+          "total"
+        ],
+        "title": "DatasetSummary"
       },
       "DecidedBy": {
         "type": "string",
@@ -2201,6 +3867,17 @@
           "cycle_status"
         ],
         "title": "InspectionOut"
+      },
+      "InspectionOutcome": {
+        "type": "string",
+        "enum": [
+          "approved",
+          "rejected",
+          "pending_review",
+          "inconclusive",
+          "reviewed"
+        ],
+        "title": "InspectionOutcome"
       },
       "InspectionPage": {
         "properties": {
@@ -2851,6 +4528,109 @@
         ],
         "title": "ModelValidationUpdate"
       },
+      "MotorTestRequest": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Request Id"
+          },
+          "run_ms": {
+            "type": "integer",
+            "maximum": 5000.0,
+            "minimum": 100.0,
+            "title": "Run Ms",
+            "description": "Tempo com o motor ligado"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id",
+          "run_ms"
+        ],
+        "title": "MotorTestRequest"
+      },
+      "ProductConfigOut": {
+        "properties": {
+          "product": {
+            "$ref": "#/components/schemas/ProductOut"
+          },
+          "bench": {
+            "$ref": "#/components/schemas/ConfigurePayload",
+            "description": "Tempos e posições da bancada"
+          },
+          "bench_is_default": {
+            "type": "boolean",
+            "title": "Bench Is Default",
+            "description": "Ainda não calibrado: valores de partida da bancada simulada. No modo real a bancada só arma depois que uma calibração for salva"
+          },
+          "editable": {
+            "type": "boolean",
+            "title": "Editable"
+          },
+          "locked_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locked Reason",
+            "description": "Por que não pode ser alterado agora"
+          }
+        },
+        "type": "object",
+        "required": [
+          "product",
+          "bench",
+          "bench_is_default",
+          "editable",
+          "locked_reason"
+        ],
+        "title": "ProductConfigOut"
+      },
+      "ProductConfigUpdate": {
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expected Version",
+            "description": "Versão lida; outra versão → CONFLICT"
+          },
+          "presentation": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Presentation"
+          },
+          "decision_threshold": {
+            "type": "number",
+            "maximum": 0.99,
+            "minimum": 0.4,
+            "title": "Decision Threshold"
+          },
+          "bench": {
+            "$ref": "#/components/schemas/ConfigurePayload"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "expected_version",
+          "decision_threshold",
+          "bench"
+        ],
+        "title": "ProductConfigUpdate"
+      },
       "ProductOut": {
         "properties": {
           "id": {
@@ -2975,6 +4755,16 @@
         ],
         "title": "RunMode"
       },
+      "SampleStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "labeled",
+          "ambiguous",
+          "unusable"
+        ],
+        "title": "SampleStatus"
+      },
       "SensorSnapshot": {
         "properties": {
           "s1": {
@@ -2997,6 +4787,36 @@
           "estop"
         ],
         "title": "SensorSnapshot"
+      },
+      "ServoTestRequest": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Request Id"
+          },
+          "angle_deg": {
+            "type": "integer",
+            "maximum": 180.0,
+            "minimum": 0.0,
+            "title": "Angle Deg"
+          },
+          "hold_ms": {
+            "type": "integer",
+            "maximum": 5000.0,
+            "minimum": 0.0,
+            "title": "Hold Ms",
+            "description": "Tempo na posição antes de voltar ao repouso"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id",
+          "angle_deg",
+          "hold_ms"
+        ],
+        "title": "ServoTestRequest"
       },
       "Severity": {
         "type": "string",

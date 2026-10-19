@@ -59,6 +59,10 @@ Blocos 1 a 5 concluídos: fundação, contratos, núcleo da API, coordenador do 
 
 Bloco 6 em andamento: a **lógica do firmware** está pronta e testada no PC contra o contrato e a API (ver `docs/firmware.md`); faltam a escolha do motor, a pinagem definitiva e os ensaios na bancada.
 
+Bloco 7 (software) pronto: **câmera real** por OpenCV (`AV_CAMERA_SOURCE`, também no modo simulado) e **tela de Coleta** (`/coleta`) para fotografar, rotular, revisar e exportar o manifesto de treino (ver `docs/coleta.md` e `docs/manual-rotulagem.md`). Faltam a câmera definitiva e os critérios A/B/C da equipe.
+
+Telas do Bloco 9 prontas no software: **Histórico** (`/historico`, filtros, foto, correção de decisão, distribuição por lote e CSV), **Configuração** (`/configuracao`, perfil e calibração da bancada por produto, com versão e registro) e **Diagnóstico** (`/diagnostico`, equipamentos, sensores ao vivo, modo manutenção com teste de motor e servo, registro de eventos). Falta a integração com a bancada real.
+
 Bloco 8 (software) pronto: **pipeline de treinamento** (divisão por peça física, MobileNetV3, ONNX, limiar calibrado, relatório com parecer) e **tela de Modelos** para instalar, validar e ativar. Falta treinar com fotos reais (ver `docs/treinamento.md`).
 
 Testes de navegador (Playwright, usa o Microsoft Edge instalado):

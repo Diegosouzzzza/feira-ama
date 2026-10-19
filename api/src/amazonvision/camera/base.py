@@ -25,18 +25,35 @@ class CameraError(Exception):
 
 
 class Camera(Protocol):
+    def start(self) -> None: ...
+
+    def stop(self) -> None: ...
+
     def info(self) -> CameraInfo: ...
 
     async def capture(self, not_before: datetime, timeout_s: float) -> Frame:
         """Return a frame captured at or after not_before, or raise CameraError."""
         ...
 
+    async def preview(self) -> tuple[bytes, str] | None:
+        """Latest image for the live view (bytes, media type); None when there is none."""
+        ...
+
 
 class NoCamera:
-    """Placeholder until the real camera exists (Block 7): always unavailable."""
+    """No camera configured: always unavailable."""
+
+    def start(self) -> None:
+        pass
+
+    def stop(self) -> None:
+        pass
 
     def info(self) -> CameraInfo:
         return CameraInfo(status="unavailable", source=None, last_frame_at=None)
 
     async def capture(self, not_before: datetime, timeout_s: float) -> Frame:
         raise CameraError(ErrorCode.CAMERA_UNAVAILABLE, "Nenhuma câmera configurada.")
+
+    async def preview(self) -> tuple[bytes, str] | None:
+        return None

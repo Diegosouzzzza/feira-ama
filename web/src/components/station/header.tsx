@@ -53,10 +53,14 @@ export function StationHeader({ status }: { status: SystemStatus | null }) {
     <header className="bg-brand-deep text-white">
       <div className="mx-auto flex max-w-[120rem] flex-wrap items-center gap-x-8 gap-y-3 px-4 py-3 sm:px-6">
         <Brand />
-        <nav aria-label="Telas" className="flex gap-1">
+        <nav aria-label="Telas" className="flex flex-wrap gap-1">
           {[
             { to: "/", label: "Operação" },
+            { to: "/historico", label: "Histórico" },
+            { to: "/coleta", label: "Coleta" },
             { to: "/modelos", label: "Modelos" },
+            { to: "/configuracao", label: "Configuração" },
+            { to: "/diagnostico", label: "Diagnóstico" },
           ].map((item) => (
             <NavLink
               key={item.to}
@@ -73,7 +77,7 @@ export function StationHeader({ status }: { status: SystemStatus | null }) {
             </NavLink>
           ))}
         </nav>
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 basis-40">
           {lot ? (
             <>
               <p className="font-wide text-lg leading-tight font-semibold">{product}</p>

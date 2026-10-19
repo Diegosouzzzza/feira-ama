@@ -25,7 +25,7 @@ Uma pasta com as imagens e um `manifest.csv`:
 | `label` | `A`, `B` ou `C` |
 | `split` | `train`, `val` ou `test` (deixe vazio para dividir automaticamente) |
 
-A ferramenta de Coleta (Bloco 7) vai exportar exatamente este formato.
+A tela de **Coleta** exporta exatamente este formato (`dataset/manifest-<produto>.csv`, ver `docs/coleta.md`), com o comando de treino pronto para copiar.
 
 ## Comandos
 

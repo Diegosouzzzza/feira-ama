@@ -38,3 +38,17 @@ def control(client: TestClient) -> dict[str, str]:
     response = client.post("/api/control/claim", json={"operator": "Ana"})
     assert response.status_code == 200, response.text
     return {"X-Control-Token": response.json()["token"]}
+
+
+@pytest.fixture
+def bench(settings: Settings) -> Iterator[TestClient]:
+    """Simulated bench accelerated 50x."""
+    fast = settings.model_copy(update={"sim_speed": 50.0, "device_silence_ms": 1500})
+    with TestClient(create_app(fast)) as client:
+        yield client
+
+
+@pytest.fixture
+def operator(bench: TestClient) -> dict[str, str]:
+    token = bench.post("/api/control/claim", json={"operator": "Ana"}).json()["token"]
+    return {"X-Control-Token": token}

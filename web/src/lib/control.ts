@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { ApiError, apiPost } from "@/lib/api/client";
+import { ApiError, apiPatch, apiPost, apiPut } from "@/lib/api/client";
 import type { ControlGrant } from "@/lib/api/types";
 
 const KEY = "av-control";
@@ -62,13 +62,25 @@ export const useControl = create<ControlStore>()((set, get) => ({
   },
 }));
 
-/** POST a control action; a CONTROL_LOCKED answer means this screen lost the control. */
-export async function controlPost<T>(path: string, body?: unknown): Promise<T> {
+async function asController<T>(send: (token: string | null) => Promise<T>): Promise<T> {
   const { token, forget } = useControl.getState();
   try {
-    return await apiPost<T>(path, body, token);
+    return await send(token);
   } catch (error) {
     if (error instanceof ApiError && error.code === "CONTROL_LOCKED") forget();
     throw error;
   }
+}
+
+/** POST a control action; a CONTROL_LOCKED answer means this screen lost the control. */
+export function controlPost<T>(path: string, body?: unknown): Promise<T> {
+  return asController((token) => apiPost<T>(path, body, token));
+}
+
+export function controlPatch<T>(path: string, body: unknown): Promise<T> {
+  return asController((token) => apiPatch<T>(path, body, token));
+}
+
+export function controlPut<T>(path: string, body: unknown): Promise<T> {
+  return asController((token) => apiPut<T>(path, body, token));
 }

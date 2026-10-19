@@ -3,7 +3,11 @@ import { useEffect } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { startRealtime } from "@/lib/realtime/store";
+import { ColetaPage } from "@/pages/coleta";
+import { ConfiguracaoPage } from "@/pages/configuracao";
+import { DiagnosticoPage } from "@/pages/diagnostico";
 import { FeiraPage } from "@/pages/feira";
+import { HistoricoPage } from "@/pages/historico";
 import { ModelosPage } from "@/pages/modelos";
 import { NaoEncontradaPage } from "@/pages/nao-encontrada";
 import { OperacaoPage } from "@/pages/operacao";
@@ -15,6 +19,10 @@ const queryClient = new QueryClient({
 const router = createBrowserRouter([
   { index: true, element: <OperacaoPage /> },
   { path: "feira", element: <FeiraPage /> },
+  { path: "historico", element: <HistoricoPage /> },
+  { path: "coleta", element: <ColetaPage /> },
+  { path: "configuracao", element: <ConfiguracaoPage /> },
+  { path: "diagnostico", element: <DiagnosticoPage /> },
   { path: "modelos", element: <ModelosPage /> },
   { path: "*", element: <NaoEncontradaPage /> },
 ]);

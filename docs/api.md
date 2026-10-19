@@ -23,6 +23,8 @@ Situação: rotas marcadas com ✅ estão implementadas e testadas. As demais en
 | `POST /api/control/claim` | `ControlClaim` (+ `X-Control-Token` opcional para renovar) | `ControlGrant` | 3 ✅ | — |
 | `POST /api/control/release` | — | 204 | 3 ✅ | sim |
 | `GET /api/products` | — | `ProductOut[]` | 3 ✅ | não |
+| `GET /api/products/{id}/config` | — | `ProductConfigOut` | 9 ✅ | não |
+| `PUT /api/products/{id}/config` | `ProductConfigUpdate` (com `expected_version`) | `ProductConfigOut` | 9 ✅ | sim |
 | `GET /api/models` | `?product_id=` | `ModelOut[]` | 8 | não |
 | `POST /api/lots` | `LotCreate` | `LotOut` (201; 200 se `request_id` repetido) | 3 ✅ | sim |
 | `GET /api/lots` | `?limit(1–100)&offset&product_id` | `LotOut[]` (mais recente primeiro) | 3 ✅ | não |
@@ -33,16 +35,23 @@ Situação: rotas marcadas com ✅ estão implementadas e testadas. As demais en
 | `POST /api/machine/pause` | `MachineCommandRequest` | `MachineCommandResult` | 4 ✅ | sim |
 | `POST /api/machine/stop` | `MachineCommandRequest` | `MachineCommandResult` | 4 ✅ | sim |
 | `POST /api/machine/rearm` | `MachineCommandRequest` | `MachineCommandResult` | 4 ✅ | sim |
-| `GET /api/inspections` | `?lot_id&product_id&grade&decision&from&to&limit&offset` | `InspectionPage` | 9 | não |
+| `POST /api/machine/maintenance/enter` / `exit` | `MachineCommandRequest` | `MachineCommandResult` | 9 ✅ | sim |
+| `POST /api/machine/maintenance/test-motor` | `MotorTestRequest` | `MachineCommandResult` | 9 ✅ | sim |
+| `POST /api/machine/maintenance/test-servo` | `ServoTestRequest` | `MachineCommandResult` | 9 ✅ | sim |
+| `GET /api/inspections` | `?lot_id&product_id&grade&outcome&from&to&limit(1–200)&offset` | `InspectionPage` (mais recente primeiro; `to` exclusivo) | 9 ✅ | não |
 | `GET /api/inspections/{id}` | — | `InspectionOut` | 4 ✅ | não |
 | `GET /api/inspections/{id}/image` | — | PNG (simulado) ou JPEG | 4 ✅ | não |
 | `POST /api/inspections/{id}/review` | `InspectionReviewCreate` | `ReviewOut` (201; 200 se `request_id` repetido) | 4 ✅ | sim |
-| `GET /api/exports/inspections.csv` | mesmos filtros | CSV UTF-8 com BOM | 9 | não |
-| `GET /api/camera/stream` | — | MJPEG (canal separado) | 7 | não |
-| `POST /api/dataset/capture` | (Bloco 7) | (Bloco 7) | 7 | sim |
-| `PATCH /api/dataset/samples/{id}/label` | (Bloco 7) | (Bloco 7) | 7 | sim |
-| `GET /api/config` / `PUT /api/config` | (Bloco 9) | (Bloco 9) | 9 | `PUT` sim |
-| `GET /api/diagnostics/events` | `?limit(1–200)&offset&severity` | `EventOut[]` (mais recente primeiro) | 3 ✅ | não |
+| `GET /api/exports/inspections.csv` | mesmos filtros | CSV UTF-8 com BOM, `;`, vírgula decimal, células nunca viram fórmula | 9 ✅ | não |
+| `GET /api/camera/stream` | — | MJPEG `multipart/x-mixed-replace` (~5 quadros/s, canal separado) | 7 ✅ | não |
+| `GET /api/camera/snapshot` | — | JPEG do quadro mais recente | 7 ✅ | não |
+| `POST /api/dataset/capture` | `DatasetCapture` | `DatasetSampleOut` (201) | 7 ✅ | sim |
+| `GET /api/dataset/samples` | `?product_id&status&label&physical_sample_id&limit(1–200)&offset` | `DatasetSamplePage` (mais recente primeiro) | 7 ✅ | não |
+| `PATCH /api/dataset/samples/{id}` | `DatasetSampleUpdate` | `DatasetSampleOut` | 7 ✅ | sim |
+| `GET /api/dataset/samples/{id}/image` | — | PNG (simulado) ou JPEG | 7 ✅ | não |
+| `GET /api/dataset/summary` | `?product_id` | `DatasetSummary` | 7 ✅ | não |
+| `POST /api/dataset/export` | `DatasetExport` | `DatasetExportOut` | 7 ✅ | sim |
+| `GET /api/diagnostics/events` | `?limit(1–200)&offset&severity&source&type&lot_id` | `EventOut[]` (mais recente primeiro) | 3 ✅ | não |
 | `WS /api/events` | — | `WsEvent` | 3 ✅ | não |
 
 Regras de estado das rotas de controle:
@@ -53,6 +62,9 @@ Regras de estado das rotas de controle:
 - `stop`: parada por software imediata (`STOP` na placa); o ciclo em andamento é registrado como interrompido.
 - `rearm`: `CLEAR_FAULT` (se em falha) + `CONFIGURE` + `ARM` (se houver lote aberto). **Nunca** liga a operação automática nem move a esteira. Recusado com peça sobre sensor ou emergência acionada.
 - Qualquer interrupção de ciclo (falha, parada, emergência, reinício da placa, placa muda, câmera/modelo/gravação com falha) desliga a operação automática.
+- `dataset/capture`: máquina parada (`409 INVALID_STATE` com a esteira em operação); câmera sem quadro novo → `503 CAMERA_UNAVAILABLE`/`STALE_FRAME`. Fotos da mesma peça física não podem ter classes diferentes (`409 CONFLICT`, também no `PATCH`).
+- `products/{id}/config`: recusado com a esteira em operação ou com lote aberto do produto (`409 INVALID_STATE`); versão diferente da lida → `409 CONFLICT`. Vale para o próximo lote (o lote congela limiar e calibração ao abrir). Cada alteração gera `CONFIG_CHANGED` com o antes e o depois.
+- `maintenance/*`: entrar exige placa conectada, sem operação automática nem ciclo; de `READY` a máquina é desarmada antes. Testes de motor e servo só em `MAINTENANCE`. Sair volta a `DISARMED`.
 - `review`: decide a peça inconclusiva parada em `REVIEW_HOLD` (a decisão é entregue à placa **antes** de ser registrada) ou corrige uma decisão anterior sem mover nada. A previsão original fica intacta; cada revisão é um registro novo.
 
 ## WebSocket `/api/events`

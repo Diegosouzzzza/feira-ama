@@ -34,12 +34,18 @@ from amazonvision.machine.protocol import (
     DecisionPayload,
     DeviceAck,
     DeviceNak,
+    EnterMaintenanceCmd,
     EventName,
+    ExitMaintenanceCmd,
     HelloCmd,
     HoldForReviewCmd,
     HostHeartbeat,
+    MotorTestCmd,
+    MotorTestPayload,
     NakCode,
     ProtocolError,
+    ServoTestCmd,
+    ServoTestPayload,
     StartCycleCmd,
     StopCmd,
     encode,
@@ -756,7 +762,11 @@ class Coordinator:
     # ------------------------------------------------------------ operator commands
 
     async def execute(
-        self, action: str, request_id: UUID, expected_state: MachineState | None
+        self,
+        action: str,
+        request_id: UUID,
+        expected_state: MachineState | None,
+        params: dict[str, int] | None = None,
     ) -> MachineCommandResult:
         async with self._op_lock:
             if request_id in self._ledger:
@@ -772,8 +782,12 @@ class Coordinator:
                 "pause": self._op_pause,
                 "stop": self._op_stop,
                 "rearm": self._op_rearm,
+                "maintenance_enter": self._op_maintenance_enter,
+                "maintenance_exit": self._op_maintenance_exit,
+                "test_motor": self._op_test_motor,
+                "test_servo": self._op_test_servo,
             }[action]
-            await handler()
+            await handler(**(params or {}))
             if self.state is None:
                 raise _serial_down()
             result = MachineCommandResult(
@@ -870,6 +884,60 @@ class Coordinator:
         lot = await self._db.run(get_open_lot)
         if self.state is S.DISARMED and lot is not None:
             await self._configure_and_arm(lot)
+
+    # ------------------------------------------------------------ maintenance
+
+    async def _command(self, cls: type, **fields: Any) -> None:
+        try:
+            ack = await self._send(cls, **fields)
+        except DeviceRejected as exc:
+            raise _rejected_to_api(exc) from exc
+        self.state = ack.state
+
+    async def _op_maintenance_enter(self) -> None:
+        """Manual tests of motor and servo. Only with the belt stopped and no cycle."""
+        self._require_device()
+        if self.running or self.cycle is not None:
+            raise ApiError(
+                ErrorCode.INVALID_STATE,
+                "A esteira está em operação.",
+                "Pare a máquina antes de entrar em manutenção.",
+            )
+        if self.state is S.MAINTENANCE:
+            return
+        if self.state is S.READY:
+            await self._command(StopCmd)
+        if self.state is not S.DISARMED:
+            raise ApiError(
+                ErrorCode.INVALID_STATE,
+                "A máquina precisa estar desarmada para entrar em manutenção.",
+                "Resolva a falha ou a emergência e tente de novo.",
+            )
+        await self._command(EnterMaintenanceCmd)
+
+    async def _op_maintenance_exit(self) -> None:
+        self._require_device()
+        if self.state is S.MAINTENANCE:
+            await self._command(ExitMaintenanceCmd)
+
+    def _require_maintenance(self) -> None:
+        self._require_device()
+        if self.state is not S.MAINTENANCE:
+            raise ApiError(
+                ErrorCode.INVALID_STATE,
+                "Os testes manuais só funcionam em manutenção.",
+                "Entre no modo manutenção antes.",
+            )
+
+    async def _op_test_motor(self, run_ms: int) -> None:
+        self._require_maintenance()
+        await self._command(MotorTestCmd, payload=MotorTestPayload(run_ms=run_ms))
+
+    async def _op_test_servo(self, angle_deg: int, hold_ms: int) -> None:
+        self._require_maintenance()
+        await self._command(
+            ServoTestCmd, payload=ServoTestPayload(angle_deg=angle_deg, hold_ms=hold_ms)
+        )
 
     async def decide_review(self, inspection_id: int, destination: Destination) -> bool:
         """Deliver an operator decision for the piece waiting in REVIEW_HOLD.

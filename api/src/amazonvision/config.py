@@ -3,7 +3,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Self
 
-from pydantic import model_validator
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -32,9 +32,13 @@ class Settings(BaseSettings):
     control_ttl_minutes: int = 30
     low_disk_bytes: int = 1_000_000_000
     log_to_file: bool = True
-    device_silence_ms: int = 3_000
-    sim_speed: float = 1.0
+    # Must stay above the board's 1 s heartbeat, or an idle board looks silent.
+    device_silence_ms: int = Field(default=3_000, ge=1_500)
+    sim_speed: float = Field(default=1.0, ge=1.0)
     sim_seed: int | None = None
+    # Simulated mode only: run this command as the device instead of the Python simulator
+    # (e.g. the native build of the firmware logic). JSON list in AV_FIRMWARE_HARNESS.
+    firmware_harness: list[str] | None = None
 
     @model_validator(mode="after")
     def _default_data_dir(self) -> Self:

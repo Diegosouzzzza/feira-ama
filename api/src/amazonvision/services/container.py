@@ -13,6 +13,7 @@ from amazonvision.core.clock import to_db, utc_now
 from amazonvision.core.control import ControlManager
 from amazonvision.machine.coordinator import Coordinator
 from amazonvision.machine.link import Link
+from amazonvision.machine.process_link import ProcessLink
 from amazonvision.machine.simulated_device import SimulatedDevice
 from amazonvision.schemas.api import EventSource, Severity, SystemStatus
 from amazonvision.schemas.events import SnapshotEvent
@@ -29,9 +30,10 @@ from amazonvision.vision.classifier import ModelManager
 class Simulation:
     """Handles to the simulated bench (simulated mode only): scenario and fault injection."""
 
-    device: SimulatedDevice
     camera: SimulatedCamera
     scenario: Scenario
+    device: SimulatedDevice | None = None  # Python simulator of the board
+    native: ProcessLink | None = None  # or the firmware logic compiled for the PC
 
 
 class Recorder:
@@ -90,10 +92,16 @@ class Services:
         port_label: str | None = None
         if settings.mode is RunMode.SIMULADO:
             scenario = Scenario(settings.sim_seed)
-            device = SimulatedDevice(speed=settings.sim_speed)
             sim_camera = SimulatedCamera(scenario)
-            simulation = Simulation(device=device, camera=sim_camera, scenario=scenario)
-            link, camera, port_label = device, sim_camera, "simulador"
+            camera = sim_camera
+            if settings.firmware_harness:
+                native = ProcessLink(settings.firmware_harness)
+                simulation = Simulation(camera=sim_camera, scenario=scenario, native=native)
+                link, port_label = native, "firmware nativo"
+            else:
+                device = SimulatedDevice(speed=settings.sim_speed)
+                simulation = Simulation(camera=sim_camera, scenario=scenario, device=device)
+                link, port_label = device, "simulador"
         # Real mode: serial link (Block 6) and real camera (Block 7) are not wired yet.
 
         coordinator = Coordinator(settings, db, bus, link, camera, models, record, port_label)

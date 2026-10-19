@@ -45,6 +45,9 @@ class StatusService:
         return StorageInfo(status=status, free_bytes=free)
 
     async def build(self, state_version: int) -> SystemStatus:
+        # Read the cycle before the totals: the coordinator records a cycle's end in the database
+        # before releasing it, so "no current cycle" here guarantees the totals include it.
+        current_cycle = await self._coordinator.current_cycle()
         lot, summary = await self._db.run(_read_active_lot)
         holder = self._control.holder
         return SystemStatus(
@@ -59,5 +62,5 @@ class StatusService:
             control_holder=holder,
             active_lot=lot,
             active_lot_summary=summary,
-            current_cycle=await self._coordinator.current_cycle(),
+            current_cycle=current_cycle,
         )

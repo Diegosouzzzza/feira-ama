@@ -13,7 +13,9 @@ Data: 2026-10-18 · Situação: aceita
 7. **Revisão move antes de registrar**: a decisão do operador é entregue à placa primeiro; só então a revisão é gravada. Assim, uma decisão registrada nunca deixa a peça parada na esteira.
 8. **Nada é reaplicado**: placa reiniciada ou muda interrompe o ciclo no banco (`DEVICE_REBOOTED`/`DEVICE_SILENT`); a nova sessão começa desarmada e exige `rearm`. Decisões pendentes nunca são reenviadas.
 9. **Ciclos órfãos**: ao iniciar o serviço, ciclos que ficaram `running` são marcados como `SERVICE_RESTARTED`.
-10. **Idempotência dos comandos de máquina** em memória (últimos 256 `request_id`), suficiente para atualizar a página ou repetir um clique; um reinício do serviço zera o registro, e a máquina também volta desarmada.
+10. **Silêncio da placa ≥ 1,5 s** (`AV_DEVICE_SILENCE_MS`, padrão 3 s): o heartbeat da placa é de 1 s; um limite menor faz uma placa parada em revisão parecer muda e interrompe o ciclo (defeito encontrado em teste em 2026-10-19 e bloqueado na validação da configuração).
+11. **Status lê o ciclo atual antes dos totais**: o fim do ciclo é gravado antes de o coordenador soltá-lo, então "nenhum ciclo na esteira" garante totais atualizados.
+12. **Idempotência dos comandos de máquina** em memória (últimos 256 `request_id`), suficiente para atualizar a página ou repetir um clique; um reinício do serviço zera o registro, e a máquina também volta desarmada.
 
 ## Evidências
 

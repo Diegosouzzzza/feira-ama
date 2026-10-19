@@ -1,5 +1,8 @@
 from pathlib import Path
 
+import pytest
+from pydantic import ValidationError
+
 from amazonvision.config import RunMode, Settings, data_base_dir
 
 
@@ -22,6 +25,11 @@ def test_environment_variables_are_read(monkeypatch, tmp_path: Path):
     settings = Settings(_env_file=None)
     assert settings.mode is RunMode.REAL
     assert settings.data_root == tmp_path
+
+
+def test_device_silence_must_exceed_board_heartbeat():
+    with pytest.raises(ValidationError):
+        Settings(_env_file=None, device_silence_ms=800)
 
 
 def test_defaults_bind_to_localhost_only():

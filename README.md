@@ -57,6 +57,8 @@ pio device monitor      # monitor serial (115200)
 
 Blocos 1 a 5 concluídos: fundação, contratos, núcleo da API, coordenador do ciclo com bancada simulada e interface (tela de **Operação** em `/` e **Modo feira** em `/feira`). No modo simulado, o sistema executa ciclos completos de ponta a ponta pela tela.
 
+Bloco 6 em andamento: a **lógica do firmware** está pronta e testada no PC contra o contrato e a API (ver `docs/firmware.md`); faltam a escolha do motor, a pinagem definitiva e os ensaios na bancada.
+
 Testes de navegador (Playwright, usa o Microsoft Edge instalado):
 
 ```powershell

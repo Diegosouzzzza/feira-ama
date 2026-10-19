@@ -24,6 +24,7 @@ dev = [
     "httpx2>=2.14.0",
     "pytest>=9.1.1",
     "ruff>=0.17.1",
+    "ziglang==0.13.0.post1",
 ]
 
 [tool.ruff]
@@ -37,6 +38,8 @@ ignore = ["S101"]
 [tool.ruff.lint.per-file-ignores]
 # Simulation randomness is not security-sensitive.
 "src/amazonvision/simulation/*" = ["S311"]
+# Tests run the locally built firmware binaries.
+"tests/*" = ["S603", "S607"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

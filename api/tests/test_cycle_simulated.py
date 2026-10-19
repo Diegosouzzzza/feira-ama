@@ -17,7 +17,7 @@ from amazonvision.simulation.scenario import confident, invalid_image, uncertain
 
 @pytest.fixture
 def bench(settings: Settings) -> Iterator[TestClient]:
-    fast = settings.model_copy(update={"sim_speed": 50.0, "device_silence_ms": 800})
+    fast = settings.model_copy(update={"sim_speed": 50.0, "device_silence_ms": 1500})
     with TestClient(create_app(fast)) as client:
         yield client
 
@@ -396,7 +396,7 @@ def test_silent_device_is_reported_and_blocks_commands(bench: TestClient, operat
 def test_duplicated_device_events_do_not_double_count(bench: TestClient, operator):
     lot = open_lot(bench, operator)
     sim(bench).device.faults.duplicate_events = True
-    sim(bench).scenario.push(confident(Grade.A), confident(Grade.B))
+    sim(bench).scenario.push(*[confident(Grade.A), confident(Grade.B)] * 3)
     machine(bench, operator, "start")
     wait_for(bench, lambda s: s["active_lot_summary"]["cycles_completed"] >= 2)
     machine(bench, operator, "pause")

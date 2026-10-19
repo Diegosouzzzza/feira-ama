@@ -1,0 +1,11 @@
+{
+  "protocol_version": 1,
+  "boot_id": "b0071d2e",
+  "session_id": "5e1a9c03",
+  "seq": 9,
+  "state": "TO_S2",
+  "type": "ack",
+  "cmd_id": "c0005",
+  "name": "DECISION",
+  "duplicate": true
+}

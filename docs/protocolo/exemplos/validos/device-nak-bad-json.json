@@ -1,0 +1,9 @@
+{
+  "protocol_version": 1,
+  "boot_id": "b0071d2e",
+  "session_id": "5e1a9c03",
+  "seq": 12,
+  "state": "READY",
+  "type": "nak",
+  "code": "BAD_JSON"
+}

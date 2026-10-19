@@ -1,0 +1,16 @@
+{
+  "protocol_version": 1,
+  "boot_id": "b0071d2e",
+  "session_id": "5e1a9c03",
+  "seq": 14,
+  "state": "FAULT",
+  "type": "evt",
+  "name": "STATE_CHANGED",
+  "cycle_id": 41,
+  "payload": {
+    "from_state": "TO_S2",
+    "to_state": "FAULT",
+    "trigger": "TIMEOUT",
+    "fault": "S2_TIMEOUT"
+  }
+}

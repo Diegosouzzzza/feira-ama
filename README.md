@@ -55,4 +55,12 @@ pio device monitor      # monitor serial (115200)
 
 ## Situação
 
-Bloco 1 (fundação) concluído. Plano completo e auditoria: `Plano_Inicio_Projeto_AmazonVision.md` na pasta da feira. Decisões em `docs/adr/`, pendências em `docs/pendencias.md`.
+Blocos 1 (fundação) e 2 (contratos) concluídos. Plano completo e auditoria: `Plano_Inicio_Projeto_AmazonVision.md` na pasta da feira. Decisões em `docs/adr/`, pendências em `docs/pendencias.md`.
+
+| Contrato | Documento | Código |
+|---|---|---|
+| Máquina de estados | `docs/maquina-de-estados.md` | `api/src/amazonvision/domain/machine.py` |
+| Protocolo serial | `docs/protocolo-serial.md` + `docs/protocolo/exemplos/` | `api/src/amazonvision/machine/protocol.py` |
+| Política de qualidade | `docs/adr/0005-contratos-v1.md` | `api/src/amazonvision/domain/quality.py` |
+| API REST, WebSocket e erros | `docs/api.md` | `api/src/amazonvision/schemas/` |
+| Banco de dados | `docs/dados.md` | `api/src/amazonvision/storage/migrations/` |

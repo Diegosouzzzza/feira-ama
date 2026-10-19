@@ -1,0 +1,13 @@
+{
+  "protocol_version": 1,
+  "boot_id": "b0071d2e",
+  "session_id": "5e1a9c03",
+  "seq": 2,
+  "state": "DISARMED",
+  "type": "ack",
+  "cmd_id": "c0002",
+  "name": "CONFIGURE",
+  "payload": {
+    "config_hash": "9f2c41aa"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "direction": "device",
+  "expect": "INVALID_PAYLOAD",
+  "line": "{\"protocol_version\":1,\"seq\":1,\"state\":\"READY\",\"type\":\"ack\",\"cmd_id\":\"c1\",\"name\":\"ARM\"}"
+}

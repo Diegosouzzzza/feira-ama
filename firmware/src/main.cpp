@@ -6,7 +6,7 @@
 #endif
 
 static constexpr uint32_t kBlinkIntervalMs = 500;
-static constexpr size_t kMaxLineLength = 256;
+static constexpr size_t kMaxLineLength = 1024;  // docs/protocolo-serial.md
 
 static uint32_t lastBlinkMs = 0;
 static bool ledOn = false;

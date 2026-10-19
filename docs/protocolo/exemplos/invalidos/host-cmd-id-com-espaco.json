@@ -1,0 +1,5 @@
+{
+  "direction": "host",
+  "expect": "INVALID_PAYLOAD",
+  "line": "{\"protocol_version\":1,\"session_id\":\"5e1a9c03\",\"type\":\"cmd\",\"cmd_id\":\"c 1\",\"name\":\"ARM\"}"
+}

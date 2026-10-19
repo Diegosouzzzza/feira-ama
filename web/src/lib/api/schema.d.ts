@@ -25,6 +25,33 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * ApiErrorBody
+         * @description Every non-2xx response from /api uses this body.
+         */
+        ApiErrorBody: {
+            code: components["schemas"]["ErrorCode"];
+            /**
+             * Message
+             * @description Texto para o operador, em português, sem detalhes técnicos
+             */
+            message: string;
+            /**
+             * Recovery
+             * @description Ação sugerida ao operador
+             */
+            recovery?: string | null;
+            /**
+             * Trace Id
+             * @description Identificador para localizar o erro nos logs
+             */
+            trace_id: string;
+        };
+        /**
+         * ErrorCode
+         * @enum {string}
+         */
+        ErrorCode: "VALIDATION_ERROR" | "NOT_FOUND" | "CONFLICT" | "INVALID_STATE" | "CONTROL_LOCKED" | "REVIEW_REQUIRED" | "CAMERA_UNAVAILABLE" | "STALE_FRAME" | "MODEL_NOT_READY" | "SERIAL_DISCONNECTED" | "SENSOR_TIMEOUT" | "STORAGE_ERROR" | "INTERNAL_ERROR";
         /** HealthResponse */
         HealthResponse: {
             /**
@@ -41,6 +68,844 @@ export interface components {
          * @enum {string}
          */
         RunMode: "simulado" | "real";
+        /** LotCreate */
+        LotCreate: {
+            /**
+             * Request Id
+             * Format: uuid
+             */
+            request_id: string;
+            /** Product Id */
+            product_id: string;
+            /** Operator */
+            operator: string;
+            /**
+             * Notes
+             * @default null
+             */
+            notes: string | null;
+        };
+        /**
+         * MachineState
+         * @enum {string}
+         */
+        MachineState: "DISARMED" | "READY" | "TO_S1" | "SETTLING" | "INSPECTING" | "REVIEW_HOLD" | "TO_S2" | "SORTING" | "RELEASING" | "FAULT" | "ESTOP" | "MAINTENANCE";
+        /** MachineCommandRequest */
+        MachineCommandRequest: {
+            /**
+             * Request Id
+             * Format: uuid
+             * @description Repetir o mesmo id devolve o resultado original
+             */
+            request_id: string;
+            /**
+             * @description Recusa com INVALID_STATE se o estado atual for outro
+             * @default null
+             */
+            expected_state: components["schemas"]["MachineState"] | null;
+        };
+        /** ControlClaim */
+        ControlClaim: {
+            /** Operator */
+            operator: string;
+        };
+        /**
+         * Destination
+         * @enum {string}
+         */
+        Destination: "APPROVED" | "REJECTED";
+        /** InspectionReviewCreate */
+        InspectionReviewCreate: {
+            /**
+             * Request Id
+             * Format: uuid
+             */
+            request_id: string;
+            decision: components["schemas"]["Destination"];
+            /** Reviewer */
+            reviewer: string;
+            /** Reason */
+            reason: string;
+        };
+        /** CameraInfo */
+        CameraInfo: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ok" | "unavailable" | "stale";
+            /** Source */
+            source: string | null;
+            /** Last Frame At */
+            last_frame_at: string | null;
+        };
+        /** CycleOut */
+        CycleOut: {
+            /** Id */
+            id: number;
+            /** Lot Id */
+            lot_id: number;
+            /** Seq In Lot */
+            seq_in_lot: number;
+            status: components["schemas"]["CycleStatus"];
+            machine_state: components["schemas"]["MachineState"] | null;
+            commanded_destination: components["schemas"]["Destination"] | null;
+            /** Abort Reason */
+            abort_reason: string | null;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Ended At */
+            ended_at: string | null;
+        };
+        /**
+         * CycleStatus
+         * @enum {string}
+         */
+        CycleStatus: "running" | "completed" | "aborted";
+        /** DeviceLink */
+        DeviceLink: {
+            /** Connected */
+            connected: boolean;
+            /** Port */
+            port: string | null;
+            /** Boot Id */
+            boot_id: string | null;
+            /** Firmware Version */
+            firmware_version: string | null;
+            /**
+             * Last Seen At
+             * @description Última mensagem recebida da placa
+             */
+            last_seen_at: string | null;
+        };
+        /**
+         * FaultCode
+         * @enum {string}
+         */
+        FaultCode: "S1_TIMEOUT" | "DECISION_TIMEOUT" | "S2_TIMEOUT" | "EXIT_BLOCKED" | "LINK_LOST" | "SESSION_REPLACED" | "SENSOR_CONFLICT" | "INTERNAL";
+        /**
+         * Grade
+         * @enum {string}
+         */
+        Grade: "A" | "B" | "C";
+        /** LotOut */
+        LotOut: {
+            /** Id */
+            id: number;
+            /** Product Id */
+            product_id: string;
+            /** Model Id */
+            model_id: string | null;
+            /** Operator */
+            operator: string;
+            status: components["schemas"]["LotStatus"];
+            /** Is Simulated */
+            is_simulated: boolean;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Ended At */
+            ended_at: string | null;
+            /** Notes */
+            notes: string | null;
+        };
+        /**
+         * LotStatus
+         * @enum {string}
+         */
+        LotStatus: "open" | "closed";
+        /**
+         * LotSummary
+         * @description Counters derived from stored records, never from client-side increments.
+         */
+        LotSummary: {
+            /** Lot Id */
+            lot_id: number;
+            /**
+             * Inspected
+             * @description Inspeções registradas
+             */
+            inspected: number;
+            /**
+             * Approved
+             * @description Decisão final aprovada (automática ou revisada)
+             */
+            approved: number;
+            /**
+             * Rejected
+             * @description Decisão final rejeitada
+             */
+            rejected: number;
+            /**
+             * Review Pending
+             * @description Inconclusivos ainda sem decisão do operador
+             */
+            review_pending: number;
+            /**
+             * Reviewed
+             * @description Inspeções com revisão humana
+             */
+            reviewed: number;
+            /**
+             * By Grade
+             * @description Previsões do modelo por classe
+             */
+            by_grade: {
+                [key: string]: number;
+            };
+            /** Cycles Completed */
+            cycles_completed: number;
+            /** Cycles Aborted */
+            cycles_aborted: number;
+            /**
+             * Approval Rate
+             * @description approved / (approved + rejected); nulo se o denominador é zero
+             */
+            approval_rate: number | null;
+            /** Approval Rate Denominator */
+            approval_rate_denominator: number;
+        };
+        /** MachineInfo */
+        MachineInfo: {
+            /** @description Nulo se a placa nunca respondeu */
+            state: components["schemas"]["MachineState"] | null;
+            fault: components["schemas"]["FaultCode"] | null;
+            sensors: components["schemas"]["SensorSnapshot"] | null;
+            link: components["schemas"]["DeviceLink"];
+        };
+        /** ModelInfo */
+        ModelInfo: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ready" | "not_loaded" | "loading" | "error";
+            /** Model Id */
+            model_id: string | null;
+            /** Product Id */
+            product_id: string | null;
+        };
+        /** SensorSnapshot */
+        SensorSnapshot: {
+            /** S1 */
+            s1: boolean;
+            /** S2 */
+            s2: boolean;
+            /** Estop */
+            estop: boolean;
+        };
+        /** StorageInfo */
+        StorageInfo: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ok" | "low_space" | "error";
+            /** Free Bytes */
+            free_bytes: number | null;
+        };
+        /** SystemStatus */
+        SystemStatus: {
+            mode: components["schemas"]["RunMode"];
+            /**
+             * Generated At
+             * Format: date-time
+             */
+            generated_at: string;
+            /**
+             * State Version
+             * @description Cresce a cada mudança relevante de estado
+             */
+            state_version: number;
+            machine: components["schemas"]["MachineInfo"];
+            camera: components["schemas"]["CameraInfo"];
+            model: components["schemas"]["ModelInfo"];
+            storage: components["schemas"]["StorageInfo"];
+            /**
+             * Control Locked
+             * @description Há um operador com o controle ativo
+             */
+            control_locked: boolean;
+            active_lot: components["schemas"]["LotOut"] | null;
+            active_lot_summary: components["schemas"]["LotSummary"] | null;
+            current_cycle: components["schemas"]["CycleOut"] | null;
+        };
+        /** ProductOut */
+        ProductOut: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Presentation
+             * @description Ex.: com casca / sem casca
+             */
+            presentation: string | null;
+            /** Active Model Id */
+            active_model_id: string | null;
+            /** Decision Threshold */
+            decision_threshold: number;
+            /** Version */
+            version: number;
+        };
+        /**
+         * ModelValidationStatus
+         * @enum {string}
+         */
+        ModelValidationStatus: "pending" | "validated" | "rejected";
+        /** ModelOut */
+        ModelOut: {
+            /** Id */
+            id: string;
+            /** Product Id */
+            product_id: string;
+            /** Architecture */
+            architecture: string;
+            /** Class Order */
+            class_order: components["schemas"]["Grade"][];
+            /** Dataset Version */
+            dataset_version: string;
+            validation_status: components["schemas"]["ModelValidationStatus"];
+            /** Metrics */
+            metrics: {
+                [key: string]: number;
+            } | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** MachineCommandResult */
+        MachineCommandResult: {
+            /**
+             * Request Id
+             * Format: uuid
+             */
+            request_id: string;
+            /** Accepted */
+            accepted: boolean;
+            /** Duplicate */
+            duplicate: boolean;
+            state: components["schemas"]["MachineState"];
+        };
+        /** ControlGrant */
+        ControlGrant: {
+            /**
+             * Token
+             * @description Enviar no cabeçalho X-Control-Token nas rotas de controle
+             */
+            token: string;
+            /** Operator */
+            operator: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+        };
+        /**
+         * AutoDecision
+         * @enum {string}
+         */
+        AutoDecision: "APPROVED" | "REJECTED" | "REVIEW";
+        /**
+         * DecidedBy
+         * @enum {string}
+         */
+        DecidedBy: "auto" | "operator";
+        /**
+         * ReviewReason
+         * @enum {string}
+         */
+        ReviewReason: "LOW_CONFIDENCE" | "AMBIGUOUS" | "INVALID_IMAGE";
+        /** InspectionOut */
+        InspectionOut: {
+            /** Id */
+            id: number;
+            /** Cycle Id */
+            cycle_id: number;
+            /** Lot Id */
+            lot_id: number;
+            /** Product Id */
+            product_id: string;
+            /**
+             * Captured At
+             * Format: date-time
+             */
+            captured_at: string;
+            /** Image Url */
+            image_url: string;
+            /** Model Id */
+            model_id: string | null;
+            predicted_grade: components["schemas"]["Grade"] | null;
+            /** Scores */
+            scores: {
+                [key: string]: number;
+            } | null;
+            /**
+             * Confidence
+             * @description Confiança estimada do modelo, não taxa de acerto
+             */
+            confidence: number | null;
+            /** Latency Ms */
+            latency_ms: number | null;
+            auto_decision: components["schemas"]["AutoDecision"];
+            review_reason: components["schemas"]["ReviewReason"] | null;
+            final_decision: components["schemas"]["Destination"] | null;
+            decided_by: components["schemas"]["DecidedBy"] | null;
+            cycle_status: components["schemas"]["CycleStatus"];
+        };
+        /** InspectionPage */
+        InspectionPage: {
+            /** Items */
+            items: components["schemas"]["InspectionOut"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+        };
+        /** ReviewOut */
+        ReviewOut: {
+            /** Id */
+            id: number;
+            /** Inspection Id */
+            inspection_id: number;
+            /** Reviewer */
+            reviewer: string;
+            previous_decision: components["schemas"]["Destination"] | null;
+            new_decision: components["schemas"]["Destination"];
+            /** Reason */
+            reason: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * Component
+         * @enum {string}
+         */
+        Component: "device" | "camera" | "model" | "storage";
+        /** ConnectionData */
+        ConnectionData: {
+            component: components["schemas"]["Component"];
+            /** Message */
+            message: string;
+        };
+        /** ConnectionLostEvent */
+        ConnectionLostEvent: {
+            /**
+             * Seq
+             * @description Sequência do servidor; lacuna = cliente deve pedir novo snapshot
+             */
+            seq: number;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** State Version */
+            state_version: number;
+            /**
+             * Lot Id
+             * @default null
+             */
+            lot_id: number | null;
+            /**
+             * Cycle Id
+             * @default null
+             */
+            cycle_id: number | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "CONNECTION_LOST";
+            data: components["schemas"]["ConnectionData"];
+        };
+        /** ConnectionRestoredEvent */
+        ConnectionRestoredEvent: {
+            /**
+             * Seq
+             * @description Sequência do servidor; lacuna = cliente deve pedir novo snapshot
+             */
+            seq: number;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** State Version */
+            state_version: number;
+            /**
+             * Lot Id
+             * @default null
+             */
+            lot_id: number | null;
+            /**
+             * Cycle Id
+             * @default null
+             */
+            cycle_id: number | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "CONNECTION_RESTORED";
+            data: components["schemas"]["ConnectionData"];
+        };
+        /** CycleAbortedData */
+        CycleAbortedData: {
+            /** Reason */
+            reason: string;
+            summary: components["schemas"]["LotSummary"];
+        };
+        /** CycleAbortedEvent */
+        CycleAbortedEvent: {
+            /**
+             * Seq
+             * @description Sequência do servidor; lacuna = cliente deve pedir novo snapshot
+             */
+            seq: number;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** State Version */
+            state_version: number;
+            /**
+             * Lot Id
+             * @default null
+             */
+            lot_id: number | null;
+            /**
+             * Cycle Id
+             * @default null
+             */
+            cycle_id: number | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "CYCLE_ABORTED";
+            data: components["schemas"]["CycleAbortedData"];
+        };
+        /** CycleCompletedData */
+        CycleCompletedData: {
+            destination: components["schemas"]["Destination"];
+            summary: components["schemas"]["LotSummary"];
+        };
+        /** CycleCompletedEvent */
+        CycleCompletedEvent: {
+            /**
+             * Seq
+             * @description Sequência do servidor; lacuna = cliente deve pedir novo snapshot
+             */
+            seq: number;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** State Version */
+            state_version: number;
+            /**
+             * Lot Id
+             * @default null
+             */
+            lot_id: number | null;
+            /**
+             * Cycle Id
+             * @default null
+             */
+            cycle_id: number | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "CYCLE_COMPLETED";
+            data: components["schemas"]["CycleCompletedData"];
+        };
+        /** DecisionAcceptedData */
+        DecisionAcceptedData: {
+            /** Inspection Id */
+            inspection_id: number;
+            destination: components["schemas"]["Destination"];
+            decided_by: components["schemas"]["DecidedBy"];
+        };
+        /** DecisionAcceptedEvent */
+        DecisionAcceptedEvent: {
+            /**
+             * Seq
+             * @description Sequência do servidor; lacuna = cliente deve pedir novo snapshot
+             */
+            seq: number;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** State Version */
+            state_version: number;
+            /**
+             * Lot Id
+             * @default null
+             */
+            lot_id: number | null;
+            /**
+             * Cycle Id
+             * @default null
+             */
+            cycle_id: number | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "DECISION_ACCEPTED";
+            data: components["schemas"]["DecisionAcceptedData"];
+        };
+        /** FaultData */
+        FaultData: {
+            code: components["schemas"]["FaultCode"];
+            /**
+             * Message
+             * @description Texto para o operador
+             */
+            message: string;
+            /**
+             * Recovery
+             * @default null
+             */
+            recovery: string | null;
+        };
+        /** FaultEvent */
+        FaultEvent: {
+            /**
+             * Seq
+             * @description Sequência do servidor; lacuna = cliente deve pedir novo snapshot
+             */
+            seq: number;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** State Version */
+            state_version: number;
+            /**
+             * Lot Id
+             * @default null
+             */
+            lot_id: number | null;
+            /**
+             * Cycle Id
+             * @default null
+             */
+            cycle_id: number | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "FAULT";
+            data: components["schemas"]["FaultData"];
+        };
+        /** InspectionReadyEvent */
+        InspectionReadyEvent: {
+            /**
+             * Seq
+             * @description Sequência do servidor; lacuna = cliente deve pedir novo snapshot
+             */
+            seq: number;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** State Version */
+            state_version: number;
+            /**
+             * Lot Id
+             * @default null
+             */
+            lot_id: number | null;
+            /**
+             * Cycle Id
+             * @default null
+             */
+            cycle_id: number | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "INSPECTION_READY";
+            data: components["schemas"]["InspectionOut"];
+        };
+        /** LotUpdatedData */
+        LotUpdatedData: {
+            lot: components["schemas"]["LotOut"];
+            summary: components["schemas"]["LotSummary"];
+        };
+        /** LotUpdatedEvent */
+        LotUpdatedEvent: {
+            /**
+             * Seq
+             * @description Sequência do servidor; lacuna = cliente deve pedir novo snapshot
+             */
+            seq: number;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** State Version */
+            state_version: number;
+            /**
+             * Lot Id
+             * @default null
+             */
+            lot_id: number | null;
+            /**
+             * Cycle Id
+             * @default null
+             */
+            cycle_id: number | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "LOT_UPDATED";
+            data: components["schemas"]["LotUpdatedData"];
+        };
+        /** SensorChangedData */
+        SensorChangedData: {
+            /**
+             * Sensor
+             * @enum {string}
+             */
+            sensor: "S1" | "S2" | "ESTOP";
+            /** Active */
+            active: boolean;
+        };
+        /** SensorChangedEvent */
+        SensorChangedEvent: {
+            /**
+             * Seq
+             * @description Sequência do servidor; lacuna = cliente deve pedir novo snapshot
+             */
+            seq: number;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** State Version */
+            state_version: number;
+            /**
+             * Lot Id
+             * @default null
+             */
+            lot_id: number | null;
+            /**
+             * Cycle Id
+             * @default null
+             */
+            cycle_id: number | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "SENSOR_CHANGED";
+            data: components["schemas"]["SensorChangedData"];
+        };
+        /**
+         * SnapshotEvent
+         * @description Always the first message after connecting or reconnecting.
+         */
+        SnapshotEvent: {
+            /**
+             * Seq
+             * @description Sequência do servidor; lacuna = cliente deve pedir novo snapshot
+             */
+            seq: number;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** State Version */
+            state_version: number;
+            /**
+             * Lot Id
+             * @default null
+             */
+            lot_id: number | null;
+            /**
+             * Cycle Id
+             * @default null
+             */
+            cycle_id: number | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "SNAPSHOT";
+            data: components["schemas"]["SystemStatus"];
+        };
+        /** StateChangedData */
+        StateChangedData: {
+            from_state: components["schemas"]["MachineState"];
+            to_state: components["schemas"]["MachineState"];
+            trigger: components["schemas"]["Trigger"];
+            /** @default null */
+            fault: components["schemas"]["FaultCode"] | null;
+        };
+        /** StateChangedEvent */
+        StateChangedEvent: {
+            /**
+             * Seq
+             * @description Sequência do servidor; lacuna = cliente deve pedir novo snapshot
+             */
+            seq: number;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** State Version */
+            state_version: number;
+            /**
+             * Lot Id
+             * @default null
+             */
+            lot_id: number | null;
+            /**
+             * Cycle Id
+             * @default null
+             */
+            cycle_id: number | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "STATE_CHANGED";
+            data: components["schemas"]["StateChangedData"];
+        };
+        /**
+         * Trigger
+         * @enum {string}
+         */
+        Trigger: "HELLO" | "ARM" | "STOP" | "START_CYCLE" | "DECISION" | "HOLD_FOR_REVIEW" | "CLEAR_FAULT" | "ENTER_MAINTENANCE" | "EXIT_MAINTENANCE" | "S1_PRESENT" | "SETTLED" | "S2_PRESENT" | "SORT_DONE" | "RELEASED" | "TIMEOUT" | "LINK_LOST" | "ESTOP_PRESSED" | "ESTOP_RELEASED";
+        WsEvent: components["schemas"]["SnapshotEvent"] | components["schemas"]["StateChangedEvent"] | components["schemas"]["SensorChangedEvent"] | components["schemas"]["InspectionReadyEvent"] | components["schemas"]["DecisionAcceptedEvent"] | components["schemas"]["CycleCompletedEvent"] | components["schemas"]["CycleAbortedEvent"] | components["schemas"]["LotUpdatedEvent"] | components["schemas"]["ConnectionLostEvent"] | components["schemas"]["ConnectionRestoredEvent"] | components["schemas"]["FaultEvent"];
     };
     responses: never;
     parameters: never;
@@ -66,6 +931,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
                 };
             };
         };

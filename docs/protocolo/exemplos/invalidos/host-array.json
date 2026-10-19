@@ -1,0 +1,5 @@
+{
+  "direction": "host",
+  "expect": "BAD_JSON",
+  "line": "[1,2,3]"
+}

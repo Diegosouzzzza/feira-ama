@@ -1,0 +1,5 @@
+{
+  "direction": "host",
+  "expect": "UNSUPPORTED_VERSION",
+  "line": "{\"protocol_version\":2,\"session_id\":\"5e1a9c03\",\"type\":\"cmd\",\"cmd_id\":\"c1\",\"name\":\"ARM\"}"
+}

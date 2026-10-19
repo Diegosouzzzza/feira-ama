@@ -1,0 +1,14 @@
+{
+  "protocol_version": 1,
+  "boot_id": "b0071d2e",
+  "session_id": "5e1a9c03",
+  "seq": 15,
+  "state": "TO_S1",
+  "type": "evt",
+  "name": "SENSOR_CHANGED",
+  "cycle_id": 41,
+  "payload": {
+    "sensor": "S1",
+    "active": true
+  }
+}

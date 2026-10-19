@@ -1,0 +1,19 @@
+{
+  "protocol_version": 1,
+  "boot_id": "b0071d2e",
+  "session_id": "5e1a9c03",
+  "seq": 20,
+  "state": "INSPECTING",
+  "type": "hb",
+  "payload": {
+    "s1": true,
+    "s2": false,
+    "estop": false,
+    "motor_on": false,
+    "servo_deg_cmd": 10,
+    "configured": true,
+    "lot_id": 3,
+    "cycle_id": 41,
+    "uptime_ms": 912345
+  }
+}

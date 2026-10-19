@@ -2,6 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "AmazonVision 4.0 API",
+    "description": "Serviço local de inspeção visual e controle da bancada. Contrato: docs/api.md",
     "version": "0.1.0"
   },
   "paths": {
@@ -22,6 +23,26 @@
                 }
               }
             }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
           }
         }
       }
@@ -29,6 +50,62 @@
   },
   "components": {
     "schemas": {
+      "ApiErrorBody": {
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/ErrorCode"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "description": "Texto para o operador, em português, sem detalhes técnicos"
+          },
+          "recovery": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recovery",
+            "description": "Ação sugerida ao operador"
+          },
+          "trace_id": {
+            "type": "string",
+            "title": "Trace Id",
+            "description": "Identificador para localizar o erro nos logs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "trace_id"
+        ],
+        "title": "ApiErrorBody",
+        "description": "Every non-2xx response from /api uses this body."
+      },
+      "ErrorCode": {
+        "type": "string",
+        "enum": [
+          "VALIDATION_ERROR",
+          "NOT_FOUND",
+          "CONFLICT",
+          "INVALID_STATE",
+          "CONTROL_LOCKED",
+          "REVIEW_REQUIRED",
+          "CAMERA_UNAVAILABLE",
+          "STALE_FRAME",
+          "MODEL_NOT_READY",
+          "SERIAL_DISCONNECTED",
+          "SENSOR_TIMEOUT",
+          "STORAGE_ERROR",
+          "INTERNAL_ERROR"
+        ],
+        "title": "ErrorCode"
+      },
       "HealthResponse": {
         "properties": {
           "status": {
@@ -59,6 +136,2146 @@
           "real"
         ],
         "title": "RunMode"
+      },
+      "LotCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "product_id": {
+            "pattern": "^[a-z][a-z0-9_]{1,31}$",
+            "title": "Product Id",
+            "type": "string"
+          },
+          "operator": {
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Operator",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Notes"
+          }
+        },
+        "required": [
+          "request_id",
+          "product_id",
+          "operator"
+        ],
+        "title": "LotCreate",
+        "type": "object"
+      },
+      "MachineState": {
+        "enum": [
+          "DISARMED",
+          "READY",
+          "TO_S1",
+          "SETTLING",
+          "INSPECTING",
+          "REVIEW_HOLD",
+          "TO_S2",
+          "SORTING",
+          "RELEASING",
+          "FAULT",
+          "ESTOP",
+          "MAINTENANCE"
+        ],
+        "title": "MachineState",
+        "type": "string"
+      },
+      "MachineCommandRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "request_id": {
+            "description": "Repetir o mesmo id devolve o resultado original",
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "expected_state": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MachineState"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Recusa com INVALID_STATE se o estado atual for outro"
+          }
+        },
+        "required": [
+          "request_id"
+        ],
+        "title": "MachineCommandRequest",
+        "type": "object"
+      },
+      "ControlClaim": {
+        "additionalProperties": false,
+        "properties": {
+          "operator": {
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Operator",
+            "type": "string"
+          }
+        },
+        "required": [
+          "operator"
+        ],
+        "title": "ControlClaim",
+        "type": "object"
+      },
+      "Destination": {
+        "enum": [
+          "APPROVED",
+          "REJECTED"
+        ],
+        "title": "Destination",
+        "type": "string"
+      },
+      "InspectionReviewCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Destination"
+          },
+          "reviewer": {
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Reviewer",
+            "type": "string"
+          },
+          "reason": {
+            "maxLength": 200,
+            "minLength": 3,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "decision",
+          "reviewer",
+          "reason"
+        ],
+        "title": "InspectionReviewCreate",
+        "type": "object"
+      },
+      "CameraInfo": {
+        "properties": {
+          "status": {
+            "enum": [
+              "ok",
+              "unavailable",
+              "stale"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "last_frame_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Frame At"
+          }
+        },
+        "required": [
+          "status",
+          "source",
+          "last_frame_at"
+        ],
+        "title": "CameraInfo",
+        "type": "object"
+      },
+      "CycleOut": {
+        "properties": {
+          "id": {
+            "minimum": 1,
+            "title": "Id",
+            "type": "integer"
+          },
+          "lot_id": {
+            "minimum": 1,
+            "title": "Lot Id",
+            "type": "integer"
+          },
+          "seq_in_lot": {
+            "minimum": 1,
+            "title": "Seq In Lot",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CycleStatus"
+          },
+          "machine_state": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MachineState"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "commanded_destination": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Destination"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "abort_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Abort Reason"
+          },
+          "started_at": {
+            "format": "date-time",
+            "title": "Started At",
+            "type": "string"
+          },
+          "ended_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ended At"
+          }
+        },
+        "required": [
+          "id",
+          "lot_id",
+          "seq_in_lot",
+          "status",
+          "machine_state",
+          "commanded_destination",
+          "abort_reason",
+          "started_at",
+          "ended_at"
+        ],
+        "title": "CycleOut",
+        "type": "object"
+      },
+      "CycleStatus": {
+        "enum": [
+          "running",
+          "completed",
+          "aborted"
+        ],
+        "title": "CycleStatus",
+        "type": "string"
+      },
+      "DeviceLink": {
+        "properties": {
+          "connected": {
+            "title": "Connected",
+            "type": "boolean"
+          },
+          "port": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Port"
+          },
+          "boot_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boot Id"
+          },
+          "firmware_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Firmware Version"
+          },
+          "last_seen_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Última mensagem recebida da placa",
+            "title": "Last Seen At"
+          }
+        },
+        "required": [
+          "connected",
+          "port",
+          "boot_id",
+          "firmware_version",
+          "last_seen_at"
+        ],
+        "title": "DeviceLink",
+        "type": "object"
+      },
+      "FaultCode": {
+        "enum": [
+          "S1_TIMEOUT",
+          "DECISION_TIMEOUT",
+          "S2_TIMEOUT",
+          "EXIT_BLOCKED",
+          "LINK_LOST",
+          "SESSION_REPLACED",
+          "SENSOR_CONFLICT",
+          "INTERNAL"
+        ],
+        "title": "FaultCode",
+        "type": "string"
+      },
+      "Grade": {
+        "enum": [
+          "A",
+          "B",
+          "C"
+        ],
+        "title": "Grade",
+        "type": "string"
+      },
+      "LotOut": {
+        "properties": {
+          "id": {
+            "minimum": 1,
+            "title": "Id",
+            "type": "integer"
+          },
+          "product_id": {
+            "pattern": "^[a-z][a-z0-9_]{1,31}$",
+            "title": "Product Id",
+            "type": "string"
+          },
+          "model_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Id"
+          },
+          "operator": {
+            "title": "Operator",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/LotStatus"
+          },
+          "is_simulated": {
+            "title": "Is Simulated",
+            "type": "boolean"
+          },
+          "started_at": {
+            "format": "date-time",
+            "title": "Started At",
+            "type": "string"
+          },
+          "ended_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ended At"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "required": [
+          "id",
+          "product_id",
+          "model_id",
+          "operator",
+          "status",
+          "is_simulated",
+          "started_at",
+          "ended_at",
+          "notes"
+        ],
+        "title": "LotOut",
+        "type": "object"
+      },
+      "LotStatus": {
+        "enum": [
+          "open",
+          "closed"
+        ],
+        "title": "LotStatus",
+        "type": "string"
+      },
+      "LotSummary": {
+        "description": "Counters derived from stored records, never from client-side increments.",
+        "properties": {
+          "lot_id": {
+            "minimum": 1,
+            "title": "Lot Id",
+            "type": "integer"
+          },
+          "inspected": {
+            "description": "Inspeções registradas",
+            "minimum": 0,
+            "title": "Inspected",
+            "type": "integer"
+          },
+          "approved": {
+            "description": "Decisão final aprovada (automática ou revisada)",
+            "minimum": 0,
+            "title": "Approved",
+            "type": "integer"
+          },
+          "rejected": {
+            "description": "Decisão final rejeitada",
+            "minimum": 0,
+            "title": "Rejected",
+            "type": "integer"
+          },
+          "review_pending": {
+            "description": "Inconclusivos ainda sem decisão do operador",
+            "minimum": 0,
+            "title": "Review Pending",
+            "type": "integer"
+          },
+          "reviewed": {
+            "description": "Inspeções com revisão humana",
+            "minimum": 0,
+            "title": "Reviewed",
+            "type": "integer"
+          },
+          "by_grade": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "Previsões do modelo por classe",
+            "propertyNames": {
+              "$ref": "#/components/schemas/Grade"
+            },
+            "title": "By Grade",
+            "type": "object"
+          },
+          "cycles_completed": {
+            "minimum": 0,
+            "title": "Cycles Completed",
+            "type": "integer"
+          },
+          "cycles_aborted": {
+            "minimum": 0,
+            "title": "Cycles Aborted",
+            "type": "integer"
+          },
+          "approval_rate": {
+            "anyOf": [
+              {
+                "maximum": 1,
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "approved / (approved + rejected); nulo se o denominador é zero",
+            "title": "Approval Rate"
+          },
+          "approval_rate_denominator": {
+            "minimum": 0,
+            "title": "Approval Rate Denominator",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "lot_id",
+          "inspected",
+          "approved",
+          "rejected",
+          "review_pending",
+          "reviewed",
+          "by_grade",
+          "cycles_completed",
+          "cycles_aborted",
+          "approval_rate",
+          "approval_rate_denominator"
+        ],
+        "title": "LotSummary",
+        "type": "object"
+      },
+      "MachineInfo": {
+        "properties": {
+          "state": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MachineState"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Nulo se a placa nunca respondeu"
+          },
+          "fault": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FaultCode"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sensors": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SensorSnapshot"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "link": {
+            "$ref": "#/components/schemas/DeviceLink"
+          }
+        },
+        "required": [
+          "state",
+          "fault",
+          "sensors",
+          "link"
+        ],
+        "title": "MachineInfo",
+        "type": "object"
+      },
+      "ModelInfo": {
+        "properties": {
+          "status": {
+            "enum": [
+              "ready",
+              "not_loaded",
+              "loading",
+              "error"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "model_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Id"
+          },
+          "product_id": {
+            "anyOf": [
+              {
+                "pattern": "^[a-z][a-z0-9_]{1,31}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Id"
+          }
+        },
+        "required": [
+          "status",
+          "model_id",
+          "product_id"
+        ],
+        "title": "ModelInfo",
+        "type": "object"
+      },
+      "SensorSnapshot": {
+        "properties": {
+          "s1": {
+            "title": "S1",
+            "type": "boolean"
+          },
+          "s2": {
+            "title": "S2",
+            "type": "boolean"
+          },
+          "estop": {
+            "title": "Estop",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "s1",
+          "s2",
+          "estop"
+        ],
+        "title": "SensorSnapshot",
+        "type": "object"
+      },
+      "StorageInfo": {
+        "properties": {
+          "status": {
+            "enum": [
+              "ok",
+              "low_space",
+              "error"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "free_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Free Bytes"
+          }
+        },
+        "required": [
+          "status",
+          "free_bytes"
+        ],
+        "title": "StorageInfo",
+        "type": "object"
+      },
+      "SystemStatus": {
+        "properties": {
+          "mode": {
+            "$ref": "#/components/schemas/RunMode"
+          },
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "state_version": {
+            "description": "Cresce a cada mudança relevante de estado",
+            "minimum": 0,
+            "title": "State Version",
+            "type": "integer"
+          },
+          "machine": {
+            "$ref": "#/components/schemas/MachineInfo"
+          },
+          "camera": {
+            "$ref": "#/components/schemas/CameraInfo"
+          },
+          "model": {
+            "$ref": "#/components/schemas/ModelInfo"
+          },
+          "storage": {
+            "$ref": "#/components/schemas/StorageInfo"
+          },
+          "control_locked": {
+            "description": "Há um operador com o controle ativo",
+            "title": "Control Locked",
+            "type": "boolean"
+          },
+          "active_lot": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LotOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "active_lot_summary": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LotSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "current_cycle": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CycleOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "mode",
+          "generated_at",
+          "state_version",
+          "machine",
+          "camera",
+          "model",
+          "storage",
+          "control_locked",
+          "active_lot",
+          "active_lot_summary",
+          "current_cycle"
+        ],
+        "title": "SystemStatus",
+        "type": "object"
+      },
+      "ProductOut": {
+        "properties": {
+          "id": {
+            "pattern": "^[a-z][a-z0-9_]{1,31}$",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "presentation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Ex.: com casca / sem casca",
+            "title": "Presentation"
+          },
+          "active_model_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Model Id"
+          },
+          "decision_threshold": {
+            "exclusiveMinimum": 0,
+            "maximum": 1,
+            "title": "Decision Threshold",
+            "type": "number"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "presentation",
+          "active_model_id",
+          "decision_threshold",
+          "version"
+        ],
+        "title": "ProductOut",
+        "type": "object"
+      },
+      "ModelValidationStatus": {
+        "enum": [
+          "pending",
+          "validated",
+          "rejected"
+        ],
+        "title": "ModelValidationStatus",
+        "type": "string"
+      },
+      "ModelOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "product_id": {
+            "pattern": "^[a-z][a-z0-9_]{1,31}$",
+            "title": "Product Id",
+            "type": "string"
+          },
+          "architecture": {
+            "title": "Architecture",
+            "type": "string"
+          },
+          "class_order": {
+            "items": {
+              "$ref": "#/components/schemas/Grade"
+            },
+            "title": "Class Order",
+            "type": "array"
+          },
+          "dataset_version": {
+            "title": "Dataset Version",
+            "type": "string"
+          },
+          "validation_status": {
+            "$ref": "#/components/schemas/ModelValidationStatus"
+          },
+          "metrics": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metrics"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "product_id",
+          "architecture",
+          "class_order",
+          "dataset_version",
+          "validation_status",
+          "metrics",
+          "created_at"
+        ],
+        "title": "ModelOut",
+        "type": "object"
+      },
+      "MachineCommandResult": {
+        "properties": {
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "accepted": {
+            "title": "Accepted",
+            "type": "boolean"
+          },
+          "duplicate": {
+            "title": "Duplicate",
+            "type": "boolean"
+          },
+          "state": {
+            "$ref": "#/components/schemas/MachineState"
+          }
+        },
+        "required": [
+          "request_id",
+          "accepted",
+          "duplicate",
+          "state"
+        ],
+        "title": "MachineCommandResult",
+        "type": "object"
+      },
+      "ControlGrant": {
+        "properties": {
+          "token": {
+            "description": "Enviar no cabeçalho X-Control-Token nas rotas de controle",
+            "title": "Token",
+            "type": "string"
+          },
+          "operator": {
+            "title": "Operator",
+            "type": "string"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "operator",
+          "expires_at"
+        ],
+        "title": "ControlGrant",
+        "type": "object"
+      },
+      "AutoDecision": {
+        "enum": [
+          "APPROVED",
+          "REJECTED",
+          "REVIEW"
+        ],
+        "title": "AutoDecision",
+        "type": "string"
+      },
+      "DecidedBy": {
+        "enum": [
+          "auto",
+          "operator"
+        ],
+        "title": "DecidedBy",
+        "type": "string"
+      },
+      "ReviewReason": {
+        "enum": [
+          "LOW_CONFIDENCE",
+          "AMBIGUOUS",
+          "INVALID_IMAGE"
+        ],
+        "title": "ReviewReason",
+        "type": "string"
+      },
+      "InspectionOut": {
+        "properties": {
+          "id": {
+            "minimum": 1,
+            "title": "Id",
+            "type": "integer"
+          },
+          "cycle_id": {
+            "minimum": 1,
+            "title": "Cycle Id",
+            "type": "integer"
+          },
+          "lot_id": {
+            "minimum": 1,
+            "title": "Lot Id",
+            "type": "integer"
+          },
+          "product_id": {
+            "pattern": "^[a-z][a-z0-9_]{1,31}$",
+            "title": "Product Id",
+            "type": "string"
+          },
+          "captured_at": {
+            "format": "date-time",
+            "title": "Captured At",
+            "type": "string"
+          },
+          "image_url": {
+            "title": "Image Url",
+            "type": "string"
+          },
+          "model_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Id"
+          },
+          "predicted_grade": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Grade"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scores": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "propertyNames": {
+                  "$ref": "#/components/schemas/Grade"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scores"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Confiança estimada do modelo, não taxa de acerto",
+            "title": "Confidence"
+          },
+          "latency_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latency Ms"
+          },
+          "auto_decision": {
+            "$ref": "#/components/schemas/AutoDecision"
+          },
+          "review_reason": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReviewReason"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "final_decision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Destination"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "decided_by": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecidedBy"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cycle_status": {
+            "$ref": "#/components/schemas/CycleStatus"
+          }
+        },
+        "required": [
+          "id",
+          "cycle_id",
+          "lot_id",
+          "product_id",
+          "captured_at",
+          "image_url",
+          "model_id",
+          "predicted_grade",
+          "scores",
+          "confidence",
+          "latency_ms",
+          "auto_decision",
+          "review_reason",
+          "final_decision",
+          "decided_by",
+          "cycle_status"
+        ],
+        "title": "InspectionOut",
+        "type": "object"
+      },
+      "InspectionPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/InspectionOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "minimum": 0,
+            "title": "Total",
+            "type": "integer"
+          },
+          "limit": {
+            "maximum": 200,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "minimum": 0,
+            "title": "Offset",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "InspectionPage",
+        "type": "object"
+      },
+      "ReviewOut": {
+        "properties": {
+          "id": {
+            "minimum": 1,
+            "title": "Id",
+            "type": "integer"
+          },
+          "inspection_id": {
+            "minimum": 1,
+            "title": "Inspection Id",
+            "type": "integer"
+          },
+          "reviewer": {
+            "title": "Reviewer",
+            "type": "string"
+          },
+          "previous_decision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Destination"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "new_decision": {
+            "$ref": "#/components/schemas/Destination"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "inspection_id",
+          "reviewer",
+          "previous_decision",
+          "new_decision",
+          "reason",
+          "created_at"
+        ],
+        "title": "ReviewOut",
+        "type": "object"
+      },
+      "Component": {
+        "enum": [
+          "device",
+          "camera",
+          "model",
+          "storage"
+        ],
+        "title": "Component",
+        "type": "string"
+      },
+      "ConnectionData": {
+        "properties": {
+          "component": {
+            "$ref": "#/components/schemas/Component"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "component",
+          "message"
+        ],
+        "title": "ConnectionData",
+        "type": "object"
+      },
+      "ConnectionLostEvent": {
+        "properties": {
+          "seq": {
+            "description": "Sequência do servidor; lacuna = cliente deve pedir novo snapshot",
+            "minimum": 1,
+            "title": "Seq",
+            "type": "integer"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "state_version": {
+            "minimum": 0,
+            "title": "State Version",
+            "type": "integer"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Lot Id"
+          },
+          "cycle_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cycle Id"
+          },
+          "type": {
+            "const": "CONNECTION_LOST",
+            "default": "CONNECTION_LOST",
+            "title": "Type",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ConnectionData"
+          }
+        },
+        "required": [
+          "seq",
+          "at",
+          "state_version",
+          "data"
+        ],
+        "title": "ConnectionLostEvent",
+        "type": "object"
+      },
+      "ConnectionRestoredEvent": {
+        "properties": {
+          "seq": {
+            "description": "Sequência do servidor; lacuna = cliente deve pedir novo snapshot",
+            "minimum": 1,
+            "title": "Seq",
+            "type": "integer"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "state_version": {
+            "minimum": 0,
+            "title": "State Version",
+            "type": "integer"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Lot Id"
+          },
+          "cycle_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cycle Id"
+          },
+          "type": {
+            "const": "CONNECTION_RESTORED",
+            "default": "CONNECTION_RESTORED",
+            "title": "Type",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ConnectionData"
+          }
+        },
+        "required": [
+          "seq",
+          "at",
+          "state_version",
+          "data"
+        ],
+        "title": "ConnectionRestoredEvent",
+        "type": "object"
+      },
+      "CycleAbortedData": {
+        "properties": {
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/LotSummary"
+          }
+        },
+        "required": [
+          "reason",
+          "summary"
+        ],
+        "title": "CycleAbortedData",
+        "type": "object"
+      },
+      "CycleAbortedEvent": {
+        "properties": {
+          "seq": {
+            "description": "Sequência do servidor; lacuna = cliente deve pedir novo snapshot",
+            "minimum": 1,
+            "title": "Seq",
+            "type": "integer"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "state_version": {
+            "minimum": 0,
+            "title": "State Version",
+            "type": "integer"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Lot Id"
+          },
+          "cycle_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cycle Id"
+          },
+          "type": {
+            "const": "CYCLE_ABORTED",
+            "default": "CYCLE_ABORTED",
+            "title": "Type",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CycleAbortedData"
+          }
+        },
+        "required": [
+          "seq",
+          "at",
+          "state_version",
+          "data"
+        ],
+        "title": "CycleAbortedEvent",
+        "type": "object"
+      },
+      "CycleCompletedData": {
+        "properties": {
+          "destination": {
+            "$ref": "#/components/schemas/Destination"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/LotSummary"
+          }
+        },
+        "required": [
+          "destination",
+          "summary"
+        ],
+        "title": "CycleCompletedData",
+        "type": "object"
+      },
+      "CycleCompletedEvent": {
+        "properties": {
+          "seq": {
+            "description": "Sequência do servidor; lacuna = cliente deve pedir novo snapshot",
+            "minimum": 1,
+            "title": "Seq",
+            "type": "integer"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "state_version": {
+            "minimum": 0,
+            "title": "State Version",
+            "type": "integer"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Lot Id"
+          },
+          "cycle_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cycle Id"
+          },
+          "type": {
+            "const": "CYCLE_COMPLETED",
+            "default": "CYCLE_COMPLETED",
+            "title": "Type",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CycleCompletedData"
+          }
+        },
+        "required": [
+          "seq",
+          "at",
+          "state_version",
+          "data"
+        ],
+        "title": "CycleCompletedEvent",
+        "type": "object"
+      },
+      "DecisionAcceptedData": {
+        "properties": {
+          "inspection_id": {
+            "title": "Inspection Id",
+            "type": "integer"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/Destination"
+          },
+          "decided_by": {
+            "$ref": "#/components/schemas/DecidedBy"
+          }
+        },
+        "required": [
+          "inspection_id",
+          "destination",
+          "decided_by"
+        ],
+        "title": "DecisionAcceptedData",
+        "type": "object"
+      },
+      "DecisionAcceptedEvent": {
+        "properties": {
+          "seq": {
+            "description": "Sequência do servidor; lacuna = cliente deve pedir novo snapshot",
+            "minimum": 1,
+            "title": "Seq",
+            "type": "integer"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "state_version": {
+            "minimum": 0,
+            "title": "State Version",
+            "type": "integer"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Lot Id"
+          },
+          "cycle_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cycle Id"
+          },
+          "type": {
+            "const": "DECISION_ACCEPTED",
+            "default": "DECISION_ACCEPTED",
+            "title": "Type",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DecisionAcceptedData"
+          }
+        },
+        "required": [
+          "seq",
+          "at",
+          "state_version",
+          "data"
+        ],
+        "title": "DecisionAcceptedEvent",
+        "type": "object"
+      },
+      "FaultData": {
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/FaultCode"
+          },
+          "message": {
+            "description": "Texto para o operador",
+            "title": "Message",
+            "type": "string"
+          },
+          "recovery": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Recovery"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "FaultData",
+        "type": "object"
+      },
+      "FaultEvent": {
+        "properties": {
+          "seq": {
+            "description": "Sequência do servidor; lacuna = cliente deve pedir novo snapshot",
+            "minimum": 1,
+            "title": "Seq",
+            "type": "integer"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "state_version": {
+            "minimum": 0,
+            "title": "State Version",
+            "type": "integer"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Lot Id"
+          },
+          "cycle_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cycle Id"
+          },
+          "type": {
+            "const": "FAULT",
+            "default": "FAULT",
+            "title": "Type",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/FaultData"
+          }
+        },
+        "required": [
+          "seq",
+          "at",
+          "state_version",
+          "data"
+        ],
+        "title": "FaultEvent",
+        "type": "object"
+      },
+      "InspectionReadyEvent": {
+        "properties": {
+          "seq": {
+            "description": "Sequência do servidor; lacuna = cliente deve pedir novo snapshot",
+            "minimum": 1,
+            "title": "Seq",
+            "type": "integer"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "state_version": {
+            "minimum": 0,
+            "title": "State Version",
+            "type": "integer"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Lot Id"
+          },
+          "cycle_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cycle Id"
+          },
+          "type": {
+            "const": "INSPECTION_READY",
+            "default": "INSPECTION_READY",
+            "title": "Type",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/InspectionOut"
+          }
+        },
+        "required": [
+          "seq",
+          "at",
+          "state_version",
+          "data"
+        ],
+        "title": "InspectionReadyEvent",
+        "type": "object"
+      },
+      "LotUpdatedData": {
+        "properties": {
+          "lot": {
+            "$ref": "#/components/schemas/LotOut"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/LotSummary"
+          }
+        },
+        "required": [
+          "lot",
+          "summary"
+        ],
+        "title": "LotUpdatedData",
+        "type": "object"
+      },
+      "LotUpdatedEvent": {
+        "properties": {
+          "seq": {
+            "description": "Sequência do servidor; lacuna = cliente deve pedir novo snapshot",
+            "minimum": 1,
+            "title": "Seq",
+            "type": "integer"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "state_version": {
+            "minimum": 0,
+            "title": "State Version",
+            "type": "integer"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Lot Id"
+          },
+          "cycle_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cycle Id"
+          },
+          "type": {
+            "const": "LOT_UPDATED",
+            "default": "LOT_UPDATED",
+            "title": "Type",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/LotUpdatedData"
+          }
+        },
+        "required": [
+          "seq",
+          "at",
+          "state_version",
+          "data"
+        ],
+        "title": "LotUpdatedEvent",
+        "type": "object"
+      },
+      "SensorChangedData": {
+        "properties": {
+          "sensor": {
+            "enum": [
+              "S1",
+              "S2",
+              "ESTOP"
+            ],
+            "title": "Sensor",
+            "type": "string"
+          },
+          "active": {
+            "title": "Active",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "sensor",
+          "active"
+        ],
+        "title": "SensorChangedData",
+        "type": "object"
+      },
+      "SensorChangedEvent": {
+        "properties": {
+          "seq": {
+            "description": "Sequência do servidor; lacuna = cliente deve pedir novo snapshot",
+            "minimum": 1,
+            "title": "Seq",
+            "type": "integer"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "state_version": {
+            "minimum": 0,
+            "title": "State Version",
+            "type": "integer"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Lot Id"
+          },
+          "cycle_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cycle Id"
+          },
+          "type": {
+            "const": "SENSOR_CHANGED",
+            "default": "SENSOR_CHANGED",
+            "title": "Type",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/SensorChangedData"
+          }
+        },
+        "required": [
+          "seq",
+          "at",
+          "state_version",
+          "data"
+        ],
+        "title": "SensorChangedEvent",
+        "type": "object"
+      },
+      "SnapshotEvent": {
+        "description": "Always the first message after connecting or reconnecting.",
+        "properties": {
+          "seq": {
+            "description": "Sequência do servidor; lacuna = cliente deve pedir novo snapshot",
+            "minimum": 1,
+            "title": "Seq",
+            "type": "integer"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "state_version": {
+            "minimum": 0,
+            "title": "State Version",
+            "type": "integer"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Lot Id"
+          },
+          "cycle_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cycle Id"
+          },
+          "type": {
+            "const": "SNAPSHOT",
+            "default": "SNAPSHOT",
+            "title": "Type",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/SystemStatus"
+          }
+        },
+        "required": [
+          "seq",
+          "at",
+          "state_version",
+          "data"
+        ],
+        "title": "SnapshotEvent",
+        "type": "object"
+      },
+      "StateChangedData": {
+        "properties": {
+          "from_state": {
+            "$ref": "#/components/schemas/MachineState"
+          },
+          "to_state": {
+            "$ref": "#/components/schemas/MachineState"
+          },
+          "trigger": {
+            "$ref": "#/components/schemas/Trigger"
+          },
+          "fault": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FaultCode"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "from_state",
+          "to_state",
+          "trigger"
+        ],
+        "title": "StateChangedData",
+        "type": "object"
+      },
+      "StateChangedEvent": {
+        "properties": {
+          "seq": {
+            "description": "Sequência do servidor; lacuna = cliente deve pedir novo snapshot",
+            "minimum": 1,
+            "title": "Seq",
+            "type": "integer"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "state_version": {
+            "minimum": 0,
+            "title": "State Version",
+            "type": "integer"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Lot Id"
+          },
+          "cycle_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cycle Id"
+          },
+          "type": {
+            "const": "STATE_CHANGED",
+            "default": "STATE_CHANGED",
+            "title": "Type",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/StateChangedData"
+          }
+        },
+        "required": [
+          "seq",
+          "at",
+          "state_version",
+          "data"
+        ],
+        "title": "StateChangedEvent",
+        "type": "object"
+      },
+      "Trigger": {
+        "enum": [
+          "HELLO",
+          "ARM",
+          "STOP",
+          "START_CYCLE",
+          "DECISION",
+          "HOLD_FOR_REVIEW",
+          "CLEAR_FAULT",
+          "ENTER_MAINTENANCE",
+          "EXIT_MAINTENANCE",
+          "S1_PRESENT",
+          "SETTLED",
+          "S2_PRESENT",
+          "SORT_DONE",
+          "RELEASED",
+          "TIMEOUT",
+          "LINK_LOST",
+          "ESTOP_PRESSED",
+          "ESTOP_RELEASED"
+        ],
+        "title": "Trigger",
+        "type": "string"
+      },
+      "WsEvent": {
+        "discriminator": {
+          "mapping": {
+            "CONNECTION_LOST": "#/components/schemas/ConnectionLostEvent",
+            "CONNECTION_RESTORED": "#/components/schemas/ConnectionRestoredEvent",
+            "CYCLE_ABORTED": "#/components/schemas/CycleAbortedEvent",
+            "CYCLE_COMPLETED": "#/components/schemas/CycleCompletedEvent",
+            "DECISION_ACCEPTED": "#/components/schemas/DecisionAcceptedEvent",
+            "FAULT": "#/components/schemas/FaultEvent",
+            "INSPECTION_READY": "#/components/schemas/InspectionReadyEvent",
+            "LOT_UPDATED": "#/components/schemas/LotUpdatedEvent",
+            "SENSOR_CHANGED": "#/components/schemas/SensorChangedEvent",
+            "SNAPSHOT": "#/components/schemas/SnapshotEvent",
+            "STATE_CHANGED": "#/components/schemas/StateChangedEvent"
+          },
+          "propertyName": "type"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/SnapshotEvent"
+          },
+          {
+            "$ref": "#/components/schemas/StateChangedEvent"
+          },
+          {
+            "$ref": "#/components/schemas/SensorChangedEvent"
+          },
+          {
+            "$ref": "#/components/schemas/InspectionReadyEvent"
+          },
+          {
+            "$ref": "#/components/schemas/DecisionAcceptedEvent"
+          },
+          {
+            "$ref": "#/components/schemas/CycleCompletedEvent"
+          },
+          {
+            "$ref": "#/components/schemas/CycleAbortedEvent"
+          },
+          {
+            "$ref": "#/components/schemas/LotUpdatedEvent"
+          },
+          {
+            "$ref": "#/components/schemas/ConnectionLostEvent"
+          },
+          {
+            "$ref": "#/components/schemas/ConnectionRestoredEvent"
+          },
+          {
+            "$ref": "#/components/schemas/FaultEvent"
+          }
+        ]
       }
     }
   }

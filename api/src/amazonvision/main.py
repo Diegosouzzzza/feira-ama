@@ -6,6 +6,8 @@ from fastapi import FastAPI
 
 from amazonvision import __version__
 from amazonvision.config import Settings
+from amazonvision.http_errors import ERROR_RESPONSES, install_error_handlers
+from amazonvision.openapi import install_openapi
 from amazonvision.routes import health
 from amazonvision.web import mount_web
 
@@ -24,12 +26,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = FastAPI(
         title="AmazonVision 4.0 API",
         version=__version__,
+        description="Serviço local de inspeção visual e controle da bancada. Contrato: docs/api.md",
         lifespan=lifespan,
         docs_url="/api/docs",
         openapi_url="/api/openapi.json",
         redoc_url=None,
     )
     app.state.settings = settings
-    app.include_router(health.router, prefix="/api")
+    install_error_handlers(app)
+    app.include_router(health.router, prefix="/api", responses=ERROR_RESPONSES)
     mount_web(app, settings.web_dist)
+    install_openapi(app)
     return app

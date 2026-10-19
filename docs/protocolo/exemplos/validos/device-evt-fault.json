@@ -1,0 +1,14 @@
+{
+  "protocol_version": 1,
+  "boot_id": "b0071d2e",
+  "session_id": "5e1a9c03",
+  "seq": 19,
+  "state": "FAULT",
+  "type": "evt",
+  "name": "FAULT",
+  "cycle_id": 41,
+  "payload": {
+    "code": "S2_TIMEOUT",
+    "detail": "S2 nao detectado em 8000 ms"
+  }
+}

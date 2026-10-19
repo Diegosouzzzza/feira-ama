@@ -1,0 +1,13 @@
+{
+  "protocol_version": 1,
+  "boot_id": "b0071d2e",
+  "session_id": "5e1a9c03",
+  "seq": 17,
+  "state": "READY",
+  "type": "evt",
+  "name": "CYCLE_COMPLETED",
+  "cycle_id": 41,
+  "payload": {
+    "destination": "REJECTED"
+  }
+}

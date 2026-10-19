@@ -1,0 +1,16 @@
+{
+  "protocol_version": 1,
+  "boot_id": "b0071d2e",
+  "seq": 0,
+  "state": "DISARMED",
+  "type": "hb",
+  "payload": {
+    "s1": true,
+    "s2": false,
+    "estop": false,
+    "motor_on": false,
+    "servo_deg_cmd": 10,
+    "configured": false,
+    "uptime_ms": 912345
+  }
+}

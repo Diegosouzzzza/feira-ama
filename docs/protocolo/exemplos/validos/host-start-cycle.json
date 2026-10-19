@@ -1,0 +1,9 @@
+{
+  "protocol_version": 1,
+  "session_id": "5e1a9c03",
+  "type": "cmd",
+  "cmd_id": "c0004",
+  "name": "START_CYCLE",
+  "lot_id": 3,
+  "cycle_id": 41
+}

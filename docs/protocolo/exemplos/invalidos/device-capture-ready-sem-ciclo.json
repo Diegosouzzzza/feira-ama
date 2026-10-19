@@ -1,0 +1,5 @@
+{
+  "direction": "device",
+  "expect": "INVALID_PAYLOAD",
+  "line": "{\"protocol_version\":1,\"boot_id\":\"b0071d2e\",\"session_id\":\"5e1a9c03\",\"seq\":1,\"state\":\"INSPECTING\",\"type\":\"evt\",\"name\":\"CAPTURE_READY\"}"
+}

@@ -1,0 +1,10 @@
+{
+  "protocol_version": 1,
+  "boot_id": "b0071d2e",
+  "session_id": "5e1a9c03",
+  "seq": 16,
+  "state": "INSPECTING",
+  "type": "evt",
+  "name": "CAPTURE_READY",
+  "cycle_id": 41
+}

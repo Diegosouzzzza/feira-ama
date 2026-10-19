@@ -1,0 +1,13 @@
+{
+  "protocol_version": 1,
+  "boot_id": "b0071d2e",
+  "session_id": "5e1a9c03",
+  "seq": 18,
+  "state": "FAULT",
+  "type": "evt",
+  "name": "CYCLE_ABORTED",
+  "cycle_id": 41,
+  "payload": {
+    "reason": "S2_TIMEOUT"
+  }
+}

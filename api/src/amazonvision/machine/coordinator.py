@@ -205,7 +205,7 @@ class Coordinator:
             )
         lot = await self._db.run(get_open_lot)
         if lot is not None:
-            self._models.load(lot.product_id)
+            self._models.load(lot.product_id, lot.model_id)
         if self._link is None:
             return
         await self._link.start()

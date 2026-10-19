@@ -18,6 +18,7 @@ from amazonvision.machine.simulated_device import SimulatedDevice
 from amazonvision.schemas.api import EventSource, Severity, SystemStatus
 from amazonvision.schemas.events import SnapshotEvent
 from amazonvision.services.lots import LotService
+from amazonvision.services.models import ModelService
 from amazonvision.services.reviews import ReviewService
 from amazonvision.services.status import StatusService
 from amazonvision.simulation.scenario import Scenario
@@ -74,6 +75,7 @@ class Services:
     coordinator: Coordinator
     lots: LotService
     reviews: ReviewService
+    model_registry: ModelService
     status: StatusService
     record: Recorder
     simulation: Simulation | None
@@ -110,7 +112,7 @@ class Services:
             db,
             bus,
             machine_busy=coordinator.busy,
-            on_opened=lambda lot: models.load(lot.product_id),
+            on_opened=lambda lot: models.load(lot.product_id, lot.model_id),
             on_closed=lambda lot: models.unload(),
         )
         services = cls(
@@ -123,6 +125,7 @@ class Services:
             coordinator=coordinator,
             lots=lots,
             reviews=ReviewService(db, bus, coordinator),
+            model_registry=ModelService(settings, db),
             status=StatusService(settings, db, control, coordinator, camera, models),
             record=record,
             simulation=simulation,

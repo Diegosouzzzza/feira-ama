@@ -8,6 +8,9 @@ authors = [
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "fastapi>=0.146.0",
+    "numpy>=2.5.4",
+    "onnxruntime>=1.31.0",
+    "pillow>=13.0.0",
     "pydantic-settings>=2.16.0",
     "uvicorn[standard]>=0.54.0",
 ]
@@ -22,10 +25,29 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "httpx2>=2.14.0",
+    "onnx>=1.23.2",
     "pytest>=9.1.1",
     "ruff>=0.17.1",
     "ziglang==0.13.0.post1",
 ]
+training = [
+    "onnx>=1.23.2",
+    "onnxscript>=0.7.2",
+    "scikit-learn>=1.9.1",
+    "torch>=2.14.1",
+    "torchvision>=0.29.1",
+]
+
+# PyTorch only for training (group "training"). CPU build by default so it installs anywhere;
+# the RTX notebook can switch the index to a CUDA build (docs/treinamento.md).
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+torchvision = { index = "pytorch-cpu" }
 
 [tool.ruff]
 line-length = 100
@@ -38,6 +60,7 @@ ignore = ["S101"]
 [tool.ruff.lint.per-file-ignores]
 # Simulation randomness is not security-sensitive.
 "src/amazonvision/simulation/*" = ["S311"]
+"src/amazonvision/training/*" = ["S311"]
 # Tests run the locally built firmware binaries.
 "tests/*" = ["S603", "S607"]
 

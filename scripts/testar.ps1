@@ -5,9 +5,10 @@ $ErrorActionPreference = 'Continue'
 $falhas = @()
 
 Push-Location (Join-Path $Raiz 'api')
-uv run ruff check .;             if ($LASTEXITCODE) { $falhas += 'api: ruff check' }
-uv run ruff format --check .;    if ($LASTEXITCODE) { $falhas += 'api: ruff format' }
-uv run pytest -q;                if ($LASTEXITCODE) { $falhas += 'api: pytest' }
+# The training group (PyTorch) is included so the real training test runs too.
+uv run --group training ruff check .;           if ($LASTEXITCODE) { $falhas += 'api: ruff check' }
+uv run --group training ruff format --check .;  if ($LASTEXITCODE) { $falhas += 'api: ruff format' }
+uv run --group training pytest -q;              if ($LASTEXITCODE) { $falhas += 'api: pytest' }
 Pop-Location
 
 Push-Location (Join-Path $Raiz 'web')

@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { startRealtime } from "@/lib/realtime/store";
 import { FeiraPage } from "@/pages/feira";
+import { ModelosPage } from "@/pages/modelos";
 import { NaoEncontradaPage } from "@/pages/nao-encontrada";
 import { OperacaoPage } from "@/pages/operacao";
 
@@ -14,6 +15,7 @@ const queryClient = new QueryClient({
 const router = createBrowserRouter([
   { index: true, element: <OperacaoPage /> },
   { path: "feira", element: <FeiraPage /> },
+  { path: "modelos", element: <ModelosPage /> },
   { path: "*", element: <NaoEncontradaPage /> },
 ]);
 

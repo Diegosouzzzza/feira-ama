@@ -238,6 +238,100 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Models */
+        get: operations["list_models_api_models_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/models/install": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Install
+         * @description Instala um pacote gerado pelo treinamento (pasta com model.onnx e model.json).
+         */
+        post: operations["install_api_models_install_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/models/{model_id}/validation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Set Validation
+         * @description Registra a decisão da equipe sobre o relatório do modelo.
+         */
+        post: operations["set_validation_api_models__model_id__validation_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/models/{model_id}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Activate
+         * @description Torna o modelo o ativo do produto e adota o limiar calibrado na validação.
+         */
+        post: operations["activate_api_models__model_id__activate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/models/{model_id}/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Report */
+        get: operations["report_api_models__model_id__report_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/inspections": {
         parameters: {
             query?: never;
@@ -726,6 +820,67 @@ export interface components {
             /** Product Id */
             product_id: string | null;
         };
+        /** ModelInstall */
+        ModelInstall: {
+            /**
+             * Path
+             * @description Pasta do pacote (model.onnx + model.json) neste computador
+             */
+            path: string;
+        };
+        /** ModelOut */
+        ModelOut: {
+            /** Id */
+            id: string;
+            /** Product Id */
+            product_id: string;
+            /** Architecture */
+            architecture: string;
+            /** Class Order */
+            class_order: components["schemas"]["Grade"][];
+            /** Dataset Version */
+            dataset_version: string;
+            validation_status: components["schemas"]["ModelValidationStatus"];
+            /** Validated By */
+            validated_by: string | null;
+            /**
+             * Metrics
+             * @description Resumo do teste: falsa aprovação, rejeição de B/C, revisão, latência
+             */
+            metrics: {
+                [key: string]: number | boolean | null;
+            } | null;
+            /**
+             * Recommended Threshold
+             * @description Limiar escolhido na validação; vira o limiar do produto ao ativar
+             */
+            recommended_threshold: number | null;
+            /**
+             * Active
+             * @description É o modelo ativo do produto
+             */
+            active: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * ModelValidationStatus
+         * @enum {string}
+         */
+        ModelValidationStatus: "pending" | "validated" | "rejected";
+        /** ModelValidationUpdate */
+        ModelValidationUpdate: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "validated" | "rejected";
+            /** Reviewer */
+            reviewer: string;
+        };
         /** ProductOut */
         ProductOut: {
             /** Id */
@@ -826,34 +981,6 @@ export interface components {
             active_lot: components["schemas"]["LotOut"] | null;
             active_lot_summary: components["schemas"]["LotSummary"] | null;
             current_cycle: components["schemas"]["CycleOut"] | null;
-        };
-        /**
-         * ModelValidationStatus
-         * @enum {string}
-         */
-        ModelValidationStatus: "pending" | "validated" | "rejected";
-        /** ModelOut */
-        ModelOut: {
-            /** Id */
-            id: string;
-            /** Product Id */
-            product_id: string;
-            /** Architecture */
-            architecture: string;
-            /** Class Order */
-            class_order: components["schemas"]["Grade"][];
-            /** Dataset Version */
-            dataset_version: string;
-            validation_status: components["schemas"]["ModelValidationStatus"];
-            /** Metrics */
-            metrics: {
-                [key: string]: number;
-            } | null;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
         };
         /**
          * Component
@@ -1872,6 +1999,230 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    list_models_api_models_get: {
+        parameters: {
+            query?: {
+                product_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelOut"][];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    install_api_models_install_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ModelInstall"];
+            };
+        };
+        responses: {
+            /** @description Pacote já instalado */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelOut"];
+                };
+            };
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelOut"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    set_validation_api_models__model_id__validation_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path: {
+                model_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ModelValidationUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelOut"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    activate_api_models__model_id__activate_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path: {
+                model_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelOut"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    report_api_models__model_id__report_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                model_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": string;
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": components["schemas"]["ApiErrorBody"];
                 };
             };
         };

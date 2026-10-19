@@ -24,7 +24,7 @@ test("operador assume, abre lote e inicia; recarregar não duplica nada", async 
   await page.getByRole("combobox", { name: "Produto" }).click();
   await page.getByRole("option", { name: "Castanha-do-pará" }).click();
   await page.getByRole("button", { name: "Abrir lote" }).click();
-  await expect(page.getByText("Castanha-do-pará", { exact: true })).toBeVisible();
+  await expect(page.getByRole("banner").getByText("Castanha-do-pará", { exact: true })).toBeVisible();
 
   await page.getByRole("button", { name: "Iniciar" }).click();
   await expect.poll(() => inspected(page), { timeout: 20_000 }).toBeGreaterThanOrEqual(2);

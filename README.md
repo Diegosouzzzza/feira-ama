@@ -59,6 +59,8 @@ Blocos 1 a 5 concluídos: fundação, contratos, núcleo da API, coordenador do 
 
 Bloco 6 em andamento: a **lógica do firmware** está pronta e testada no PC contra o contrato e a API (ver `docs/firmware.md`); faltam a escolha do motor, a pinagem definitiva e os ensaios na bancada.
 
+Bloco 8 (software) pronto: **pipeline de treinamento** (divisão por peça física, MobileNetV3, ONNX, limiar calibrado, relatório com parecer) e **tela de Modelos** para instalar, validar e ativar. Falta treinar com fotos reais (ver `docs/treinamento.md`).
+
 Testes de navegador (Playwright, usa o Microsoft Edge instalado):
 
 ```powershell

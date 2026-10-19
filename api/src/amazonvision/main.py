@@ -17,6 +17,7 @@ from amazonvision.routes import (
     inspections,
     lots,
     machine,
+    models,
     status,
     ws,
 )
@@ -63,6 +64,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         control.router,
         lots.router,
         machine.router,
+        models.router,
         inspections.router,
         diagnostics.router,
     ):

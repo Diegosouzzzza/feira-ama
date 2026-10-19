@@ -45,8 +45,26 @@ class ModelOut(BaseModel):
     class_order: list[Grade]
     dataset_version: str
     validation_status: ModelValidationStatus
-    metrics: dict[str, float] | None
+    validated_by: str | None
+    metrics: dict[str, float | bool | None] | None = Field(
+        description="Resumo do teste: falsa aprovação, rejeição de B/C, revisão, latência"
+    )
+    recommended_threshold: float | None = Field(
+        description="Limiar escolhido na validação; vira o limiar do produto ao ativar"
+    )
+    active: bool = Field(description="É o modelo ativo do produto")
     created_at: AwareDatetime
+
+
+class ModelInstall(_In):
+    path: Annotated[str, StringConstraints(min_length=1, max_length=500)] = Field(
+        description="Pasta do pacote (model.onnx + model.json) neste computador"
+    )
+
+
+class ModelValidationUpdate(_In):
+    status: Literal[ModelValidationStatus.VALIDATED, ModelValidationStatus.REJECTED]
+    reviewer: PersonName
 
 
 # ---------------------------------------------------------------- lots

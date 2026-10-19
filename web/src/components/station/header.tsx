@@ -1,5 +1,5 @@
 import { Presentation } from "lucide-react";
-import { Link } from "react-router";
+import { Link, NavLink } from "react-router";
 import type { SystemStatus } from "@/lib/api/types";
 import { formatTime } from "@/lib/format";
 import { MACHINE_STATE } from "@/lib/labels";
@@ -53,6 +53,26 @@ export function StationHeader({ status }: { status: SystemStatus | null }) {
     <header className="bg-brand-deep text-white">
       <div className="mx-auto flex max-w-[120rem] flex-wrap items-center gap-x-8 gap-y-3 px-4 py-3 sm:px-6">
         <Brand />
+        <nav aria-label="Telas" className="flex gap-1">
+          {[
+            { to: "/", label: "Operação" },
+            { to: "/modelos", label: "Modelos" },
+          ].map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end
+              className={({ isActive }) =>
+                cn(
+                  "rounded-md px-3 py-1.5 text-sm font-medium",
+                  isActive ? "bg-white/15 text-white" : "text-white/70 hover:bg-white/10 hover:text-white",
+                )
+              }
+            >
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
         <div className="min-w-0 flex-1">
           {lot ? (
             <>

@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Node
+node_modules/
+web/dist/
+*.tsbuildinfo
+
+# PlatformIO
+firmware/.pio/
+
+# Dados de execução, datasets e pesos ficam fora do Git (%LOCALAPPDATA%\AmazonVision)
+*.onnx
+*.pt
+*.pth
+*.sqlite
+*.sqlite3
+*.db
+data/
+datasets/
+
+# Ambiente e editor
+.env
+.env.*
+!.env.example
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.claude/
+Thumbs.db
+.DS_Store

@@ -1,0 +1,65 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AmazonVision 4.0 API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": [
+          "sistema"
+        ],
+        "summary": "Health",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "ok",
+            "title": "Status"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/RunMode"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "version",
+          "mode"
+        ],
+        "title": "HealthResponse"
+      },
+      "RunMode": {
+        "type": "string",
+        "enum": [
+          "simulado",
+          "real"
+        ],
+        "title": "RunMode"
+      }
+    }
+  }
+}

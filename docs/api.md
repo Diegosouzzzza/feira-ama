@@ -2,12 +2,12 @@
 
 Fonte de verdade: `api/src/amazonvision/schemas/` (Pydantic) e o OpenAPI gerado (`api/openapi.json`, também em `/api/docs` com a API rodando). Os tipos do `web/` são gerados desse arquivo (`pnpm gen:api`), **incluindo os eventos WebSocket** (`WsEvent`).
 
-Situação: no Bloco 2 apenas `GET /api/health` está implementada; as demais rotas entram nos Blocos 3, 4, 7 e 9, sem mudar os esquemas abaixo (mudanças viram nova versão do contrato).
+Situação: rotas marcadas com ✅ estão implementadas e testadas. As demais entram nos blocos indicados.
 
 ## Princípios
 
-1. O serviço escuta só em `127.0.0.1`. Outro aparelho na rede, se for habilitado, só tem leitura.
-2. **Um operador controla por vez.** `POST /api/control/claim` devolve um token; rotas de controle exigem o cabeçalho `X-Control-Token`. Sem token válido → `423 CONTROL_LOCKED`. Leituras não precisam de token.
+1. O serviço escuta só em `127.0.0.1`. Requisições com cabeçalho `Host` não local são recusadas (`400`, proteção contra DNS rebinding), e o WebSocket recusa `Origin` de outros sites (código `1008`). Outro aparelho na rede, se um dia for habilitado, terá só leitura.
+2. **Um operador controla por vez.** `POST /api/control/claim` devolve um token; rotas de controle exigem o cabeçalho `X-Control-Token`. Sem token válido → `423 CONTROL_LOCKED` com o nome de quem tem o controle. O token expira após 30 min **sem uso** (cada uso renova). Reenviar o claim com o próprio token só renova. Outro operador pode assumir com `takeover: true`; o anterior perde o token e o fato fica registrado como aviso no diagnóstico. O controle fica em memória: reiniciar o serviço o libera.
 3. **Idempotência.** Toda requisição que muda estado leva `request_id` (UUID). Repetir o mesmo `request_id` devolve o resultado original com `duplicate: true` e não executa de novo. Atualizar a página nunca reenvia movimentos.
 4. **Estado esperado.** Comandos de máquina podem levar `expected_state`; se o estado atual for outro → `409 INVALID_STATE`.
 5. **Totais vêm do banco** (`LotSummary`), nunca de contagem no navegador.
@@ -19,15 +19,16 @@ Situação: no Bloco 2 apenas `GET /api/health` está implementada; as demais ro
 | Método e rota | Corpo | Resposta | Bloco | Controle? |
 |---|---|---|---|---|
 | `GET /api/health` | — | `HealthResponse` | 1 ✅ | não |
-| `GET /api/status` | — | `SystemStatus` | 3 | não |
-| `POST /api/control/claim` | `ControlClaim` | `ControlGrant` | 3 | — |
-| `POST /api/control/release` | — | 204 | 3 | sim |
-| `GET /api/products` | — | `ProductOut[]` | 3 | não |
+| `GET /api/status` | — | `SystemStatus` | 3 ✅ | não |
+| `POST /api/control/claim` | `ControlClaim` (+ `X-Control-Token` opcional para renovar) | `ControlGrant` | 3 ✅ | — |
+| `POST /api/control/release` | — | 204 | 3 ✅ | sim |
+| `GET /api/products` | — | `ProductOut[]` | 3 ✅ | não |
 | `GET /api/models` | `?product_id=` | `ModelOut[]` | 8 | não |
-| `POST /api/lots` | `LotCreate` | `LotOut` (201) | 3 | sim |
-| `GET /api/lots` | `?limit&offset&product_id` | `LotOut[]` | 3 | não |
-| `GET /api/lots/{id}/summary` | — | `LotSummary` | 3 | não |
-| `POST /api/lots/{id}/close` | `MachineCommandRequest` | `LotOut` | 3 | sim |
+| `POST /api/lots` | `LotCreate` | `LotOut` (201; 200 se `request_id` repetido) | 3 ✅ | sim |
+| `GET /api/lots` | `?limit(1–100)&offset&product_id` | `LotOut[]` (mais recente primeiro) | 3 ✅ | não |
+| `GET /api/lots/{id}` | — | `LotOut` | 3 ✅ | não |
+| `GET /api/lots/{id}/summary` | — | `LotSummary` | 3 ✅ | não |
+| `POST /api/lots/{id}/close` | — | `LotOut` (encerrar de novo devolve o mesmo lote) | 3 ✅ | sim |
 | `POST /api/machine/start` | `MachineCommandRequest` | `MachineCommandResult` | 4 | sim |
 | `POST /api/machine/pause` | `MachineCommandRequest` | `MachineCommandResult` | 4 | sim |
 | `POST /api/machine/stop` | `MachineCommandRequest` | `MachineCommandResult` | 4 | sim |
@@ -41,8 +42,8 @@ Situação: no Bloco 2 apenas `GET /api/health` está implementada; as demais ro
 | `POST /api/dataset/capture` | (Bloco 7) | (Bloco 7) | 7 | sim |
 | `PATCH /api/dataset/samples/{id}/label` | (Bloco 7) | (Bloco 7) | 7 | sim |
 | `GET /api/config` / `PUT /api/config` | (Bloco 9) | (Bloco 9) | 9 | `PUT` sim |
-| `GET /api/diagnostics/events` | `?limit&offset&severity` | lista de eventos | 3 | não |
-| `WS /api/events` | — | `WsEvent` | 3 | não |
+| `GET /api/diagnostics/events` | `?limit(1–200)&offset&severity` | `EventOut[]` (mais recente primeiro) | 3 ✅ | não |
+| `WS /api/events` | — | `WsEvent` | 3 ✅ | não |
 
 Regras de estado das rotas de controle:
 
@@ -55,8 +56,10 @@ Regras de estado das rotas de controle:
 ## WebSocket `/api/events`
 
 - Somente servidor → cliente. Comandos vão sempre por HTTP.
-- A **primeira mensagem** de toda conexão é `SNAPSHOT` com o `SystemStatus` completo.
-- Cada mensagem tem `seq` crescente. Se o cliente detectar lacuna em `seq`, reconecta e recebe novo `SNAPSHOT`.
+- A **primeira mensagem** de toda conexão é `SNAPSHOT` com o `SystemStatus` completo. O `seq` do snapshot é o último evento já refletido nele (pode ser `0`); o próximo evento terá `seq + 1`.
+- O servidor também envia `SNAPSHOT` a todos quando muda algo fora do fluxo de eventos (ex.: quem tem o controle). O cliente substitui o estado inteiro.
+- Cada evento tem `seq` crescente. Se o cliente detectar lacuna em `seq`, reconecta e recebe novo `SNAPSHOT`.
+- Cliente lento demais (fila de 256 eventos cheia) é desconectado com código `4000`; deve reconectar.
 - `state_version` cresce a cada mudança relevante; a interface ignora mensagem com versão menor que a que já mostrou.
 - Tipos: `SNAPSHOT`, `STATE_CHANGED`, `SENSOR_CHANGED`, `INSPECTION_READY`, `DECISION_ACCEPTED`, `CYCLE_COMPLETED`, `CYCLE_ABORTED`, `LOT_UPDATED`, `CONNECTION_LOST`, `CONNECTION_RESTORED`, `FAULT`.
 - Vídeo ao vivo **não** passa por aqui (`/api/camera/stream`).

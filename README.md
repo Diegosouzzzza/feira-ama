@@ -12,7 +12,7 @@ Esteira seletora com inspeção visual de qualidade (tucumã e castanha-do-pará
 | `docs/` | Decisões (ADR), protocolo, calibração, operação |
 | `scripts/` | Inicialização, testes e verificação do ambiente (PowerShell) |
 
-Dados de execução (banco, imagens, modelos, logs, backups) ficam fora do repositório, em `%LOCALAPPDATA%\AmazonVision`.
+Dados de execução (banco, imagens, modelos, logs, backups) ficam fora do repositório, em `%LOCALAPPDATA%\AmazonVision\<modo>` (`simulado` ou `real`, separados de propósito).
 
 ## Requisitos de desenvolvimento
 
@@ -55,7 +55,7 @@ pio device monitor      # monitor serial (115200)
 
 ## Situação
 
-Blocos 1 (fundação) e 2 (contratos) concluídos. Plano completo e auditoria: `Plano_Inicio_Projeto_AmazonVision.md` na pasta da feira. Decisões em `docs/adr/`, pendências em `docs/pendencias.md`.
+Blocos 1 (fundação), 2 (contratos) e 3 (núcleo da API: banco, lotes, controle de operador, WebSocket) concluídos. Plano completo e auditoria: `Plano_Inicio_Projeto_AmazonVision.md` na pasta da feira. Decisões em `docs/adr/`, pendências em `docs/pendencias.md`.
 
 | Contrato | Documento | Código |
 |---|---|---|

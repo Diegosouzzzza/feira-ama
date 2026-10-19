@@ -3,12 +3,15 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from amazonvision import __version__
 from amazonvision.config import Settings
+from amazonvision.core.logs import setup_logging
 from amazonvision.http_errors import ERROR_RESPONSES, install_error_handlers
 from amazonvision.openapi import install_openapi
-from amazonvision.routes import health
+from amazonvision.routes import control, diagnostics, health, lots, status, ws
+from amazonvision.services.container import Services
 from amazonvision.web import mount_web
 
 log = logging.getLogger("amazonvision")
@@ -20,8 +23,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         settings.ensure_data_dirs()
+        if settings.log_to_file:
+            setup_logging(settings.data_subdirs["logs"])
+        services = Services.create(settings)
+        await services.start()
+        app.state.services = services
         log.info("AmazonVision %s iniciado em modo %s", __version__, settings.mode)
-        yield
+        try:
+            yield
+        finally:
+            await services.stop()
+            log.info("AmazonVision encerrado")
 
     app = FastAPI(
         title="AmazonVision 4.0 API",
@@ -33,8 +45,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         redoc_url=None,
     )
     app.state.settings = settings
+    # Rejects requests whose Host is not local (protects against DNS rebinding).
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.allowed_hosts)
     install_error_handlers(app)
-    app.include_router(health.router, prefix="/api", responses=ERROR_RESPONSES)
+    for router in (health.router, status.router, control.router, lots.router, diagnostics.router):
+        app.include_router(router, prefix="/api", responses=ERROR_RESPONSES)
+    app.include_router(ws.router, prefix="/api")
     mount_web(app, settings.web_dist)
     install_openapi(app)
     return app

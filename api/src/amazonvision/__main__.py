@@ -1,6 +1,5 @@
 import argparse
 import json
-import logging
 from pathlib import Path
 
 import uvicorn
@@ -28,7 +27,6 @@ def main() -> None:
         return
 
     settings = Settings()
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
     uvicorn.run(
         "amazonvision.main:create_app",
         factory=True,

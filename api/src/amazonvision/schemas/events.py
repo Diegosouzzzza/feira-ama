@@ -48,9 +48,12 @@ class _Event(BaseModel):
 
 
 class SnapshotEvent(_Event):
-    """Always the first message after connecting or reconnecting."""
+    """First message of every connection; may also be broadcast to resync everyone.
+
+    seq is the last event already reflected in data; the next event has seq + 1."""
 
     type: Literal[EventType.SNAPSHOT] = EventType.SNAPSHOT
+    seq: int = Field(ge=0)
     data: SystemStatus
 
 

@@ -8,10 +8,10 @@ from amazonvision.main import create_app
 
 
 @pytest.fixture
-def make_client(tmp_path: Path):
+def make_client(settings: Settings):
     def _make(web_dist: Path | None = None) -> TestClient:
-        settings = Settings(data_dir=tmp_path / "data", web_dist=web_dist or tmp_path / "no-dist")
-        return TestClient(create_app(settings))
+        update = {"web_dist": web_dist} if web_dist else {}
+        return TestClient(create_app(settings.model_copy(update=update)))
 
     return _make
 

@@ -16,8 +16,8 @@ from amazonvision.schemas.events import EventType, WsEvent
 
 
 @pytest.fixture
-def app(tmp_path: Path):
-    app = create_app(Settings(data_dir=tmp_path / "data", web_dist=tmp_path / "dist"))
+def app(settings: Settings):
+    app = create_app(settings)
     router = APIRouter()
 
     @router.get("/_test/api-error")

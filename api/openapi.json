@@ -46,6 +46,647 @@
           }
         }
       }
+    },
+    "/api/status": {
+      "get": {
+        "tags": [
+          "sistema"
+        ],
+        "summary": "Status",
+        "operationId": "status_api_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemStatus"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products": {
+      "get": {
+        "tags": [
+          "sistema",
+          "produtos"
+        ],
+        "summary": "Products",
+        "operationId": "products_api_products_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProductOut"
+                  },
+                  "type": "array",
+                  "title": "Response Products Api Products Get"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/control/claim": {
+      "post": {
+        "tags": [
+          "controle"
+        ],
+        "summary": "Claim",
+        "operationId": "claim_api_control_claim_post",
+        "parameters": [
+          {
+            "name": "X-Control-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token de controle do operador",
+              "title": "X-Control-Token"
+            },
+            "description": "Token de controle do operador"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ControlClaim"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ControlGrant"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/control/release": {
+      "post": {
+        "tags": [
+          "controle"
+        ],
+        "summary": "Release",
+        "operationId": "release_api_control_release_post",
+        "parameters": [
+          {
+            "name": "X-Control-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token de controle do operador",
+              "title": "X-Control-Token"
+            },
+            "description": "Token de controle do operador"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lots": {
+      "post": {
+        "tags": [
+          "lotes"
+        ],
+        "summary": "Create Lot",
+        "operationId": "create_lot_api_lots_post",
+        "parameters": [
+          {
+            "name": "X-Control-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token de controle do operador",
+              "title": "X-Control-Token"
+            },
+            "description": "Token de controle do operador"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LotCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LotOut"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Mesma solicitação repetida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LotOut"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "lotes"
+        ],
+        "summary": "List Lots",
+        "operationId": "list_lots_api_lots_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{1,31}$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Product Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LotOut"
+                  },
+                  "title": "Response List Lots Api Lots Get"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lots/{lot_id}": {
+      "get": {
+        "tags": [
+          "lotes"
+        ],
+        "summary": "Get Lot",
+        "operationId": "get_lot_api_lots__lot_id__get",
+        "parameters": [
+          {
+            "name": "lot_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Lot Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LotOut"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lots/{lot_id}/summary": {
+      "get": {
+        "tags": [
+          "lotes"
+        ],
+        "summary": "Lot Summary",
+        "operationId": "lot_summary_api_lots__lot_id__summary_get",
+        "parameters": [
+          {
+            "name": "lot_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Lot Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LotSummary"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lots/{lot_id}/close": {
+      "post": {
+        "tags": [
+          "lotes"
+        ],
+        "summary": "Close Lot",
+        "operationId": "close_lot_api_lots__lot_id__close_post",
+        "parameters": [
+          {
+            "name": "lot_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Lot Id"
+            }
+          },
+          {
+            "name": "X-Control-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token de controle do operador",
+              "title": "X-Control-Token"
+            },
+            "description": "Token de controle do operador"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LotOut"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/diagnostics/events": {
+      "get": {
+        "tags": [
+          "diagnóstico"
+        ],
+        "summary": "Events",
+        "operationId": "events_api_diagnostics_events_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "severity",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Severity"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Severity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EventOut"
+                  },
+                  "title": "Response Events Api Diagnostics Events Get"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -87,210 +728,16 @@
         "title": "ApiErrorBody",
         "description": "Every non-2xx response from /api uses this body."
       },
-      "ErrorCode": {
-        "type": "string",
-        "enum": [
-          "VALIDATION_ERROR",
-          "NOT_FOUND",
-          "CONFLICT",
-          "INVALID_STATE",
-          "CONTROL_LOCKED",
-          "REVIEW_REQUIRED",
-          "CAMERA_UNAVAILABLE",
-          "STALE_FRAME",
-          "MODEL_NOT_READY",
-          "SERIAL_DISCONNECTED",
-          "SENSOR_TIMEOUT",
-          "STORAGE_ERROR",
-          "INTERNAL_ERROR"
-        ],
-        "title": "ErrorCode"
-      },
-      "HealthResponse": {
-        "properties": {
-          "status": {
-            "type": "string",
-            "const": "ok",
-            "title": "Status"
-          },
-          "version": {
-            "type": "string",
-            "title": "Version"
-          },
-          "mode": {
-            "$ref": "#/components/schemas/RunMode"
-          }
-        },
-        "type": "object",
-        "required": [
-          "status",
-          "version",
-          "mode"
-        ],
-        "title": "HealthResponse"
-      },
-      "RunMode": {
-        "type": "string",
-        "enum": [
-          "simulado",
-          "real"
-        ],
-        "title": "RunMode"
-      },
-      "LotCreate": {
-        "additionalProperties": false,
-        "properties": {
-          "request_id": {
-            "format": "uuid",
-            "title": "Request Id",
-            "type": "string"
-          },
-          "product_id": {
-            "pattern": "^[a-z][a-z0-9_]{1,31}$",
-            "title": "Product Id",
-            "type": "string"
-          },
-          "operator": {
-            "maxLength": 60,
-            "minLength": 1,
-            "title": "Operator",
-            "type": "string"
-          },
-          "notes": {
-            "anyOf": [
-              {
-                "maxLength": 500,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Notes"
-          }
-        },
-        "required": [
-          "request_id",
-          "product_id",
-          "operator"
-        ],
-        "title": "LotCreate",
-        "type": "object"
-      },
-      "MachineState": {
-        "enum": [
-          "DISARMED",
-          "READY",
-          "TO_S1",
-          "SETTLING",
-          "INSPECTING",
-          "REVIEW_HOLD",
-          "TO_S2",
-          "SORTING",
-          "RELEASING",
-          "FAULT",
-          "ESTOP",
-          "MAINTENANCE"
-        ],
-        "title": "MachineState",
-        "type": "string"
-      },
-      "MachineCommandRequest": {
-        "additionalProperties": false,
-        "properties": {
-          "request_id": {
-            "description": "Repetir o mesmo id devolve o resultado original",
-            "format": "uuid",
-            "title": "Request Id",
-            "type": "string"
-          },
-          "expected_state": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/MachineState"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Recusa com INVALID_STATE se o estado atual for outro"
-          }
-        },
-        "required": [
-          "request_id"
-        ],
-        "title": "MachineCommandRequest",
-        "type": "object"
-      },
-      "ControlClaim": {
-        "additionalProperties": false,
-        "properties": {
-          "operator": {
-            "maxLength": 60,
-            "minLength": 1,
-            "title": "Operator",
-            "type": "string"
-          }
-        },
-        "required": [
-          "operator"
-        ],
-        "title": "ControlClaim",
-        "type": "object"
-      },
-      "Destination": {
-        "enum": [
-          "APPROVED",
-          "REJECTED"
-        ],
-        "title": "Destination",
-        "type": "string"
-      },
-      "InspectionReviewCreate": {
-        "additionalProperties": false,
-        "properties": {
-          "request_id": {
-            "format": "uuid",
-            "title": "Request Id",
-            "type": "string"
-          },
-          "decision": {
-            "$ref": "#/components/schemas/Destination"
-          },
-          "reviewer": {
-            "maxLength": 60,
-            "minLength": 1,
-            "title": "Reviewer",
-            "type": "string"
-          },
-          "reason": {
-            "maxLength": 200,
-            "minLength": 3,
-            "title": "Reason",
-            "type": "string"
-          }
-        },
-        "required": [
-          "request_id",
-          "decision",
-          "reviewer",
-          "reason"
-        ],
-        "title": "InspectionReviewCreate",
-        "type": "object"
-      },
       "CameraInfo": {
         "properties": {
           "status": {
+            "type": "string",
             "enum": [
               "ok",
               "unavailable",
               "stale"
             ],
-            "title": "Status",
-            "type": "string"
+            "title": "Status"
           },
           "source": {
             "anyOf": [
@@ -306,8 +753,8 @@
           "last_frame_at": {
             "anyOf": [
               {
-                "format": "date-time",
-                "type": "string"
+                "type": "string",
+                "format": "date-time"
               },
               {
                 "type": "null"
@@ -316,30 +763,77 @@
             "title": "Last Frame At"
           }
         },
+        "type": "object",
         "required": [
           "status",
           "source",
           "last_frame_at"
         ],
-        "title": "CameraInfo",
-        "type": "object"
+        "title": "CameraInfo"
+      },
+      "ControlClaim": {
+        "properties": {
+          "operator": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Operator"
+          },
+          "takeover": {
+            "type": "boolean",
+            "title": "Takeover",
+            "description": "Assumir o controle mesmo que outro operador o tenha",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "operator"
+        ],
+        "title": "ControlClaim"
+      },
+      "ControlGrant": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "title": "Token",
+            "description": "Enviar no cabeçalho X-Control-Token nas rotas de controle"
+          },
+          "operator": {
+            "type": "string",
+            "title": "Operator"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "token",
+          "operator",
+          "expires_at"
+        ],
+        "title": "ControlGrant"
       },
       "CycleOut": {
         "properties": {
           "id": {
-            "minimum": 1,
-            "title": "Id",
-            "type": "integer"
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Id"
           },
           "lot_id": {
-            "minimum": 1,
-            "title": "Lot Id",
-            "type": "integer"
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Lot Id"
           },
           "seq_in_lot": {
-            "minimum": 1,
-            "title": "Seq In Lot",
-            "type": "integer"
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Seq In Lot"
           },
           "status": {
             "$ref": "#/components/schemas/CycleStatus"
@@ -376,15 +870,15 @@
             "title": "Abort Reason"
           },
           "started_at": {
+            "type": "string",
             "format": "date-time",
-            "title": "Started At",
-            "type": "string"
+            "title": "Started At"
           },
           "ended_at": {
             "anyOf": [
               {
-                "format": "date-time",
-                "type": "string"
+                "type": "string",
+                "format": "date-time"
               },
               {
                 "type": "null"
@@ -393,6 +887,7 @@
             "title": "Ended At"
           }
         },
+        "type": "object",
         "required": [
           "id",
           "lot_id",
@@ -404,23 +899,30 @@
           "started_at",
           "ended_at"
         ],
-        "title": "CycleOut",
-        "type": "object"
+        "title": "CycleOut"
       },
       "CycleStatus": {
+        "type": "string",
         "enum": [
           "running",
           "completed",
           "aborted"
         ],
-        "title": "CycleStatus",
-        "type": "string"
+        "title": "CycleStatus"
+      },
+      "Destination": {
+        "type": "string",
+        "enum": [
+          "APPROVED",
+          "REJECTED"
+        ],
+        "title": "Destination"
       },
       "DeviceLink": {
         "properties": {
           "connected": {
-            "title": "Connected",
-            "type": "boolean"
+            "type": "boolean",
+            "title": "Connected"
           },
           "port": {
             "anyOf": [
@@ -458,17 +960,18 @@
           "last_seen_at": {
             "anyOf": [
               {
-                "format": "date-time",
-                "type": "string"
+                "type": "string",
+                "format": "date-time"
               },
               {
                 "type": "null"
               }
             ],
-            "description": "Última mensagem recebida da placa",
-            "title": "Last Seen At"
+            "title": "Last Seen At",
+            "description": "Última mensagem recebida da placa"
           }
         },
+        "type": "object",
         "required": [
           "connected",
           "port",
@@ -476,10 +979,101 @@
           "firmware_version",
           "last_seen_at"
         ],
-        "title": "DeviceLink",
-        "type": "object"
+        "title": "DeviceLink"
+      },
+      "ErrorCode": {
+        "type": "string",
+        "enum": [
+          "VALIDATION_ERROR",
+          "NOT_FOUND",
+          "CONFLICT",
+          "INVALID_STATE",
+          "CONTROL_LOCKED",
+          "REVIEW_REQUIRED",
+          "CAMERA_UNAVAILABLE",
+          "STALE_FRAME",
+          "MODEL_NOT_READY",
+          "SERIAL_DISCONNECTED",
+          "SENSOR_TIMEOUT",
+          "STORAGE_ERROR",
+          "INTERNAL_ERROR"
+        ],
+        "title": "ErrorCode"
+      },
+      "EventOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Id"
+          },
+          "source": {
+            "$ref": "#/components/schemas/EventSource"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Id"
+          },
+          "cycle_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cycle Id"
+          },
+          "data": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Data"
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Occurred At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "type",
+          "severity",
+          "lot_id",
+          "cycle_id",
+          "data",
+          "occurred_at"
+        ],
+        "title": "EventOut"
+      },
+      "EventSource": {
+        "type": "string",
+        "enum": [
+          "device",
+          "host",
+          "operator"
+        ],
+        "title": "EventSource"
       },
       "FaultCode": {
+        "type": "string",
         "enum": [
           "S1_TIMEOUT",
           "DECISION_TIMEOUT",
@@ -490,29 +1084,91 @@
           "SENSOR_CONFLICT",
           "INTERNAL"
         ],
-        "title": "FaultCode",
-        "type": "string"
+        "title": "FaultCode"
       },
       "Grade": {
+        "type": "string",
         "enum": [
           "A",
           "B",
           "C"
         ],
-        "title": "Grade",
-        "type": "string"
+        "title": "Grade"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "ok",
+            "title": "Status"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/RunMode"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "version",
+          "mode"
+        ],
+        "title": "HealthResponse"
+      },
+      "LotCreate": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Request Id"
+          },
+          "product_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{1,31}$",
+            "title": "Product Id"
+          },
+          "operator": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Operator"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id",
+          "product_id",
+          "operator"
+        ],
+        "title": "LotCreate"
       },
       "LotOut": {
         "properties": {
           "id": {
-            "minimum": 1,
-            "title": "Id",
-            "type": "integer"
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Id"
           },
           "product_id": {
+            "type": "string",
             "pattern": "^[a-z][a-z0-9_]{1,31}$",
-            "title": "Product Id",
-            "type": "string"
+            "title": "Product Id"
           },
           "model_id": {
             "anyOf": [
@@ -526,26 +1182,26 @@
             "title": "Model Id"
           },
           "operator": {
-            "title": "Operator",
-            "type": "string"
+            "type": "string",
+            "title": "Operator"
           },
           "status": {
             "$ref": "#/components/schemas/LotStatus"
           },
           "is_simulated": {
-            "title": "Is Simulated",
-            "type": "boolean"
+            "type": "boolean",
+            "title": "Is Simulated"
           },
           "started_at": {
+            "type": "string",
             "format": "date-time",
-            "title": "Started At",
-            "type": "string"
+            "title": "Started At"
           },
           "ended_at": {
             "anyOf": [
               {
-                "format": "date-time",
-                "type": "string"
+                "type": "string",
+                "format": "date-time"
               },
               {
                 "type": "null"
@@ -565,6 +1221,7 @@
             "title": "Notes"
           }
         },
+        "type": "object",
         "required": [
           "id",
           "product_id",
@@ -576,96 +1233,95 @@
           "ended_at",
           "notes"
         ],
-        "title": "LotOut",
-        "type": "object"
+        "title": "LotOut"
       },
       "LotStatus": {
+        "type": "string",
         "enum": [
           "open",
           "closed"
         ],
-        "title": "LotStatus",
-        "type": "string"
+        "title": "LotStatus"
       },
       "LotSummary": {
-        "description": "Counters derived from stored records, never from client-side increments.",
         "properties": {
           "lot_id": {
-            "minimum": 1,
-            "title": "Lot Id",
-            "type": "integer"
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Lot Id"
           },
           "inspected": {
-            "description": "Inspeções registradas",
-            "minimum": 0,
+            "type": "integer",
+            "minimum": 0.0,
             "title": "Inspected",
-            "type": "integer"
+            "description": "Inspeções registradas"
           },
           "approved": {
-            "description": "Decisão final aprovada (automática ou revisada)",
-            "minimum": 0,
+            "type": "integer",
+            "minimum": 0.0,
             "title": "Approved",
-            "type": "integer"
+            "description": "Decisão final aprovada (automática ou revisada)"
           },
           "rejected": {
-            "description": "Decisão final rejeitada",
-            "minimum": 0,
+            "type": "integer",
+            "minimum": 0.0,
             "title": "Rejected",
-            "type": "integer"
+            "description": "Decisão final rejeitada"
           },
           "review_pending": {
-            "description": "Inconclusivos ainda sem decisão do operador",
-            "minimum": 0,
+            "type": "integer",
+            "minimum": 0.0,
             "title": "Review Pending",
-            "type": "integer"
+            "description": "Inconclusivos ainda sem decisão do operador"
           },
           "reviewed": {
-            "description": "Inspeções com revisão humana",
-            "minimum": 0,
+            "type": "integer",
+            "minimum": 0.0,
             "title": "Reviewed",
-            "type": "integer"
+            "description": "Inspeções com revisão humana"
           },
           "by_grade": {
             "additionalProperties": {
               "type": "integer"
             },
-            "description": "Previsões do modelo por classe",
             "propertyNames": {
               "$ref": "#/components/schemas/Grade"
             },
+            "type": "object",
             "title": "By Grade",
-            "type": "object"
+            "description": "Previsões do modelo por classe"
           },
           "cycles_completed": {
-            "minimum": 0,
-            "title": "Cycles Completed",
-            "type": "integer"
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Cycles Completed"
           },
           "cycles_aborted": {
-            "minimum": 0,
-            "title": "Cycles Aborted",
-            "type": "integer"
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Cycles Aborted"
           },
           "approval_rate": {
             "anyOf": [
               {
-                "maximum": 1,
-                "minimum": 0,
-                "type": "number"
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"
               }
             ],
-            "description": "approved / (approved + rejected); nulo se o denominador é zero",
-            "title": "Approval Rate"
+            "title": "Approval Rate",
+            "description": "approved / (approved + rejected); nulo se o denominador é zero"
           },
           "approval_rate_denominator": {
-            "minimum": 0,
-            "title": "Approval Rate Denominator",
-            "type": "integer"
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Approval Rate Denominator"
           }
         },
+        "type": "object",
         "required": [
           "lot_id",
           "inspected",
@@ -680,7 +1336,7 @@
           "approval_rate_denominator"
         ],
         "title": "LotSummary",
-        "type": "object"
+        "description": "Counters derived from stored records, never from client-side increments."
       },
       "MachineInfo": {
         "properties": {
@@ -719,26 +1375,44 @@
             "$ref": "#/components/schemas/DeviceLink"
           }
         },
+        "type": "object",
         "required": [
           "state",
           "fault",
           "sensors",
           "link"
         ],
-        "title": "MachineInfo",
-        "type": "object"
+        "title": "MachineInfo"
+      },
+      "MachineState": {
+        "type": "string",
+        "enum": [
+          "DISARMED",
+          "READY",
+          "TO_S1",
+          "SETTLING",
+          "INSPECTING",
+          "REVIEW_HOLD",
+          "TO_S2",
+          "SORTING",
+          "RELEASING",
+          "FAULT",
+          "ESTOP",
+          "MAINTENANCE"
+        ],
+        "title": "MachineState"
       },
       "ModelInfo": {
         "properties": {
           "status": {
+            "type": "string",
             "enum": [
               "ready",
               "not_loaded",
               "loading",
               "error"
             ],
-            "title": "Status",
-            "type": "string"
+            "title": "Status"
           },
           "model_id": {
             "anyOf": [
@@ -754,8 +1428,8 @@
           "product_id": {
             "anyOf": [
               {
-                "pattern": "^[a-z][a-z0-9_]{1,31}$",
-                "type": "string"
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,31}$"
               },
               {
                 "type": "null"
@@ -764,47 +1438,120 @@
             "title": "Product Id"
           }
         },
+        "type": "object",
         "required": [
           "status",
           "model_id",
           "product_id"
         ],
-        "title": "ModelInfo",
-        "type": "object"
+        "title": "ModelInfo"
+      },
+      "ProductOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{1,31}$",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "presentation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Presentation",
+            "description": "Ex.: com casca / sem casca"
+          },
+          "active_model_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Model Id"
+          },
+          "decision_threshold": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Decision Threshold"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "presentation",
+          "active_model_id",
+          "decision_threshold",
+          "version"
+        ],
+        "title": "ProductOut"
+      },
+      "RunMode": {
+        "type": "string",
+        "enum": [
+          "simulado",
+          "real"
+        ],
+        "title": "RunMode"
       },
       "SensorSnapshot": {
         "properties": {
           "s1": {
-            "title": "S1",
-            "type": "boolean"
+            "type": "boolean",
+            "title": "S1"
           },
           "s2": {
-            "title": "S2",
-            "type": "boolean"
+            "type": "boolean",
+            "title": "S2"
           },
           "estop": {
-            "title": "Estop",
-            "type": "boolean"
+            "type": "boolean",
+            "title": "Estop"
           }
         },
+        "type": "object",
         "required": [
           "s1",
           "s2",
           "estop"
         ],
-        "title": "SensorSnapshot",
-        "type": "object"
+        "title": "SensorSnapshot"
+      },
+      "Severity": {
+        "type": "string",
+        "enum": [
+          "info",
+          "warning",
+          "error"
+        ],
+        "title": "Severity"
       },
       "StorageInfo": {
         "properties": {
           "status": {
+            "type": "string",
             "enum": [
               "ok",
               "low_space",
               "error"
             ],
-            "title": "Status",
-            "type": "string"
+            "title": "Status"
           },
           "free_bytes": {
             "anyOf": [
@@ -818,12 +1565,12 @@
             "title": "Free Bytes"
           }
         },
+        "type": "object",
         "required": [
           "status",
           "free_bytes"
         ],
-        "title": "StorageInfo",
-        "type": "object"
+        "title": "StorageInfo"
       },
       "SystemStatus": {
         "properties": {
@@ -831,15 +1578,15 @@
             "$ref": "#/components/schemas/RunMode"
           },
           "generated_at": {
+            "type": "string",
             "format": "date-time",
-            "title": "Generated At",
-            "type": "string"
+            "title": "Generated At"
           },
           "state_version": {
-            "description": "Cresce a cada mudança relevante de estado",
-            "minimum": 0,
+            "type": "integer",
+            "minimum": 0.0,
             "title": "State Version",
-            "type": "integer"
+            "description": "Cresce a cada mudança relevante de estado"
           },
           "machine": {
             "$ref": "#/components/schemas/MachineInfo"
@@ -854,9 +1601,21 @@
             "$ref": "#/components/schemas/StorageInfo"
           },
           "control_locked": {
-            "description": "Há um operador com o controle ativo",
+            "type": "boolean",
             "title": "Control Locked",
-            "type": "boolean"
+            "description": "Há um operador com o controle ativo"
+          },
+          "control_holder": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Control Holder",
+            "description": "Nome do operador com o controle"
           },
           "active_lot": {
             "anyOf": [
@@ -889,6 +1648,7 @@
             ]
           }
         },
+        "type": "object",
         "required": [
           "mode",
           "generated_at",
@@ -898,67 +1658,72 @@
           "model",
           "storage",
           "control_locked",
+          "control_holder",
           "active_lot",
           "active_lot_summary",
           "current_cycle"
         ],
-        "title": "SystemStatus",
-        "type": "object"
+        "title": "SystemStatus"
       },
-      "ProductOut": {
+      "MachineCommandRequest": {
+        "additionalProperties": false,
         "properties": {
-          "id": {
-            "pattern": "^[a-z][a-z0-9_]{1,31}$",
-            "title": "Id",
+          "request_id": {
+            "description": "Repetir o mesmo id devolve o resultado original",
+            "format": "uuid",
+            "title": "Request Id",
             "type": "string"
           },
-          "name": {
-            "title": "Name",
-            "type": "string"
-          },
-          "presentation": {
+          "expected_state": {
             "anyOf": [
               {
-                "type": "string"
+                "$ref": "#/components/schemas/MachineState"
               },
               {
                 "type": "null"
               }
             ],
-            "description": "Ex.: com casca / sem casca",
-            "title": "Presentation"
-          },
-          "active_model_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Active Model Id"
-          },
-          "decision_threshold": {
-            "exclusiveMinimum": 0,
-            "maximum": 1,
-            "title": "Decision Threshold",
-            "type": "number"
-          },
-          "version": {
-            "title": "Version",
-            "type": "integer"
+            "default": null,
+            "description": "Recusa com INVALID_STATE se o estado atual for outro"
           }
         },
         "required": [
-          "id",
-          "name",
-          "presentation",
-          "active_model_id",
-          "decision_threshold",
-          "version"
+          "request_id"
         ],
-        "title": "ProductOut",
+        "title": "MachineCommandRequest",
+        "type": "object"
+      },
+      "InspectionReviewCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Destination"
+          },
+          "reviewer": {
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Reviewer",
+            "type": "string"
+          },
+          "reason": {
+            "maxLength": 200,
+            "minLength": 3,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "decision",
+          "reviewer",
+          "reason"
+        ],
+        "title": "InspectionReviewCreate",
         "type": "object"
       },
       "ModelValidationStatus": {
@@ -1058,31 +1823,6 @@
           "state"
         ],
         "title": "MachineCommandResult",
-        "type": "object"
-      },
-      "ControlGrant": {
-        "properties": {
-          "token": {
-            "description": "Enviar no cabeçalho X-Control-Token nas rotas de controle",
-            "title": "Token",
-            "type": "string"
-          },
-          "operator": {
-            "title": "Operator",
-            "type": "string"
-          },
-          "expires_at": {
-            "format": "date-time",
-            "title": "Expires At",
-            "type": "string"
-          }
-        },
-        "required": [
-          "token",
-          "operator",
-          "expires_at"
-        ],
-        "title": "ControlGrant",
         "type": "object"
       },
       "AutoDecision": {
@@ -2047,11 +2787,10 @@
         "type": "object"
       },
       "SnapshotEvent": {
-        "description": "Always the first message after connecting or reconnecting.",
+        "description": "First message of every connection; may also be broadcast to resync everyone.\n\nseq is the last event already reflected in data; the next event has seq + 1.",
         "properties": {
           "seq": {
-            "description": "Sequência do servidor; lacuna = cliente deve pedir novo snapshot",
-            "minimum": 1,
+            "minimum": 0,
             "title": "Seq",
             "type": "integer"
           },

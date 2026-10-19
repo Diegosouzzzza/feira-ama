@@ -21,6 +21,160 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Status */
+        get: operations["status_api_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Products */
+        get: operations["products_api_products_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/control/claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Claim */
+        post: operations["claim_api_control_claim_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/control/release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Release */
+        post: operations["release_api_control_release_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Lots */
+        get: operations["list_lots_api_lots_get"];
+        put?: never;
+        /** Create Lot */
+        post: operations["create_lot_api_lots_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lots/{lot_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Lot */
+        get: operations["get_lot_api_lots__lot_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lots/{lot_id}/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lot Summary */
+        get: operations["lot_summary_api_lots__lot_id__summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lots/{lot_id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Close Lot */
+        post: operations["close_lot_api_lots__lot_id__close_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/diagnostics/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Events */
+        get: operations["events_api_diagnostics_events_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -47,86 +201,6 @@ export interface components {
              */
             trace_id: string;
         };
-        /**
-         * ErrorCode
-         * @enum {string}
-         */
-        ErrorCode: "VALIDATION_ERROR" | "NOT_FOUND" | "CONFLICT" | "INVALID_STATE" | "CONTROL_LOCKED" | "REVIEW_REQUIRED" | "CAMERA_UNAVAILABLE" | "STALE_FRAME" | "MODEL_NOT_READY" | "SERIAL_DISCONNECTED" | "SENSOR_TIMEOUT" | "STORAGE_ERROR" | "INTERNAL_ERROR";
-        /** HealthResponse */
-        HealthResponse: {
-            /**
-             * Status
-             * @constant
-             */
-            status: "ok";
-            /** Version */
-            version: string;
-            mode: components["schemas"]["RunMode"];
-        };
-        /**
-         * RunMode
-         * @enum {string}
-         */
-        RunMode: "simulado" | "real";
-        /** LotCreate */
-        LotCreate: {
-            /**
-             * Request Id
-             * Format: uuid
-             */
-            request_id: string;
-            /** Product Id */
-            product_id: string;
-            /** Operator */
-            operator: string;
-            /**
-             * Notes
-             * @default null
-             */
-            notes: string | null;
-        };
-        /**
-         * MachineState
-         * @enum {string}
-         */
-        MachineState: "DISARMED" | "READY" | "TO_S1" | "SETTLING" | "INSPECTING" | "REVIEW_HOLD" | "TO_S2" | "SORTING" | "RELEASING" | "FAULT" | "ESTOP" | "MAINTENANCE";
-        /** MachineCommandRequest */
-        MachineCommandRequest: {
-            /**
-             * Request Id
-             * Format: uuid
-             * @description Repetir o mesmo id devolve o resultado original
-             */
-            request_id: string;
-            /**
-             * @description Recusa com INVALID_STATE se o estado atual for outro
-             * @default null
-             */
-            expected_state: components["schemas"]["MachineState"] | null;
-        };
-        /** ControlClaim */
-        ControlClaim: {
-            /** Operator */
-            operator: string;
-        };
-        /**
-         * Destination
-         * @enum {string}
-         */
-        Destination: "APPROVED" | "REJECTED";
-        /** InspectionReviewCreate */
-        InspectionReviewCreate: {
-            /**
-             * Request Id
-             * Format: uuid
-             */
-            request_id: string;
-            decision: components["schemas"]["Destination"];
-            /** Reviewer */
-            reviewer: string;
-            /** Reason */
-            reason: string;
-        };
         /** CameraInfo */
         CameraInfo: {
             /**
@@ -138,6 +212,32 @@ export interface components {
             source: string | null;
             /** Last Frame At */
             last_frame_at: string | null;
+        };
+        /** ControlClaim */
+        ControlClaim: {
+            /** Operator */
+            operator: string;
+            /**
+             * Takeover
+             * @description Assumir o controle mesmo que outro operador o tenha
+             * @default false
+             */
+            takeover: boolean;
+        };
+        /** ControlGrant */
+        ControlGrant: {
+            /**
+             * Token
+             * @description Enviar no cabeçalho X-Control-Token nas rotas de controle
+             */
+            token: string;
+            /** Operator */
+            operator: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
         };
         /** CycleOut */
         CycleOut: {
@@ -165,6 +265,11 @@ export interface components {
          * @enum {string}
          */
         CycleStatus: "running" | "completed" | "aborted";
+        /**
+         * Destination
+         * @enum {string}
+         */
+        Destination: "APPROVED" | "REJECTED";
         /** DeviceLink */
         DeviceLink: {
             /** Connected */
@@ -182,6 +287,38 @@ export interface components {
             last_seen_at: string | null;
         };
         /**
+         * ErrorCode
+         * @enum {string}
+         */
+        ErrorCode: "VALIDATION_ERROR" | "NOT_FOUND" | "CONFLICT" | "INVALID_STATE" | "CONTROL_LOCKED" | "REVIEW_REQUIRED" | "CAMERA_UNAVAILABLE" | "STALE_FRAME" | "MODEL_NOT_READY" | "SERIAL_DISCONNECTED" | "SENSOR_TIMEOUT" | "STORAGE_ERROR" | "INTERNAL_ERROR";
+        /** EventOut */
+        EventOut: {
+            /** Id */
+            id: number;
+            source: components["schemas"]["EventSource"];
+            /** Type */
+            type: string;
+            severity: components["schemas"]["Severity"];
+            /** Lot Id */
+            lot_id: number | null;
+            /** Cycle Id */
+            cycle_id: number | null;
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            };
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+        };
+        /**
+         * EventSource
+         * @enum {string}
+         */
+        EventSource: "device" | "host" | "operator";
+        /**
          * FaultCode
          * @enum {string}
          */
@@ -191,6 +328,31 @@ export interface components {
          * @enum {string}
          */
         Grade: "A" | "B" | "C";
+        /** HealthResponse */
+        HealthResponse: {
+            /**
+             * Status
+             * @constant
+             */
+            status: "ok";
+            /** Version */
+            version: string;
+            mode: components["schemas"]["RunMode"];
+        };
+        /** LotCreate */
+        LotCreate: {
+            /**
+             * Request Id
+             * Format: uuid
+             */
+            request_id: string;
+            /** Product Id */
+            product_id: string;
+            /** Operator */
+            operator: string;
+            /** Notes */
+            notes?: string | null;
+        };
         /** LotOut */
         LotOut: {
             /** Id */
@@ -278,6 +440,11 @@ export interface components {
             sensors: components["schemas"]["SensorSnapshot"] | null;
             link: components["schemas"]["DeviceLink"];
         };
+        /**
+         * MachineState
+         * @enum {string}
+         */
+        MachineState: "DISARMED" | "READY" | "TO_S1" | "SETTLING" | "INSPECTING" | "REVIEW_HOLD" | "TO_S2" | "SORTING" | "RELEASING" | "FAULT" | "ESTOP" | "MAINTENANCE";
         /** ModelInfo */
         ModelInfo: {
             /**
@@ -290,6 +457,29 @@ export interface components {
             /** Product Id */
             product_id: string | null;
         };
+        /** ProductOut */
+        ProductOut: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Presentation
+             * @description Ex.: com casca / sem casca
+             */
+            presentation: string | null;
+            /** Active Model Id */
+            active_model_id: string | null;
+            /** Decision Threshold */
+            decision_threshold: number;
+            /** Version */
+            version: number;
+        };
+        /**
+         * RunMode
+         * @enum {string}
+         */
+        RunMode: "simulado" | "real";
         /** SensorSnapshot */
         SensorSnapshot: {
             /** S1 */
@@ -299,6 +489,11 @@ export interface components {
             /** Estop */
             estop: boolean;
         };
+        /**
+         * Severity
+         * @enum {string}
+         */
+        Severity: "info" | "warning" | "error";
         /** StorageInfo */
         StorageInfo: {
             /**
@@ -331,27 +526,41 @@ export interface components {
              * @description Há um operador com o controle ativo
              */
             control_locked: boolean;
+            /**
+             * Control Holder
+             * @description Nome do operador com o controle
+             */
+            control_holder: string | null;
             active_lot: components["schemas"]["LotOut"] | null;
             active_lot_summary: components["schemas"]["LotSummary"] | null;
             current_cycle: components["schemas"]["CycleOut"] | null;
         };
-        /** ProductOut */
-        ProductOut: {
-            /** Id */
-            id: string;
-            /** Name */
-            name: string;
+        /** MachineCommandRequest */
+        MachineCommandRequest: {
             /**
-             * Presentation
-             * @description Ex.: com casca / sem casca
+             * Request Id
+             * Format: uuid
+             * @description Repetir o mesmo id devolve o resultado original
              */
-            presentation: string | null;
-            /** Active Model Id */
-            active_model_id: string | null;
-            /** Decision Threshold */
-            decision_threshold: number;
-            /** Version */
-            version: number;
+            request_id: string;
+            /**
+             * @description Recusa com INVALID_STATE se o estado atual for outro
+             * @default null
+             */
+            expected_state: components["schemas"]["MachineState"] | null;
+        };
+        /** InspectionReviewCreate */
+        InspectionReviewCreate: {
+            /**
+             * Request Id
+             * Format: uuid
+             */
+            request_id: string;
+            decision: components["schemas"]["Destination"];
+            /** Reviewer */
+            reviewer: string;
+            /** Reason */
+            reason: string;
         };
         /**
          * ModelValidationStatus
@@ -393,21 +602,6 @@ export interface components {
             /** Duplicate */
             duplicate: boolean;
             state: components["schemas"]["MachineState"];
-        };
-        /** ControlGrant */
-        ControlGrant: {
-            /**
-             * Token
-             * @description Enviar no cabeçalho X-Control-Token nas rotas de controle
-             */
-            token: string;
-            /** Operator */
-            operator: string;
-            /**
-             * Expires At
-             * Format: date-time
-             */
-            expires_at: string;
         };
         /**
          * AutoDecision
@@ -829,13 +1023,12 @@ export interface components {
         };
         /**
          * SnapshotEvent
-         * @description Always the first message after connecting or reconnecting.
+         * @description First message of every connection; may also be broadcast to resync everyone.
+         *
+         *     seq is the last event already reflected in data; the next event has seq + 1.
          */
         SnapshotEvent: {
-            /**
-             * Seq
-             * @description Sequência do servidor; lacuna = cliente deve pedir novo snapshot
-             */
+            /** Seq */
             seq: number;
             /**
              * At
@@ -931,6 +1124,427 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    status_api_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemStatus"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    products_api_products_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductOut"][];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    claim_api_control_claim_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ControlClaim"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ControlGrant"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    release_api_control_release_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    list_lots_api_lots_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                product_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LotOut"][];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    create_lot_api_lots_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LotCreate"];
+            };
+        };
+        responses: {
+            /** @description Mesma solicitação repetida */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LotOut"];
+                };
+            };
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LotOut"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    get_lot_api_lots__lot_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lot_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LotOut"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    lot_summary_api_lots__lot_id__summary_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lot_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LotSummary"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    close_lot_api_lots__lot_id__close_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path: {
+                lot_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LotOut"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    events_api_diagnostics_events_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                severity?: components["schemas"]["Severity"] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventOut"][];
                 };
             };
             /** @description Erro da requisição */

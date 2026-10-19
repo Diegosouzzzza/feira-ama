@@ -113,6 +113,9 @@ class MachineCommandResult(BaseModel):
 
 class ControlClaim(_In):
     operator: PersonName
+    takeover: bool = Field(
+        default=False, description="Assumir o controle mesmo que outro operador o tenha"
+    )
 
 
 class ControlGrant(BaseModel):
@@ -190,6 +193,32 @@ class InspectionPage(BaseModel):
     offset: int = Field(ge=0)
 
 
+# ---------------------------------------------------------------- diagnostics
+
+
+class EventSource(StrEnum):
+    DEVICE = "device"
+    HOST = "host"
+    OPERATOR = "operator"
+
+
+class Severity(StrEnum):
+    INFO = "info"
+    WARNING = "warning"
+    ERROR = "error"
+
+
+class EventOut(BaseModel):
+    id: DbId
+    source: EventSource
+    type: str
+    severity: Severity
+    lot_id: int | None
+    cycle_id: int | None
+    data: dict
+    occurred_at: AwareDatetime
+
+
 # ---------------------------------------------------------------- status snapshot
 
 
@@ -240,6 +269,7 @@ class SystemStatus(BaseModel):
     model: ModelInfo
     storage: StorageInfo
     control_locked: bool = Field(description="Há um operador com o controle ativo")
+    control_holder: str | None = Field(description="Nome do operador com o controle")
     active_lot: LotOut | None
     active_lot_summary: LotSummary | None
     current_cycle: CycleOut | None

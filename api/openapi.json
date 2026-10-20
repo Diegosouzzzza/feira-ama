@@ -2026,6 +2026,52 @@
         }
       }
     },
+    "/api/diagnostics/serial-ports": {
+      "get": {
+        "tags": [
+          "diagnóstico"
+        ],
+        "summary": "Serial Ports",
+        "description": "Portas USB visíveis ao sistema agora, para escolher em AV_SERIAL_PORT.",
+        "operationId": "serial_ports_api_diagnostics_serial_ports_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SerialPortOut"
+                  },
+                  "type": "array",
+                  "title": "Response Serial Ports Api Diagnostics Serial Ports Get"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/diagnostics/events": {
       "get": {
         "tags": [
@@ -2708,6 +2754,205 @@
         }
       }
     },
+    "/api/dataset/agreement/labels": {
+      "post": {
+        "tags": [
+          "coleta"
+        ],
+        "summary": "Submit Label",
+        "description": "Registra o rótulo de um revisor para uma foto nesta rodada, sem expor o de outro revisor.\n\nNão exige o controle da estação: é uma atividade separada da operação da bancada.",
+        "operationId": "submit_label_api_dataset_agreement_labels_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgreementLabelCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgreementLabelOut"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dataset/agreement/next": {
+      "get": {
+        "tags": [
+          "coleta"
+        ],
+        "summary": "Next Photo",
+        "description": "Próxima foto que este revisor ainda não rotulou nesta rodada; nulo quando acabou.",
+        "operationId": "next_photo_api_dataset_agreement_next_get",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{1,31}$",
+              "title": "Product Id"
+            }
+          },
+          {
+            "name": "session",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$",
+              "title": "Session"
+            }
+          },
+          {
+            "name": "reviewer",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 60,
+              "title": "Reviewer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/AgreementQueueItem"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Next Photo Api Dataset Agreement Next Get"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dataset/agreement/summary": {
+      "get": {
+        "tags": [
+          "coleta"
+        ],
+        "summary": "Summary",
+        "description": "Compara os rótulos: só faz sentido olhar depois que todos os revisores terminarem.",
+        "operationId": "summary_api_dataset_agreement_summary_get",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{1,31}$",
+              "title": "Product Id"
+            }
+          },
+          {
+            "name": "session",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$",
+              "title": "Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgreementSummary"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/exports/inspections.csv": {
       "get": {
         "tags": [
@@ -2849,10 +3094,482 @@
           }
         }
       }
+    },
+    "/api/backups": {
+      "post": {
+        "tags": [
+          "manutenção"
+        ],
+        "summary": "Create Backup",
+        "description": "Gera um .zip com o banco (cópia consistente), as fotos, os modelos e a coleta.",
+        "operationId": "create_backup_api_backups_post",
+        "parameters": [
+          {
+            "name": "X-Control-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token de controle do operador",
+              "title": "X-Control-Token"
+            },
+            "description": "Token de controle do operador"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackupOut"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "manutenção"
+        ],
+        "summary": "List Backups",
+        "operationId": "list_backups_api_backups_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BackupOut"
+                  },
+                  "title": "Response List Backups Api Backups Get"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/backups/{name}/file": {
+      "get": {
+        "tags": [
+          "manutenção"
+        ],
+        "summary": "Download Backup",
+        "operationId": "download_backup_api_backups__name__file_get",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Name"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/zip": {}
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/backups/{name}": {
+      "delete": {
+        "tags": [
+          "manutenção"
+        ],
+        "summary": "Delete Backup",
+        "operationId": "delete_backup_api_backups__name__delete",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Name"
+            }
+          },
+          {
+            "name": "X-Control-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token de controle do operador",
+              "title": "X-Control-Token"
+            },
+            "description": "Token de controle do operador"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/images/purge": {
+      "post": {
+        "tags": [
+          "manutenção"
+        ],
+        "summary": "Purge Images",
+        "description": "Apaga fotos de inspeções antigas (lote já encerrado); o registro no banco é mantido.",
+        "operationId": "purge_images_api_images_purge_post",
+        "parameters": [
+          {
+            "name": "max_age_days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Padrão: AV_IMAGE_RETENTION_DAYS",
+              "title": "Max Age Days"
+            },
+            "description": "Padrão: AV_IMAGE_RETENTION_DAYS"
+          },
+          {
+            "name": "X-Control-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token de controle do operador",
+              "title": "X-Control-Token"
+            },
+            "description": "Token de controle do operador"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurgeOut"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "AgreementLabelCreate": {
+        "properties": {
+          "product_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{1,31}$",
+            "title": "Product Id"
+          },
+          "session": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$",
+            "title": "Session",
+            "description": "Rodada do teste (ex.: 2026-10-20-criterios)"
+          },
+          "sample_id": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Sample Id"
+          },
+          "reviewer": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Reviewer"
+          },
+          "label": {
+            "$ref": "#/components/schemas/Grade"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "product_id",
+          "session",
+          "sample_id",
+          "reviewer",
+          "label"
+        ],
+        "title": "AgreementLabelCreate"
+      },
+      "AgreementLabelOut": {
+        "properties": {
+          "sample_id": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Sample Id"
+          },
+          "reviewer": {
+            "type": "string",
+            "title": "Reviewer"
+          },
+          "label": {
+            "$ref": "#/components/schemas/Grade"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sample_id",
+          "reviewer",
+          "label",
+          "created_at"
+        ],
+        "title": "AgreementLabelOut"
+      },
+      "AgreementQueueItem": {
+        "properties": {
+          "sample": {
+            "$ref": "#/components/schemas/DatasetSampleOut"
+          },
+          "remaining": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Remaining",
+            "description": "Fotos deste produto ainda sem rótulo deste revisor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sample",
+          "remaining"
+        ],
+        "title": "AgreementQueueItem"
+      },
+      "AgreementSampleResult": {
+        "properties": {
+          "sample": {
+            "$ref": "#/components/schemas/DatasetSampleOut"
+          },
+          "labels": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Grade"
+            },
+            "type": "object",
+            "title": "Labels",
+            "description": "Rótulo de cada revisor nesta rodada"
+          },
+          "agree": {
+            "type": "boolean",
+            "title": "Agree"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sample",
+          "labels",
+          "agree"
+        ],
+        "title": "AgreementSampleResult"
+      },
+      "AgreementSummary": {
+        "properties": {
+          "product_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{1,31}$",
+            "title": "Product Id"
+          },
+          "session": {
+            "type": "string",
+            "title": "Session"
+          },
+          "reviewers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Reviewers"
+          },
+          "compared": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Compared",
+            "description": "Fotos com rótulo de 2 ou mais revisores"
+          },
+          "agreed": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Agreed"
+          },
+          "agreement_rate": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agreement Rate"
+          },
+          "disagreements": {
+            "items": {
+              "$ref": "#/components/schemas/AgreementSampleResult"
+            },
+            "type": "array",
+            "title": "Disagreements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "product_id",
+          "session",
+          "reviewers",
+          "compared",
+          "agreed",
+          "agreement_rate",
+          "disagreements"
+        ],
+        "title": "AgreementSummary"
+      },
       "ApiErrorBody": {
         "properties": {
           "code": {
@@ -2898,6 +3615,46 @@
           "REVIEW"
         ],
         "title": "AutoDecision"
+      },
+      "BackupOut": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Nome do arquivo em backups/"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Size Bytes"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "inspections": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Inspections",
+            "description": "Inspeções registradas no banco incluído"
+          },
+          "dataset_photos": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Dataset Photos",
+            "description": "Fotos de coleta incluídas"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "size_bytes",
+          "created_at",
+          "inspections",
+          "dataset_photos"
+        ],
+        "title": "BackupOut"
       },
       "CameraInfo": {
         "properties": {
@@ -4565,6 +5322,17 @@
             "title": "Bench Is Default",
             "description": "Ainda não calibrado: valores de partida da bancada simulada. No modo real a bancada só arma depois que uma calibração for salva"
           },
+          "roi": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RoiOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Janela de inspeção; nulo usa o quadro inteiro"
+          },
           "editable": {
             "type": "boolean",
             "title": "Editable"
@@ -4587,6 +5355,7 @@
           "product",
           "bench",
           "bench_is_default",
+          "roi",
           "editable",
           "locked_reason"
         ],
@@ -4620,6 +5389,16 @@
           },
           "bench": {
             "$ref": "#/components/schemas/ConfigurePayload"
+          },
+          "roi": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RoiOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,
@@ -4687,6 +5466,27 @@
         ],
         "title": "ProductOut"
       },
+      "PurgeOut": {
+        "properties": {
+          "purged": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Purged",
+            "description": "Inspeções cuja foto foi apagada"
+          },
+          "freed_bytes": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Freed Bytes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "purged",
+          "freed_bytes"
+        ],
+        "title": "PurgeOut"
+      },
       "ReviewOut": {
         "properties": {
           "id": {
@@ -4747,6 +5547,43 @@
         ],
         "title": "ReviewReason"
       },
+      "RoiOut": {
+        "properties": {
+          "x": {
+            "type": "number",
+            "exclusiveMaximum": 1.0,
+            "minimum": 0.0,
+            "title": "X"
+          },
+          "y": {
+            "type": "number",
+            "exclusiveMaximum": 1.0,
+            "minimum": 0.0,
+            "title": "Y"
+          },
+          "width": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Width"
+          },
+          "height": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Height"
+          }
+        },
+        "type": "object",
+        "required": [
+          "x",
+          "y",
+          "width",
+          "height"
+        ],
+        "title": "RoiOut",
+        "description": "Inspection window as a fraction (0..1) of the camera frame, origin at the top-left.\n\nSet here as a starting point for training; the value a model actually uses is the one baked\ninto its package (training/__main__.py --roi), so changing this does not affect a model\nalready trained — only the next one."
+      },
       "RunMode": {
         "type": "string",
         "enum": [
@@ -4787,6 +5624,50 @@
           "estop"
         ],
         "title": "SensorSnapshot"
+      },
+      "SerialPortOut": {
+        "properties": {
+          "device": {
+            "type": "string",
+            "title": "Device",
+            "description": "Nome do sistema, ex.: \"COM5\""
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "hwid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hwid"
+          },
+          "in_use": {
+            "type": "boolean",
+            "title": "In Use",
+            "description": "É a porta que a bancada está usando agora"
+          }
+        },
+        "type": "object",
+        "required": [
+          "device",
+          "description",
+          "hwid",
+          "in_use"
+        ],
+        "title": "SerialPortOut"
       },
       "ServoTestRequest": {
         "properties": {

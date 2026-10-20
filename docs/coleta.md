@@ -28,6 +28,16 @@ A câmera é lida por uma linha de execução própria que guarda só o quadro m
 6. Na **Revisão das fotos**, filtre **Sem rótulo** para decidir as pendentes; marque **Ambígua** ou **Inutilizável** quando for o caso.
 7. **Exportar para treinamento** grava `dataset/manifest-<produto>.csv` e mostra o comando de treino.
 
+## Região de inspeção (ROI)
+
+Na tela **Configuração**, cada produto pode ter uma janela de recorte (x, y, largura, altura em % do quadro), com uma prévia da câmera mostrando o retângulo. Isso recorta o fundo e a esteira antes de analisar, deixando o modelo ver só onde a peça fica.
+
+O recorte **não** é aplicado à foto gravada (ela fica inteira, para auditoria); ele é aplicado como parte do pré-processamento, igual no treino e na bancada. Por isso, ao exportar, o comando de treino já vem com `--roi x,y,largura,altura` quando o produto tem um configurado — é só copiar e colar. Mudar o ROI depois não invalida as fotos já coletadas: o próximo treino simplesmente recorta de novo, com o valor atual.
+
+## Teste de concordância na rotulagem
+
+Antes da coleta grande, vale confirmar que o critério A/B/C está claro: a tela **Concordância** (`/concordancia`) deixa duas pessoas rotularem as mesmas fotos já coletadas, cada uma sem ver a resposta da outra (mesmo produto e mesmo nome de "rodada"). O resumo, visto só depois que as duas terminarem, mostra a taxa de concordância e cada foto onde elas discordaram, lado a lado. Não precisa do controle da estação: é uma atividade separada, pode rodar em paralelo com a operação. Detalhes em `docs/manual-rotulagem.md`.
+
 ## Onde ficam os arquivos
 
 ```
@@ -50,6 +60,9 @@ Cada foto é gravada de forma atômica e registrada no banco (`dataset_samples`)
 | `GET /api/dataset/samples/{id}/image` | Arquivo da foto |
 | `GET /api/dataset/summary` | Fotos e peças por classe, comparadas com a meta |
 | `POST /api/dataset/export` | Gera o manifesto do produto (controle) |
+| `POST /api/dataset/agreement/labels` | Registra o rótulo às cegas de um revisor (sem controle) |
+| `GET /api/dataset/agreement/next` | Próxima foto que o revisor ainda não rotulou nesta rodada |
+| `GET /api/dataset/agreement/summary` | Compara os rótulos; exige 2 revisores na rodada |
 
 ## Privacidade
 

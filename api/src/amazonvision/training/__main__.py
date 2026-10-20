@@ -34,6 +34,12 @@ def main() -> None:
     train.add_argument("--sem-pre-treino", action="store_true")
     train.add_argument("--dispositivo", default="auto", help="auto, cpu ou cuda")
     train.add_argument("--meta-falsa-aprovacao", type=float, default=0.05)
+    train.add_argument(
+        "--roi",
+        default=None,
+        help="janela de inspeção x,y,largura,altura em frações 0..1 (ex.: 0.2,0.1,0.6,0.8); "
+        "padrão: quadro inteiro. Use o valor mostrado na tela Configuração",
+    )
     args = parser.parse_args()
 
     if args.command == "sintetico":
@@ -58,6 +64,17 @@ def main() -> None:
         print(f"partições gravadas em {args.manifesto}")
     else:
         from amazonvision.training.train import train as run
+        from amazonvision.vision.preprocess import RoiSpec
+
+        roi = None
+        if args.roi:
+            try:
+                x, y, width, height = (float(v) for v in args.roi.split(","))
+                roi = RoiSpec(x=x, y=y, width=width, height=height)
+            except ValueError as exc:
+                parser.error(
+                    f"--roi inválido ({exc}); use x,y,largura,altura, ex.: 0.2,0.1,0.6,0.8"
+                )
 
         out = args.saida or Settings().data_root / "modelos-treinados"
         package = run(
@@ -69,6 +86,7 @@ def main() -> None:
             pretrained=not args.sem_pre_treino,
             device=args.dispositivo,
             max_false_approval=args.meta_falsa_aprovacao,
+            roi=roi,
         )
         print(f"pacote do modelo: {package}")
         print(f"relatório: {package / 'relatorio.md'}")

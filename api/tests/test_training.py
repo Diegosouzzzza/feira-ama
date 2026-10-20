@@ -95,3 +95,26 @@ def test_full_training_produces_a_loadable_package(tmp_path: Path):
     report = (package_dir / "relatorio.md").read_text(encoding="utf-8")
     assert "## Parecer" in report
     check_no_leakage(read_manifest(package_dir / "dataset_split.csv"))
+
+
+def test_training_bakes_the_roi_into_the_package(tmp_path: Path):
+    pytest.importorskip("torch", reason="grupo de dependências 'training' não instalado")
+    from amazonvision.training.synthetic import generate
+    from amazonvision.training.train import train
+    from amazonvision.vision.package import load_package
+    from amazonvision.vision.preprocess import RoiSpec
+
+    manifest = generate(
+        tmp_path / "ds", product_id="tucuma", pieces_per_class=6, photos_per_piece=2
+    )
+    roi = RoiSpec(x=0.2, y=0.1, width=0.6, height=0.8)
+    package_dir = train(
+        manifest,
+        product_id="tucuma",
+        out_dir=tmp_path / "out",
+        epochs=1,
+        pretrained=False,
+        roi=roi,
+    )
+    package = load_package(package_dir)
+    assert package.preprocess.roi == roi

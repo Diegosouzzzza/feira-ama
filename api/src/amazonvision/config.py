@@ -44,6 +44,14 @@ class Settings(BaseSettings):
     camera_width: int = 1280
     camera_height: int = 720
     camera_exposure: float | None = None  # driver units; None keeps the camera's own setting
+    # Real mode only: USB serial port to the ESP32 (e.g. "COM5"). Unset: no board, API stays up.
+    serial_port: str | None = None
+    serial_baud_rate: int = 115_200
+    # Inspection photos older than this, from closed lots, are purged automatically to protect
+    # disk space; the database row (prediction, decision, events) is kept. Dataset photos
+    # (training collection) are never touched by this.
+    image_retention_days: int = Field(default=30, ge=1)
+    retention_check_minutes: int = Field(default=60, ge=1)
 
     @model_validator(mode="after")
     def _default_data_dir(self) -> Self:

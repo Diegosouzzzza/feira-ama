@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiGet } from "@/lib/api/client";
-import type { EventOut, EventSource, MachineCommandResult, Severity, SystemStatus } from "@/lib/api/types";
+import type { EventOut, EventSource, MachineCommandResult, SerialPortOut, Severity, SystemStatus } from "@/lib/api/types";
 import { controlPost } from "@/lib/control";
 import { formatDateTime, formatTime } from "@/lib/format";
 import { MACHINE_STATE } from "@/lib/labels";
@@ -82,6 +82,44 @@ function MachinePanel({ status }: { status: SystemStatus }) {
         <Signal name="Sensor S2 (separação)" on={Boolean(sensors?.s2)} onText="Peça" offText="Livre" />
         <Signal name="Emergência" on={Boolean(sensors?.estop)} onText="Acionada" offText="Normal" danger />
       </div>
+    </section>
+  );
+}
+
+// ---------------------------------------------------------------- serial ports
+
+function SerialPortsPanel({ connected }: { connected: boolean }) {
+  const ports = useQuery({
+    queryKey: ["serial-ports"],
+    queryFn: ({ signal }) => apiGet<SerialPortOut[]>("/diagnostics/serial-ports", { signal }),
+    refetchInterval: connected ? false : 4000,
+  });
+  if (connected) return null;
+  return (
+    <section aria-labelledby="serial-title" className="space-y-3 rounded-lg border bg-card p-4">
+      <h2 id="serial-title" className="font-wide text-lg font-semibold">
+        Portas USB disponíveis
+      </h2>
+      <p className="text-sm text-muted-foreground">
+        A placa não está respondendo. Encontre a porta da placa aqui e coloque-a em{" "}
+        <code className="rounded bg-muted px-1 py-0.5">AV_SERIAL_PORT</code> no <code className="rounded bg-muted px-1 py-0.5">api/.env</code>,
+        depois reinicie o serviço.
+      </p>
+      {ports.isPending ? (
+        <p className="text-sm text-muted-foreground">Procurando portas…</p>
+      ) : (ports.data ?? []).length === 0 ? (
+        <p className="text-sm text-muted-foreground">Nenhuma porta USB encontrada. Confira o cabo.</p>
+      ) : (
+        <ul className="space-y-1.5 text-sm">
+          {ports.data?.map((port) => (
+            <li key={port.device} className="flex items-center gap-2 rounded-md border px-3 py-1.5">
+              <span className="font-mono font-semibold">{port.device}</span>
+              <span className="text-muted-foreground">{port.description ?? "sem descrição"}</span>
+              {port.in_use && <span className="ml-auto text-xs font-medium text-review">configurada, sem resposta</span>}
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }
@@ -324,6 +362,7 @@ export function DiagnosticoPage() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <MachinePanel status={status} />
           <Equipment status={status} />
+          <SerialPortsPanel connected={status.machine.link.connected} />
           <MaintenancePanel status={status} controller={controller} />
         </div>
       ) : (

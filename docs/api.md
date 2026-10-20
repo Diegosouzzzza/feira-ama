@@ -50,8 +50,17 @@ Situação: rotas marcadas com ✅ estão implementadas e testadas. As demais en
 | `PATCH /api/dataset/samples/{id}` | `DatasetSampleUpdate` | `DatasetSampleOut` | 7 ✅ | sim |
 | `GET /api/dataset/samples/{id}/image` | — | PNG (simulado) ou JPEG | 7 ✅ | não |
 | `GET /api/dataset/summary` | `?product_id` | `DatasetSummary` | 7 ✅ | não |
-| `POST /api/dataset/export` | `DatasetExport` | `DatasetExportOut` | 7 ✅ | sim |
+| `POST /api/dataset/export` | `DatasetExport` | `DatasetExportOut` (`command` inclui `--roi` se configurado) | 7 ✅ | sim |
+| `POST /api/dataset/agreement/labels` | `AgreementLabelCreate` | `AgreementLabelOut` (201; rotular de novo atualiza) | 7 ✅ | não |
+| `GET /api/dataset/agreement/next` | `?product_id&session&reviewer` | `AgreementQueueItem \| null` | 7 ✅ | não |
+| `GET /api/dataset/agreement/summary` | `?product_id&session` | `AgreementSummary` (`409` com menos de 2 revisores) | 7 ✅ | não |
 | `GET /api/diagnostics/events` | `?limit(1–200)&offset&severity&source&type&lot_id` | `EventOut[]` (mais recente primeiro) | 3 ✅ | não |
+| `GET /api/diagnostics/serial-ports` | — | `SerialPortOut[]` | 9 ✅ | não |
+| `POST /api/backups` | — | `BackupOut` (201; banco em instantâneo consistente, `VACUUM INTO`) | 10 ✅ | sim |
+| `GET /api/backups` | — | `BackupOut[]` (mais recente primeiro) | 10 ✅ | não |
+| `GET /api/backups/{name}/file` | — | `.zip` | 10 ✅ | não |
+| `DELETE /api/backups/{name}` | — | 204 | 10 ✅ | sim |
+| `POST /api/images/purge` | `?max_age_days` (padrão: `AV_IMAGE_RETENTION_DAYS`) | `PurgeOut` | 10 ✅ | sim |
 | `WS /api/events` | — | `WsEvent` | 3 ✅ | não |
 
 Regras de estado das rotas de controle:
@@ -65,6 +74,8 @@ Regras de estado das rotas de controle:
 - `dataset/capture`: máquina parada (`409 INVALID_STATE` com a esteira em operação); câmera sem quadro novo → `503 CAMERA_UNAVAILABLE`/`STALE_FRAME`. Fotos da mesma peça física não podem ter classes diferentes (`409 CONFLICT`, também no `PATCH`).
 - `products/{id}/config`: recusado com a esteira em operação ou com lote aberto do produto (`409 INVALID_STATE`); versão diferente da lida → `409 CONFLICT`. Vale para o próximo lote (o lote congela limiar e calibração ao abrir). Cada alteração gera `CONFIG_CHANGED` com o antes e o depois.
 - `maintenance/*`: entrar exige placa conectada, sem operação automática nem ciclo; de `READY` a máquina é desarmada antes. Testes de motor e servo só em `MAINTENANCE`. Sair volta a `DISARMED`.
+- `dataset/agreement/*`: não exige o controle da estação (é uma atividade separada da operação). Cada revisor só vê a própria resposta; `summary` recusa com `409 INVALID_STATE` até haver 2 revisores na mesma `session`. Rótulos de sessões diferentes nunca se comparam.
+- `backups`/`images/purge`: também funcionam com a esteira em operação (não mexem na bancada). Uma limpeza automática roda sozinha a cada `AV_RETENTION_CHECK_MINUTES` (padrão 60 min), nunca tocando no lote aberto.
 - `review`: decide a peça inconclusiva parada em `REVIEW_HOLD` (a decisão é entregue à placa **antes** de ser registrada) ou corrige uma decisão anterior sem mover nada. A previsão original fica intacta; cada revisão é um registro novo.
 
 ## WebSocket `/api/events`

@@ -504,6 +504,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/diagnostics/serial-ports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Serial Ports
+         * @description Portas USB visíveis ao sistema agora, para escolher em AV_SERIAL_PORT.
+         */
+        get: operations["serial_ports_api_diagnostics_serial_ports_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/diagnostics/events": {
         parameters: {
             query?: never;
@@ -675,6 +695,68 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/dataset/agreement/labels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit Label
+         * @description Registra o rótulo de um revisor para uma foto nesta rodada, sem expor o de outro revisor.
+         *
+         *     Não exige o controle da estação: é uma atividade separada da operação da bancada.
+         */
+        post: operations["submit_label_api_dataset_agreement_labels_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dataset/agreement/next": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Next Photo
+         * @description Próxima foto que este revisor ainda não rotulou nesta rodada; nulo quando acabou.
+         */
+        get: operations["next_photo_api_dataset_agreement_next_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dataset/agreement/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Summary
+         * @description Compara os rótulos: só faz sentido olhar depois que todos os revisores terminarem.
+         */
+        get: operations["summary_api_dataset_agreement_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/exports/inspections.csv": {
         parameters: {
             query?: never;
@@ -695,10 +777,155 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/backups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Backups */
+        get: operations["list_backups_api_backups_get"];
+        put?: never;
+        /**
+         * Create Backup
+         * @description Gera um .zip com o banco (cópia consistente), as fotos, os modelos e a coleta.
+         */
+        post: operations["create_backup_api_backups_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/backups/{name}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download Backup */
+        get: operations["download_backup_api_backups__name__file_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/backups/{name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Backup */
+        delete: operations["delete_backup_api_backups__name__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/images/purge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Purge Images
+         * @description Apaga fotos de inspeções antigas (lote já encerrado); o registro no banco é mantido.
+         */
+        post: operations["purge_images_api_images_purge_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AgreementLabelCreate */
+        AgreementLabelCreate: {
+            /** Product Id */
+            product_id: string;
+            /**
+             * Session
+             * @description Rodada do teste (ex.: 2026-10-20-criterios)
+             */
+            session: string;
+            /** Sample Id */
+            sample_id: number;
+            /** Reviewer */
+            reviewer: string;
+            label: components["schemas"]["Grade"];
+        };
+        /** AgreementLabelOut */
+        AgreementLabelOut: {
+            /** Sample Id */
+            sample_id: number;
+            /** Reviewer */
+            reviewer: string;
+            label: components["schemas"]["Grade"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** AgreementQueueItem */
+        AgreementQueueItem: {
+            sample: components["schemas"]["DatasetSampleOut"];
+            /**
+             * Remaining
+             * @description Fotos deste produto ainda sem rótulo deste revisor
+             */
+            remaining: number;
+        };
+        /** AgreementSampleResult */
+        AgreementSampleResult: {
+            sample: components["schemas"]["DatasetSampleOut"];
+            /**
+             * Labels
+             * @description Rótulo de cada revisor nesta rodada
+             */
+            labels: {
+                [key: string]: components["schemas"]["Grade"];
+            };
+            /** Agree */
+            agree: boolean;
+        };
+        /** AgreementSummary */
+        AgreementSummary: {
+            /** Product Id */
+            product_id: string;
+            /** Session */
+            session: string;
+            /** Reviewers */
+            reviewers: string[];
+            /**
+             * Compared
+             * @description Fotos com rótulo de 2 ou mais revisores
+             */
+            compared: number;
+            /** Agreed */
+            agreed: number;
+            /** Agreement Rate */
+            agreement_rate: number | null;
+            /** Disagreements */
+            disagreements: components["schemas"]["AgreementSampleResult"][];
+        };
         /**
          * ApiErrorBody
          * @description Every non-2xx response from /api uses this body.
@@ -726,6 +953,31 @@ export interface components {
          * @enum {string}
          */
         AutoDecision: "APPROVED" | "REJECTED" | "REVIEW";
+        /** BackupOut */
+        BackupOut: {
+            /**
+             * Name
+             * @description Nome do arquivo em backups/
+             */
+            name: string;
+            /** Size Bytes */
+            size_bytes: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Inspections
+             * @description Inspeções registradas no banco incluído
+             */
+            inspections: number;
+            /**
+             * Dataset Photos
+             * @description Fotos de coleta incluídas
+             */
+            dataset_photos: number;
+        };
         /** CameraInfo */
         CameraInfo: {
             /**
@@ -1328,6 +1580,8 @@ export interface components {
              * @description Ainda não calibrado: valores de partida da bancada simulada. No modo real a bancada só arma depois que uma calibração for salva
              */
             bench_is_default: boolean;
+            /** @description Janela de inspeção; nulo usa o quadro inteiro */
+            roi: components["schemas"]["RoiOut"] | null;
             /** Editable */
             editable: boolean;
             /**
@@ -1348,6 +1602,7 @@ export interface components {
             /** Decision Threshold */
             decision_threshold: number;
             bench: components["schemas"]["ConfigurePayload"];
+            roi?: components["schemas"]["RoiOut"] | null;
         };
         /** ProductOut */
         ProductOut: {
@@ -1366,6 +1621,16 @@ export interface components {
             decision_threshold: number;
             /** Version */
             version: number;
+        };
+        /** PurgeOut */
+        PurgeOut: {
+            /**
+             * Purged
+             * @description Inspeções cuja foto foi apagada
+             */
+            purged: number;
+            /** Freed Bytes */
+            freed_bytes: number;
         };
         /** ReviewOut */
         ReviewOut: {
@@ -1391,6 +1656,24 @@ export interface components {
          */
         ReviewReason: "LOW_CONFIDENCE" | "AMBIGUOUS" | "INVALID_IMAGE";
         /**
+         * RoiOut
+         * @description Inspection window as a fraction (0..1) of the camera frame, origin at the top-left.
+         *
+         *     Set here as a starting point for training; the value a model actually uses is the one baked
+         *     into its package (training/__main__.py --roi), so changing this does not affect a model
+         *     already trained — only the next one.
+         */
+        RoiOut: {
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+            /** Width */
+            width: number;
+            /** Height */
+            height: number;
+        };
+        /**
          * RunMode
          * @enum {string}
          */
@@ -1408,6 +1691,23 @@ export interface components {
             s2: boolean;
             /** Estop */
             estop: boolean;
+        };
+        /** SerialPortOut */
+        SerialPortOut: {
+            /**
+             * Device
+             * @description Nome do sistema, ex.: "COM5"
+             */
+            device: string;
+            /** Description */
+            description: string | null;
+            /** Hwid */
+            hwid: string | null;
+            /**
+             * In Use
+             * @description É a porta que a bancada está usando agora
+             */
+            in_use: boolean;
         };
         /** ServoTestRequest */
         ServoTestRequest: {
@@ -3167,6 +3467,44 @@ export interface operations {
             };
         };
     };
+    serial_ports_api_diagnostics_serial_ports_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SerialPortOut"][];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
     events_api_diagnostics_events_get: {
         parameters: {
             query?: {
@@ -3554,6 +3892,131 @@ export interface operations {
             };
         };
     };
+    submit_label_api_dataset_agreement_labels_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AgreementLabelCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgreementLabelOut"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    next_photo_api_dataset_agreement_next_get: {
+        parameters: {
+            query: {
+                product_id: string;
+                session: string;
+                reviewer: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgreementQueueItem"] | null;
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    summary_api_dataset_agreement_summary_get: {
+        parameters: {
+            query: {
+                product_id: string;
+                session: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgreementSummary"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
     inspections_csv_api_exports_inspections_csv_get: {
         parameters: {
             query?: {
@@ -3578,6 +4041,210 @@ export interface operations {
                 };
                 content: {
                     "text/csv": unknown;
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    list_backups_api_backups_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BackupOut"][];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    create_backup_api_backups_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BackupOut"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    download_backup_api_backups__name__file_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/zip": unknown;
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    delete_backup_api_backups__name__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path: {
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    purge_images_api_images_purge_post: {
+        parameters: {
+            query?: {
+                /** @description Padrão: AV_IMAGE_RETENTION_DAYS */
+                max_age_days?: number | null;
+            };
+            header?: {
+                /** @description Token de controle do operador */
+                "X-Control-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurgeOut"];
                 };
             };
             /** @description Erro da requisição */

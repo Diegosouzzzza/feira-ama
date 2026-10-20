@@ -1,5 +1,6 @@
 import asyncio
 import hashlib
+import json
 import sqlite3
 from collections.abc import Callable
 from pathlib import Path, PurePosixPath
@@ -58,10 +59,11 @@ class DatasetService:
     def root(self) -> Path:
         return self._settings.data_root / "dataset"
 
-    async def _require_product(self, product_id: str) -> None:
+    async def _require_product(self, product_id: str) -> sqlite3.Row:
         product = await self._db.run(lambda conn: get_product_row(conn, product_id))
         if product is None:
             raise ApiError(ErrorCode.VALIDATION_ERROR, f"Produto {product_id} não existe.")
+        return product
 
     async def capture(self, body: DatasetCapture, operator: str) -> DatasetSampleOut:
         if self._machine_busy():
@@ -213,7 +215,7 @@ class DatasetService:
         """Write dataset/manifest-<product>.csv (training format, paths relative to dataset/).
 
         Only labeled photos go in; the split by physical piece is left to the training step."""
-        await self._require_product(product_id)
+        product = await self._require_product(product_id)
         rows = await self._db.run(lambda conn: repo.labeled_for_export(conn, product_id))
         if not rows:
             raise ApiError(
@@ -234,13 +236,17 @@ class DatasetService:
         temporary = manifest.with_suffix(".csv.tmp")
         await asyncio.to_thread(write_manifest, temporary, samples)
         temporary.replace(manifest)
+        command = (
+            "uv run --group training python -m amazonvision.training treinar "
+            f'--manifesto "{manifest}" --produto {product_id}'
+        )
+        if product["roi_json"]:
+            roi = json.loads(product["roi_json"])
+            command += f" --roi {roi['x']},{roi['y']},{roi['width']},{roi['height']}"
         return DatasetExportOut(
             product_id=product_id,
             manifest_path=str(manifest),
             photos=len(samples),
             pieces=len({s.physical_sample_id for s in samples}),
-            command=(
-                "uv run --group training python -m amazonvision.training treinar "
-                f'--manifesto "{manifest}" --produto {product_id}'
-            ),
+            command=command,
         )

@@ -2,11 +2,19 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query
 
+from amazonvision.machine.serial_link import list_ports
 from amazonvision.routes.deps import ServicesDep
-from amazonvision.schemas.api import EventOut, EventSource, Severity
+from amazonvision.schemas.api import EventOut, EventSource, SerialPortOut, Severity
 from amazonvision.storage.events import list_events
 
 router = APIRouter(prefix="/diagnostics", tags=["diagnóstico"])
+
+
+@router.get("/serial-ports", response_model=list[SerialPortOut])
+async def serial_ports(services: ServicesDep) -> list[SerialPortOut]:
+    """Portas USB visíveis ao sistema agora, para escolher em AV_SERIAL_PORT."""
+    in_use = services.settings.serial_port
+    return [SerialPortOut(**port, in_use=port["device"] == in_use) for port in list_ports()]
 
 
 @router.get("/events", response_model=list[EventOut])

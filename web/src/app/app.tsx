@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { startRealtime } from "@/lib/realtime/store";
 import { ColetaPage } from "@/pages/coleta";
+import { ConcordanciaPage } from "@/pages/concordancia";
 import { ConfiguracaoPage } from "@/pages/configuracao";
 import { DiagnosticoPage } from "@/pages/diagnostico";
 import { FeiraPage } from "@/pages/feira";
@@ -21,6 +22,7 @@ const router = createBrowserRouter([
   { path: "feira", element: <FeiraPage /> },
   { path: "historico", element: <HistoricoPage /> },
   { path: "coleta", element: <ColetaPage /> },
+  { path: "concordancia", element: <ConcordanciaPage /> },
   { path: "configuracao", element: <ConfiguracaoPage /> },
   { path: "diagnostico", element: <DiagnosticoPage /> },
   { path: "modelos", element: <ModelosPage /> },

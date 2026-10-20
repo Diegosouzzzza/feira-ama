@@ -37,7 +37,7 @@ from amazonvision.training.report import readiness, write_report
 from amazonvision.vision.onnx_classifier import OnnxClassifier
 from amazonvision.vision.package import FORMAT_VERSION, WEIGHTS, load_package, sha256_file
 from amazonvision.vision.package import write_manifest as write_model_manifest
-from amazonvision.vision.preprocess import PreprocessSpec, prepare_image
+from amazonvision.vision.preprocess import PreprocessSpec, RoiSpec, prepare_image
 
 ARCHITECTURE = "mobilenet_v3_small"
 LABEL_INDEX = {g: i for i, g in enumerate(ORDER)}
@@ -147,6 +147,7 @@ def train(
     device: str = "auto",
     max_false_approval: float = 0.05,
     dataset_version: str | None = None,
+    roi: RoiSpec | None = None,
 ) -> Path:
     """Train, export, evaluate and write a complete model package. Returns its folder."""
     random.seed(seed)
@@ -171,7 +172,7 @@ def train(
     package_dir.mkdir(parents=True, exist_ok=False)
     write_manifest(package_dir / "dataset_split.csv", samples)
 
-    spec = PreprocessSpec()
+    spec = PreprocessSpec(roi=roi)
     dev = _device(device)
     model = _build_model(pretrained).to(dev)
     train_loader = DataLoader(

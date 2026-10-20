@@ -31,14 +31,23 @@ def update_config(
     presentation: str | None,
     decision_threshold: float,
     bench_config_json: str,
+    roi_json: str | None,
     at: str,
 ) -> bool:
     """Optimistic update: False when someone saved another version in the meantime."""
     cursor = conn.execute(
         """UPDATE product_profiles
-           SET presentation = ?, decision_threshold = ?, bench_config_json = ?,
+           SET presentation = ?, decision_threshold = ?, bench_config_json = ?, roi_json = ?,
                version = version + 1, updated_at = ?
            WHERE id = ? AND version = ?""",
-        (presentation, decision_threshold, bench_config_json, at, product_id, expected_version),
+        (
+            presentation,
+            decision_threshold,
+            bench_config_json,
+            roi_json,
+            at,
+            product_id,
+            expected_version,
+        ),
     )
     return cursor.rowcount == 1

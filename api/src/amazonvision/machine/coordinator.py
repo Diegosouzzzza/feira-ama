@@ -147,6 +147,7 @@ class Coordinator:
     HOST_HEARTBEAT_S = 0.5
     WATCHDOG_S = 0.1
     LEDGER_SIZE = 256
+    RECONNECT_DELAY_S = 2.0
 
     def __init__(
         self,
@@ -366,6 +367,10 @@ class Coordinator:
                 line = await self._link.read_line()
             except LinkClosed:
                 await self._mark_lost("Conexão com a placa encerrada.")
+                current = asyncio.current_task()
+                if current in self._loops:
+                    self._loops.remove(current)
+                self._spawn(self._reconnect())
                 return
             try:
                 message = parse_device_line(line)
@@ -376,6 +381,29 @@ class Coordinator:
                 await self._on_message(message)
             except ApiError:
                 log.exception("falha ao registrar mensagem da placa")
+
+    async def _reconnect(self) -> None:
+        """The link broke (cable out, port closed): keep trying to reopen it on its own."""
+        assert self._link is not None
+        attempt = 0
+        while True:
+            await asyncio.sleep(self.RECONNECT_DELAY_S)
+            attempt += 1
+            with contextlib.suppress(Exception):
+                await self._link.close()
+            try:
+                await self._link.start()
+            except LinkClosed as exc:
+                if attempt == 1:
+                    log.warning("não foi possível reabrir a conexão com a placa: %s", exc)
+                continue
+            break
+        log.info("conexão com a placa reaberta após %d tentativa(s)", attempt)
+        self._loops.append(asyncio.create_task(self._reader()))
+        try:
+            await self._handshake()
+        except ApiError:
+            log.warning("placa reconectada não respondeu ao HELLO")
 
     async def _host_heartbeat(self) -> None:
         assert self._link is not None

@@ -7,7 +7,7 @@ from amazonvision.config import Settings
 from amazonvision.core.clock import to_db, utc_now
 from amazonvision.machine.bench_config import SIMULATED_BENCH
 from amazonvision.machine.protocol import ConfigurePayload
-from amazonvision.schemas.api import ProductConfigOut, ProductConfigUpdate
+from amazonvision.schemas.api import ProductConfigOut, ProductConfigUpdate, RoiOut
 from amazonvision.schemas.errors import ApiError, ErrorCode
 from amazonvision.storage import products as repo
 from amazonvision.storage.db import Database, transaction
@@ -44,11 +44,13 @@ class ProductConfigService:
             if default
             else ConfigurePayload.model_validate_json(row["bench_config_json"])
         )
+        roi = RoiOut.model_validate_json(row["roi_json"]) if row["roi_json"] else None
         reason = self._locked_reason(conn, product_id)
         return ProductConfigOut(
             product=repo.to_product(row),
             bench=bench,
             bench_is_default=default,
+            roi=roi,
             editable=reason is None,
             locked_reason=reason,
         )
@@ -74,6 +76,7 @@ class ProductConfigService:
                     presentation=body.presentation or None,
                     decision_threshold=body.decision_threshold,
                     bench_config_json=body.bench.model_dump_json(),
+                    roi_json=body.roi.model_dump_json() if body.roi else None,
                     at=now,
                 )
                 if not saved:
@@ -92,11 +95,13 @@ def _changes(before: ProductConfigOut, after: ProductConfigOut) -> dict[str, Any
     old: dict[str, Any] = {
         "presentation": before.product.presentation,
         "decision_threshold": before.product.decision_threshold,
+        "roi": before.roi.model_dump() if before.roi else None,
         **json.loads(before.bench.model_dump_json()),
     }
     new: dict[str, Any] = {
         "presentation": after.product.presentation,
         "decision_threshold": after.product.decision_threshold,
+        "roi": after.roi.model_dump() if after.roi else None,
         **json.loads(after.bench.model_dump_json()),
     }
     return {

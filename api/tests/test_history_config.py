@@ -125,7 +125,44 @@ def test_config_defaults_to_simulated_bench(bench: TestClient):
     assert current["bench_is_default"] is True
     assert current["bench"]["settle_ms"] > 0
     assert current["editable"] is True
+    assert current["roi"] is None
     assert bench.get("/api/products/acai/config").status_code == 404
+
+
+def test_roi_is_saved_and_rejects_a_window_outside_the_frame(bench: TestClient, operator):
+    current = config(bench)
+    roi = {"x": 0.2, "y": 0.1, "width": 0.6, "height": 0.8}
+    saved = update(bench, operator, current, roi=roi)
+    assert saved.status_code == 200, saved.text
+    assert saved.json()["roi"] == roi
+
+    [event] = [
+        e for e in bench.get("/api/diagnostics/events", params={"type": "CONFIG_CHANGED"}).json()
+    ]
+    assert event["data"]["changes"]["roi"] == {"de": None, "para": roi}
+
+    current = config(bench)
+    outside = update(
+        bench, operator, current, roi={"x": 0.6, "y": 0.0, "width": 0.6, "height": 0.5}
+    )
+    assert outside.status_code == 422
+
+    cleared = update(bench, operator, config(bench), roi=None)
+    assert cleared.json()["roi"] is None
+
+
+def test_dataset_export_command_includes_the_configured_roi(bench: TestClient, operator):
+    update(bench, operator, config(bench), roi={"x": 0.25, "y": 0.1, "width": 0.5, "height": 0.8})
+    body = {
+        "product_id": "tucuma",
+        "physical_sample_id": "T-1",
+        "collection_session": "s1",
+        "label": "A",
+    }
+    assert bench.post("/api/dataset/capture", json=body, headers=operator).status_code == 201
+    export = bench.post("/api/dataset/export", json={"product_id": "tucuma"}, headers=operator)
+    assert export.status_code == 200, export.text
+    assert "--roi 0.25,0.1,0.5,0.8" in export.json()["command"]
 
 
 def test_config_update_applies_to_next_lot_and_is_logged(bench: TestClient, operator):
@@ -240,3 +277,23 @@ def test_maintenance_from_ready_disarms_first(bench: TestClient, operator):
     again = bench.post("/api/machine/maintenance/exit", json=body, headers=operator).json()
     assert again["duplicate"] is True
     assert again["state"] == first["state"] == "DISARMED"
+
+
+# ---------------------------------------------------------------- serial ports
+
+
+def test_serial_ports_lists_what_the_system_sees(client: TestClient, monkeypatch):
+    from amazonvision.machine import serial_link as serial_link_module
+
+    class FakePortInfo:
+        device = "COM7"
+        description = "USB-SERIAL CH340"
+        hwid = "USB VID:PID=1A86:7523"
+
+    monkeypatch.setattr(serial_link_module._list_ports, "comports", lambda: [FakePortInfo()])
+    response = client.get("/api/diagnostics/serial-ports")
+    assert response.status_code == 200
+    [port] = response.json()
+    assert port["device"] == "COM7"
+    assert port["description"] == "USB-SERIAL CH340"
+    assert port["in_use"] is False

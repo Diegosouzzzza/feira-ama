@@ -58,6 +58,7 @@ export function StationHeader({ status }: { status: SystemStatus | null }) {
             { to: "/", label: "Operação" },
             { to: "/historico", label: "Histórico" },
             { to: "/coleta", label: "Coleta" },
+            { to: "/concordancia", label: "Concordância" },
             { to: "/modelos", label: "Modelos" },
             { to: "/configuracao", label: "Configuração" },
             { to: "/diagnostico", label: "Diagnóstico" },

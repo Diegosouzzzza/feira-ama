@@ -48,9 +48,17 @@ Casos de fronteira combinados pela equipe (preencher):
 
 -
 
+## Teste de concordância (antes de começar a coleta grande)
+
+Com as primeiras ~20 fotos de cada classe já coletadas (coleta piloto), duas pessoas da equipe usam a tela **Concordância** (`/concordancia`) para rotular as mesmas fotos, cada uma sem ver a resposta da outra. O resumo mostra a taxa de concordância e cada foto onde discordaram, lado a lado — é ali que se discute e se ajustam os critérios acima, **antes** de rotular as centenas de fotos da coleta grande. Repita sempre que os critérios mudarem.
+
+| Data | Produto | Revisores | Fotos comparadas | Concordância | Combinados ajustados |
+|---|---|---|---|---|---|
+| | | | | | |
+
 ## Revisão cruzada
 
-Antes de exportar para o treinamento, uma segunda pessoa revisa uma amostra de pelo menos 10 % das fotos rotuladas de cada classe (filtro **Rotuladas** na tela de Coleta). Discordâncias voltam para discussão e, se necessário, para **Ambígua**.
+Além do teste de concordância, antes de exportar para o treinamento uma segunda pessoa revisa uma amostra de pelo menos 10 % das fotos rotuladas de cada classe (filtro **Rotuladas** na tela de Coleta). Discordâncias voltam para discussão e, se necessário, para **Ambígua**.
 
 | Data | Produto | Quem revisou | Fotos revisadas | Discordâncias | Decisão |
 |---|---|---|---|---|---|

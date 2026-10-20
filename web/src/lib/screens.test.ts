@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validate } from "@/lib/bench-fields";
+import { toRoi, validate } from "@/lib/bench-fields";
 import { filterParams } from "@/lib/history-filters";
 
 const BENCH = {
@@ -18,6 +18,11 @@ const BENCH = {
   motor_power_pct: "",
   presentation: "",
   threshold: "0.8",
+  roiEnabled: false,
+  roiX: "0",
+  roiY: "0",
+  roiWidth: "100",
+  roiHeight: "100",
 };
 
 describe("validate (Configuração)", () => {
@@ -41,6 +46,24 @@ describe("validate (Configuração)", () => {
 
   it("accepts a decimal comma in the threshold", () => {
     expect(validate({ ...BENCH, threshold: "0,85" })).toEqual({});
+  });
+
+  it("ignores the roi fields when disabled, converts null", () => {
+    const draft = { ...BENCH, roiX: "not a number at all" };
+    expect(validate(draft)).toEqual({});
+    expect(toRoi(draft)).toBeNull();
+  });
+
+  it("validates the roi window when enabled, and converts to fractions", () => {
+    const enabled = { ...BENCH, roiEnabled: true, roiX: "20", roiY: "10", roiWidth: "60", roiHeight: "80" };
+    expect(validate(enabled)).toEqual({});
+    expect(toRoi(enabled)).toEqual({ x: 0.2, y: 0.1, width: 0.6, height: 0.8 });
+
+    const overflowing = { ...enabled, roiWidth: "85" }; // 20 + 85 > 100
+    expect(Object.keys(validate(overflowing))).toEqual(["roiWidth"]);
+
+    const zeroWidth = { ...enabled, roiWidth: "0" };
+    expect(Object.keys(validate(zeroWidth))).toEqual(["roiWidth"]);
   });
 });
 

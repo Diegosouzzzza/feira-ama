@@ -1,6 +1,6 @@
 /** Bench calibration fields of the Configuração screen, with the protocol limits. */
 
-import type { ConfigurePayload, ProductConfigOut } from "@/lib/api/types";
+import type { ConfigurePayload, ProductConfigOut, RoiOut } from "@/lib/api/types";
 
 export type BenchKey = keyof ConfigurePayload;
 
@@ -48,22 +48,43 @@ export const BENCH_GROUPS: { title: string; fields: Field[] }[] = [
 
 export const FIELDS = BENCH_GROUPS.flatMap((g) => g.fields);
 
-export type Draft = Record<BenchKey, string> & { presentation: string; threshold: string };
+export const ROI_KEYS = ["roiX", "roiY", "roiWidth", "roiHeight"] as const;
+export type RoiKey = (typeof ROI_KEYS)[number];
+const ROI_LABEL: Record<RoiKey, string> = {
+  roiX: "da esquerda",
+  roiY: "do topo",
+  roiWidth: "largura",
+  roiHeight: "altura",
+};
+
+export type Draft = Record<BenchKey, string> &
+  Record<RoiKey, string> & { presentation: string; threshold: string; roiEnabled: boolean };
+
+/** Round-trips cleanly: 0.6 -> "60" -> 0.6, never 59.999999999999996. */
+function toPercent(fraction: number): string {
+  return (Math.round(fraction * 1000) / 10).toString();
+}
 
 export function toDraft(config: ProductConfigOut): Draft {
   const bench = Object.fromEntries(
     FIELDS.map((f) => [f.key, config.bench[f.key] === null || config.bench[f.key] === undefined ? "" : String(config.bench[f.key])]),
   ) as Record<BenchKey, string>;
+  const roi = config.roi;
   return {
     ...bench,
     presentation: config.product.presentation ?? "",
     threshold: config.product.decision_threshold.toFixed(2).replace(".", ","),
+    roiEnabled: roi !== null,
+    roiX: roi ? toPercent(roi.x) : "0",
+    roiY: roi ? toPercent(roi.y) : "0",
+    roiWidth: roi ? toPercent(roi.width) : "100",
+    roiHeight: roi ? toPercent(roi.height) : "100",
   };
 }
 
 /** Field errors in the operator's words; empty when the draft can be saved. */
-export function validate(draft: Draft): Partial<Record<BenchKey | "threshold", string>> {
-  const errors: Partial<Record<BenchKey | "threshold", string>> = {};
+export function validate(draft: Draft): Partial<Record<BenchKey | "threshold" | RoiKey, string>> {
+  const errors: Partial<Record<BenchKey | "threshold" | RoiKey, string>> = {};
   for (const f of FIELDS) {
     const raw = draft[f.key].trim();
     if (raw === "" && f.optional) continue;
@@ -80,5 +101,37 @@ export function validate(draft: Draft): Partial<Record<BenchKey | "threshold", s
   }
   const threshold = Number(draft.threshold.replace(",", "."));
   if (!(threshold >= 0.4 && threshold <= 0.99)) errors.threshold = "Use um valor de 0,40 a 0,99.";
+
+  if (draft.roiEnabled) {
+    const values: Record<RoiKey, number> = {
+      roiX: Number(draft.roiX),
+      roiY: Number(draft.roiY),
+      roiWidth: Number(draft.roiWidth),
+      roiHeight: Number(draft.roiHeight),
+    };
+    for (const key of ROI_KEYS) {
+      const value = values[key];
+      if (!Number.isFinite(value) || value < 0 || value > 100 || (key.endsWith("Width") || key.endsWith("Height") ? value <= 0 : false)) {
+        errors[key] = `Use um número de 0 a 100 (${ROI_LABEL[key]}).`;
+      }
+    }
+    if (!errors.roiX && !errors.roiWidth && values.roiX + values.roiWidth > 100) {
+      errors.roiWidth = "Posição + largura não pode passar de 100%.";
+    }
+    if (!errors.roiY && !errors.roiHeight && values.roiY + values.roiHeight > 100) {
+      errors.roiHeight = "Posição + altura não pode passar de 100%.";
+    }
+  }
   return errors;
+}
+
+/** Null means "no crop": the API field this becomes when roiEnabled is false. */
+export function toRoi(draft: Draft): RoiOut | null {
+  if (!draft.roiEnabled) return null;
+  return {
+    x: Number(draft.roiX) / 100,
+    y: Number(draft.roiY) / 100,
+    width: Number(draft.roiWidth) / 100,
+    height: Number(draft.roiHeight) / 100,
+  };
 }

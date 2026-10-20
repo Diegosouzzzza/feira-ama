@@ -11,12 +11,14 @@ from amazonvision.core.logs import setup_logging
 from amazonvision.http_errors import ERROR_RESPONSES, install_error_handlers
 from amazonvision.openapi import install_openapi
 from amazonvision.routes import (
+    agreement,
     camera,
     control,
     dataset,
     diagnostics,
     exports,
     health,
+    housekeeping,
     inspections,
     lots,
     machine,
@@ -72,7 +74,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         diagnostics.router,
         camera.router,
         dataset.router,
+        agreement.router,
         exports.router,
+        housekeeping.router,
     ):
         app.include_router(router, prefix="/api", responses=ERROR_RESPONSES)
     app.include_router(ws.router, prefix="/api")

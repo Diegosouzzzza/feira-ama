@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Info, Lock } from "lucide-react";
+import { Download, HardDriveDownload, Info, Lock, RefreshCw, Trash2 } from "lucide-react";
 import { type FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useProducts } from "@/components/station/lot-setup";
@@ -8,11 +8,179 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ApiError, apiGet } from "@/lib/api/client";
-import type { ConfigurePayload, ProductConfigOut } from "@/lib/api/types";
-import { BENCH_GROUPS, type BenchKey, type Draft, FIELDS, toDraft, validate } from "@/lib/bench-fields";
-import { controlPut, useControl } from "@/lib/control";
+import type { BackupOut, ConfigurePayload, ProductConfigOut, PurgeOut } from "@/lib/api/types";
+import { BENCH_GROUPS, type BenchKey, type Draft, FIELDS, type RoiKey, toDraft, toRoi, validate } from "@/lib/bench-fields";
+import { controlDelete, controlPost, controlPut, useControl } from "@/lib/control";
+import { formatBytes, formatDateTime } from "@/lib/format";
 import { notifyError } from "@/lib/notify";
 import { cn } from "@/lib/utils";
+
+// ---------------------------------------------------------------- backups and cleanup
+
+function BackupsPanel({ controller }: { controller: boolean }) {
+  const queryClient = useQueryClient();
+  const [busy, setBusy] = useState<"backup" | "purge" | null>(null);
+  const backups = useQuery({
+    queryKey: ["backups"],
+    queryFn: ({ signal }) => apiGet<BackupOut[]>("/backups", { signal }),
+  });
+
+  async function createBackup() {
+    setBusy("backup");
+    try {
+      await controlPost<BackupOut>("/backups");
+      toast.success("Backup criado. Baixe e guarde numa unidade separada (pendrive).");
+      await queryClient.invalidateQueries({ queryKey: ["backups"] });
+    } catch (error) {
+      notifyError(error);
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function removeBackup(name: string) {
+    try {
+      await controlDelete<void>(`/backups/${encodeURIComponent(name)}`);
+      await queryClient.invalidateQueries({ queryKey: ["backups"] });
+    } catch (error) {
+      notifyError(error);
+    }
+  }
+
+  async function purgeImages() {
+    setBusy("purge");
+    try {
+      const result = await controlPost<PurgeOut>("/images/purge");
+      toast.success(
+        result.purged > 0
+          ? `${result.purged} foto(s) de inspeções antigas apagada(s), ${formatBytes(result.freed_bytes)} liberados.`
+          : "Nenhuma foto antiga para apagar.",
+      );
+    } catch (error) {
+      notifyError(error);
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  return (
+    <section aria-labelledby="backups-title" className="space-y-4 rounded-lg border bg-card p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 id="backups-title" className="font-wide text-lg font-semibold">
+          Backups e limpeza
+        </h2>
+        {controller && (
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" disabled={busy !== null} onClick={() => void purgeImages()}>
+              <Trash2 aria-hidden />
+              Limpar fotos antigas
+            </Button>
+            <Button size="sm" disabled={busy !== null} onClick={() => void createBackup()}>
+              <HardDriveDownload aria-hidden />
+              {busy === "backup" ? "Gerando…" : "Fazer backup agora"}
+            </Button>
+          </div>
+        )}
+      </div>
+      <p className="text-sm text-muted-foreground">
+        O backup inclui uma cópia consistente do banco, as fotos de inspeção, os modelos instalados e a coleta de
+        treinamento. A limpeza apaga fotos de inspeções antigas de lotes já encerrados (o lote aberto nunca é
+        tocado); o registro de cada peça continua no histórico e no CSV, só a foto sai.
+      </p>
+      {!controller && <NeedControl action="fazer backup ou limpar fotos" />}
+      {backups.isPending ? (
+        <p className="text-sm text-muted-foreground">Carregando…</p>
+      ) : backups.data?.length === 0 ? (
+        <p className="text-sm text-muted-foreground">Nenhum backup ainda.</p>
+      ) : (
+        <ul className="divide-y rounded-md border text-sm">
+          {backups.data?.map((backup) => (
+            <li key={backup.name} className="flex flex-wrap items-center gap-3 px-3 py-2">
+              <div className="min-w-0 flex-1">
+                <p className="font-medium">{formatDateTime(backup.created_at)}</p>
+                <p className="text-muted-foreground">
+                  {formatBytes(backup.size_bytes)} · {backup.inspections} inspeções · {backup.dataset_photos} fotos
+                  de coleta
+                </p>
+              </div>
+              <Button variant="outline" size="sm" asChild>
+                <a href={`/api/backups/${encodeURIComponent(backup.name)}/file`} download>
+                  <Download aria-hidden />
+                  Baixar
+                </a>
+              </Button>
+              {controller && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  aria-label={`Apagar backup de ${formatDateTime(backup.created_at)}`}
+                  onClick={() => void removeBackup(backup.name)}
+                >
+                  <Trash2 aria-hidden />
+                </Button>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+// ---------------------------------------------------------------- ROI (inspection window)
+
+function RoiPreview({ draft }: { draft: Draft }) {
+  const [attempt, setAttempt] = useState(0);
+  const [failed, setFailed] = useState(false);
+  const x = Number(draft.roiX) || 0;
+  const y = Number(draft.roiY) || 0;
+  const width = Number(draft.roiWidth) || 0;
+  const height = Number(draft.roiHeight) || 0;
+
+  return (
+    <div className="space-y-2">
+      <div className="relative aspect-video overflow-hidden rounded-md bg-brand-deep">
+        {failed ? (
+          <p className="grid h-full place-items-center p-4 text-center text-sm text-white/75">
+            Sem imagem da câmera agora.
+          </p>
+        ) : (
+          <img
+            key={attempt}
+            src={`/api/camera/snapshot?n=${attempt}`}
+            alt="Último quadro da câmera, para posicionar o recorte"
+            className="h-full w-full object-contain"
+            onError={() => setFailed(true)}
+          />
+        )}
+        {!failed && draft.roiEnabled && (
+          <div
+            aria-hidden
+            className="absolute border-2 border-brand-bright shadow-[0_0_0_9999px_rgba(0,0,0,0.5)]"
+            style={{
+              left: `${x}%`,
+              top: `${y}%`,
+              width: `${width}%`,
+              height: `${height}%`,
+            }}
+          />
+        )}
+      </div>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={() => {
+          setFailed(false);
+          setAttempt((n) => n + 1);
+        }}
+      >
+        <RefreshCw aria-hidden />
+        Atualizar imagem
+      </Button>
+    </div>
+  );
+}
 
 function ProductForm({ productId, controller }: { productId: string; controller: boolean }) {
   const queryClient = useQueryClient();
@@ -48,6 +216,7 @@ function ProductForm({ productId, controller }: { productId: string; controller:
         presentation: draft.presentation.trim() || null,
         decision_threshold: Number(draft.threshold.replace(",", ".")),
         bench,
+        roi: toRoi(draft),
       });
       toast.success("Configuração salva. Vale a partir do próximo lote deste produto.");
       await queryClient.invalidateQueries({ queryKey: ["product-config", productId] });
@@ -62,7 +231,7 @@ function ProductForm({ productId, controller }: { productId: string; controller:
     }
   }
 
-  const input = (key: BenchKey | "threshold" | "presentation", id: string, extra?: { invalid?: boolean; numeric?: boolean }) => (
+  const input = (key: BenchKey | RoiKey | "threshold" | "presentation", id: string, extra?: { invalid?: boolean; numeric?: boolean }) => (
     <Input
       id={id}
       value={draft[key]}
@@ -133,6 +302,54 @@ function ProductForm({ productId, controller }: { productId: string; controller:
         </section>
       ))}
 
+      <section className="space-y-4 rounded-lg border bg-card p-4" aria-labelledby={`${productId}-roi`}>
+        <h3 id={`${productId}-roi`} className="font-wide font-semibold">
+          Região de inspeção (ROI)
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          Recorta o quadro da câmera antes de analisar, para o modelo ver só a área da esteira onde a peça fica,
+          sem a esteira e o fundo ao redor. Vale a partir do próximo treino: use estes mesmos valores no comando de
+          treinamento (a tela Coleta já inclui isso ao exportar).
+        </p>
+        <label className="flex items-center gap-2 text-sm font-medium">
+          <input
+            type="checkbox"
+            className="accent-primary size-4"
+            checked={draft.roiEnabled}
+            disabled={locked}
+            onChange={(e) => setDraft({ ...draft, roiEnabled: e.target.checked })}
+          />
+          Recortar a imagem (desmarcado: usa o quadro inteiro)
+        </label>
+        {draft.roiEnabled && (
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-2 gap-4">
+              {(
+                [
+                  ["roiX", "Da esquerda"],
+                  ["roiY", "Do topo"],
+                  ["roiWidth", "Largura"],
+                  ["roiHeight", "Altura"],
+                ] as const
+              ).map(([key, label]) => {
+                const id = `${productId}-${key}`;
+                const error = errors[key];
+                return (
+                  <div key={key} className="space-y-1.5">
+                    <Label htmlFor={id}>
+                      {label} <span className="font-normal text-muted-foreground">(%)</span>
+                    </Label>
+                    {input(key, id, { invalid: Boolean(error), numeric: true })}
+                    {error && <p className="text-sm text-grade-c">{error}</p>}
+                  </div>
+                );
+              })}
+            </div>
+            <RoiPreview draft={draft} />
+          </div>
+        )}
+      </section>
+
       {!locked && (
         <div className="sticky bottom-0 flex flex-wrap items-center gap-3 border-t bg-background/95 py-3 backdrop-blur">
           <Button type="submit" disabled={!valid || !changed || saving}>
@@ -179,6 +396,7 @@ export function ConfiguracaoPage() {
         ))}
       </div>
       {productId && <ProductForm key={productId} productId={productId} controller={controller} />}
+      <BackupsPanel controller={controller} />
     </PageShell>
   );
 }

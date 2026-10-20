@@ -67,3 +67,7 @@ export function apiPatch<T>(path: string, body: unknown, token?: string | null):
 export function apiPut<T>(path: string, body: unknown, token?: string | null): Promise<T> {
   return send<T>("PUT", path, body, token);
 }
+
+export function apiDelete<T>(path: string, token?: string | null): Promise<T> {
+  return send<T>("DELETE", path, undefined, token);
+}

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { ApiError, apiPatch, apiPost, apiPut } from "@/lib/api/client";
+import { ApiError, apiDelete, apiPatch, apiPost, apiPut } from "@/lib/api/client";
 import type { ControlGrant } from "@/lib/api/types";
 
 const KEY = "av-control";
@@ -83,4 +83,8 @@ export function controlPatch<T>(path: string, body: unknown): Promise<T> {
 
 export function controlPut<T>(path: string, body: unknown): Promise<T> {
   return asController((token) => apiPut<T>(path, body, token));
+}
+
+export function controlDelete<T>(path: string): Promise<T> {
+  return asController((token) => apiDelete<T>(path, token));
 }

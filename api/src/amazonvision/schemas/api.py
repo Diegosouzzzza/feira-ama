@@ -2,10 +2,10 @@
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Self
 from uuid import UUID
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StringConstraints
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
 from amazonvision.config import RunMode
 from amazonvision.domain.machine import FaultCode, MachineState
@@ -384,7 +384,74 @@ class DatasetExportOut(BaseModel):
     command: str = Field(description="Comando para treinar a partir deste manifesto")
 
 
+# ---------------------------------------------------------------- teste de concordância
+
+
+class AgreementLabelCreate(_In):
+    product_id: ProductId
+    session: CollectionTag = Field(description="Rodada do teste (ex.: 2026-10-20-criterios)")
+    sample_id: DbId
+    reviewer: PersonName
+    label: Grade
+
+
+class AgreementLabelOut(BaseModel):
+    sample_id: DbId
+    reviewer: str
+    label: Grade
+    created_at: AwareDatetime
+
+
+class AgreementQueueItem(BaseModel):
+    sample: DatasetSampleOut
+    remaining: int = Field(ge=0, description="Fotos deste produto ainda sem rótulo deste revisor")
+
+
+class AgreementSampleResult(BaseModel):
+    sample: DatasetSampleOut
+    labels: dict[str, Grade] = Field(description="Rótulo de cada revisor nesta rodada")
+    agree: bool
+
+
+class AgreementSummary(BaseModel):
+    product_id: ProductId
+    session: str
+    reviewers: list[str]
+    compared: int = Field(ge=0, description="Fotos com rótulo de 2 ou mais revisores")
+    agreed: int = Field(ge=0)
+    agreement_rate: float | None = Field(ge=0, le=1)
+    disagreements: list[AgreementSampleResult]
+
+
+class SerialPortOut(BaseModel):
+    device: str = Field(description='Nome do sistema, ex.: "COM5"')
+    description: str | None
+    hwid: str | None
+    in_use: bool = Field(description="É a porta que a bancada está usando agora")
+
+
 # ---------------------------------------------------------------- product configuration
+
+
+class RoiOut(BaseModel):
+    """Inspection window as a fraction (0..1) of the camera frame, origin at the top-left.
+
+    Set here as a starting point for training; the value a model actually uses is the one baked
+    into its package (training/__main__.py --roi), so changing this does not affect a model
+    already trained — only the next one."""
+
+    x: float = Field(ge=0, lt=1)
+    y: float = Field(ge=0, lt=1)
+    width: float = Field(gt=0, le=1)
+    height: float = Field(gt=0, le=1)
+
+    @model_validator(mode="after")
+    def _fits_the_frame(self) -> Self:
+        if self.x + self.width > 1:
+            raise ValueError("x + width deve ser no máximo 1")
+        if self.y + self.height > 1:
+            raise ValueError("y + height deve ser no máximo 1")
+        return self
 
 
 class ProductConfigOut(BaseModel):
@@ -394,6 +461,7 @@ class ProductConfigOut(BaseModel):
         description="Ainda não calibrado: valores de partida da bancada simulada. No modo real a "
         "bancada só arma depois que uma calibração for salva"
     )
+    roi: RoiOut | None = Field(description="Janela de inspeção; nulo usa o quadro inteiro")
     editable: bool
     locked_reason: str | None = Field(description="Por que não pode ser alterado agora")
 
@@ -406,6 +474,7 @@ class ProductConfigUpdate(_In):
     # Same range the training searches when calibrating (training/evaluate.py).
     decision_threshold: float = Field(ge=0.4, le=0.99)
     bench: ConfigurePayload
+    roi: RoiOut | None = None
 
 
 # ---------------------------------------------------------------- maintenance
@@ -420,3 +489,19 @@ class ServoTestRequest(_In):
     request_id: UUID
     angle_deg: int = Field(ge=0, le=180)
     hold_ms: int = Field(ge=0, le=5_000, description="Tempo na posição antes de voltar ao repouso")
+
+
+# ---------------------------------------------------------------- housekeeping (backup, limpeza)
+
+
+class PurgeOut(BaseModel):
+    purged: int = Field(ge=0, description="Inspeções cuja foto foi apagada")
+    freed_bytes: int = Field(ge=0)
+
+
+class BackupOut(BaseModel):
+    name: str = Field(description="Nome do arquivo em backups/")
+    size_bytes: int = Field(ge=0)
+    created_at: AwareDatetime
+    inspections: int = Field(ge=0, description="Inspeções registradas no banco incluído")
+    dataset_photos: int = Field(ge=0, description="Fotos de coleta incluídas")

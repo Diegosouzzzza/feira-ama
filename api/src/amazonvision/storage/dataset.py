@@ -9,7 +9,7 @@ from amazonvision.domain.quality import Grade
 from amazonvision.schemas.api import DatasetClassCount, DatasetSampleOut, SampleStatus
 
 
-def _to_sample(row: sqlite3.Row) -> DatasetSampleOut:
+def to_sample(row: sqlite3.Row) -> DatasetSampleOut:
     return DatasetSampleOut(
         id=row["id"],
         product_id=row["product_id"],
@@ -63,7 +63,7 @@ def insert_sample(
 
 def get_sample(conn: sqlite3.Connection, sample_id: int) -> DatasetSampleOut | None:
     row = conn.execute("SELECT * FROM dataset_samples WHERE id = ?", (sample_id,)).fetchone()
-    return _to_sample(row) if row else None
+    return to_sample(row) if row else None
 
 
 def get_image_path(conn: sqlite3.Connection, sample_id: int) -> str | None:
@@ -138,7 +138,7 @@ def list_samples(
         f"SELECT * FROM dataset_samples{clause} ORDER BY id DESC LIMIT ? OFFSET ?",  # noqa: S608
         [*params, limit, offset],
     ).fetchall()
-    return [_to_sample(r) for r in rows], total
+    return [to_sample(r) for r in rows], total
 
 
 def summary_counts(

@@ -15,13 +15,17 @@ from amazonvision.core.control import ControlManager
 from amazonvision.machine.coordinator import Coordinator
 from amazonvision.machine.link import Link
 from amazonvision.machine.process_link import ProcessLink
+from amazonvision.machine.serial_link import SerialLink
 from amazonvision.machine.simulated_device import SimulatedDevice
 from amazonvision.schemas.api import EventSource, Severity, SystemStatus
 from amazonvision.schemas.events import SnapshotEvent
+from amazonvision.services.agreement import AgreementService
+from amazonvision.services.backups import BackupService
 from amazonvision.services.dataset import DatasetService
 from amazonvision.services.lots import LotService
 from amazonvision.services.models import ModelService
 from amazonvision.services.products import ProductConfigService
+from amazonvision.services.retention import RetentionService
 from amazonvision.services.reviews import ReviewService
 from amazonvision.services.status import StatusService
 from amazonvision.simulation.scenario import Scenario
@@ -80,7 +84,10 @@ class Services:
     reviews: ReviewService
     model_registry: ModelService
     dataset: DatasetService
+    agreement: AgreementService
     product_config: ProductConfigService
+    backups: BackupService
+    retention: RetentionService
     status: StatusService
     record: Recorder
     simulation: Simulation | None
@@ -117,7 +124,9 @@ class Services:
                 device = SimulatedDevice(speed=settings.sim_speed)
                 simulation = Simulation(camera=sim_camera, scenario=scenario, device=device)
                 link, port_label = device, "simulador"
-        # Real mode: the serial link to the ESP32 is not wired yet (Block 6).
+        elif settings.serial_port:
+            link = SerialLink(settings.serial_port, settings.serial_baud_rate)
+            port_label = settings.serial_port
 
         coordinator = Coordinator(settings, db, bus, link, camera, models, record, port_label)
         lots = LotService(
@@ -140,7 +149,10 @@ class Services:
             reviews=ReviewService(db, bus, coordinator),
             model_registry=ModelService(settings, db),
             dataset=DatasetService(settings, db, camera, coordinator.busy),
+            agreement=AgreementService(db),
             product_config=ProductConfigService(settings, db, coordinator.busy),
+            backups=BackupService(settings, db),
+            retention=RetentionService(settings, db, record),
             status=StatusService(settings, db, control, coordinator, camera, models),
             record=record,
             simulation=simulation,
@@ -152,8 +164,10 @@ class Services:
         await self.db.open()
         self.camera.start()
         await self.coordinator.start()
+        self.retention.start()
 
     async def stop(self) -> None:
+        await self.retention.stop()
         await self.coordinator.stop()
         self.camera.stop()
         await self.db.close()

@@ -118,3 +118,60 @@ def test_training_bakes_the_roi_into_the_package(tmp_path: Path):
     )
     package = load_package(package_dir)
     assert package.preprocess.roi == roi
+
+
+def test_anomaly_calibration_puts_the_threshold_on_the_edges():
+    pytest.importorskip("torch", reason="grupo de dependências 'training' não instalado")
+    import math
+
+    from amazonvision.training.anomaly import calibrate
+
+    edges = calibrate([1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 2.0], threshold=0.8)
+
+    def p_out(distance: float) -> float:
+        return 1 / (1 + math.exp(-(distance - edges["center"]) / edges["scale"]))
+
+    assert edges["approve_edge"] < edges["reject_edge"]
+    assert p_out(edges["approve_edge"]) == pytest.approx(0.2)  # A reaches the 0.80 threshold
+    assert p_out(edges["reject_edge"]) == pytest.approx(0.8)  # C reaches the 0.80 threshold
+
+
+def test_anomaly_model_learns_from_good_pieces_only(tmp_path: Path):
+    pytest.importorskip("torch", reason="grupo de dependências 'training' não instalado")
+    from amazonvision.training.anomaly import ARCHITECTURE, train_anomaly
+    from amazonvision.training.synthetic import generate
+    from amazonvision.vision.onnx_classifier import OnnxClassifier
+    from amazonvision.vision.package import load_package
+    from amazonvision.vision.preprocess import prepare_image
+
+    manifest = generate(
+        tmp_path / "ds", product_id="castanha", pieces_per_class=6, photos_per_piece=2
+    )
+    package_dir = train_anomaly(
+        manifest, product_id="castanha", out_dir=tmp_path / "out", pretrained=False, bank_size=500
+    )
+    package = load_package(package_dir)
+    assert package.architecture == ARCHITECTURE
+    assert package.recommended_threshold == pytest.approx(0.8)
+    assert all(isinstance(v, int | float | bool | None) for v in package.metrics.values())
+    assert package.metrics["ready_for_bench"] is False
+
+    split = read_manifest(package_dir / "dataset_split.csv")
+    check_no_leakage(split)
+    # Defective pieces never feed the memory bank; they are only measured.
+    assert all(s.split == "test" for s in split if s.label is not Grade.A)
+    assert {s.split for s in split if s.label is Grade.A} == {"train", "val", "test"}
+
+    # Same output contract as any model: A/B/C scores summing to 1, B never predicted.
+    from PIL import Image
+
+    sample = next(s for s in split if s.split == "test")
+    with Image.open(manifest.parent / sample.path) as raw:
+        array = prepare_image(raw.convert("RGB"), package.preprocess)
+    scores = OnnxClassifier(package).classify_array(array)
+    assert sum(scores.values()) == pytest.approx(1.0)
+    assert scores[Grade.B] < 1e-9
+
+    report = (package_dir / "relatorio.md").read_text(encoding="utf-8")
+    assert "detecção de anomalia" in report
+    assert "Nenhuma peça defeituosa real foi medida" in report

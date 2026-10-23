@@ -1,8 +1,12 @@
+from io import BytesIO
+from pathlib import Path as FilePath
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query, Response, status
 from fastapi.responses import FileResponse
+from PIL import Image, ImageOps
 from pydantic import AwareDatetime
+from starlette.concurrency import run_in_threadpool
 
 from amazonvision.core.clock import to_db
 from amazonvision.domain.quality import Grade
@@ -28,6 +32,7 @@ router = APIRouter(prefix="/inspections", tags=["inspeções"])
 
 InspectionId = Annotated[int, Path(ge=1)]
 _MEDIA = {"png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg"}
+_THUMBNAIL_SIZE = (96, 96)
 
 
 def _not_found() -> ApiError:
@@ -95,6 +100,40 @@ async def inspection_image(inspection_id: InspectionId, services: ServicesDep) -
     return FileResponse(
         path,
         media_type=_MEDIA.get(path.suffix.lstrip(".").lower(), "application/octet-stream"),
+        headers={"Cache-Control": "private, max-age=31536000, immutable"},
+    )
+
+
+def _render_thumbnail(path: FilePath) -> bytes:
+    """Small, fixed-size preview for the fair mural; never keeps decoded images in memory."""
+    with Image.open(path) as source:
+        image = ImageOps.exif_transpose(source).convert("RGB")
+        image.thumbnail(_THUMBNAIL_SIZE, Image.Resampling.LANCZOS)
+        canvas = Image.new("RGB", _THUMBNAIL_SIZE, "#0D241C")
+        x = (_THUMBNAIL_SIZE[0] - image.width) // 2
+        y = (_THUMBNAIL_SIZE[1] - image.height) // 2
+        canvas.paste(image, (x, y))
+        output = BytesIO()
+        canvas.save(output, format="JPEG", quality=76, optimize=True)
+        return output.getvalue()
+
+
+@router.get(
+    "/{inspection_id}/thumbnail",
+    responses={200: {"content": {"image/jpeg": {}}}},
+)
+async def inspection_thumbnail(inspection_id: InspectionId, services: ServicesDep) -> Response:
+    found = await services.db.run(lambda conn: get_image_path(conn, inspection_id))
+    if found is None:
+        raise _not_found()
+    relative, purged = found
+    path = None if purged else resolve_image(services.settings.data_root, relative)
+    if path is None:
+        raise ApiError(ErrorCode.NOT_FOUND, "Miniatura não está mais disponível.")
+    content = await run_in_threadpool(_render_thumbnail, path)
+    return Response(
+        content=content,
+        media_type="image/jpeg",
         headers={"Cache-Control": "private, max-age=31536000, immutable"},
     )
 

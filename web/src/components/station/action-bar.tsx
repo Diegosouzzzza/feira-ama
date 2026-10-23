@@ -26,6 +26,9 @@ export function startBlockedReason(status: SystemStatus): string | null {
   if (machine.state === "ESTOP") return "Solte o botão de emergência e use Rearmar.";
   if (machine.state === "FAULT") return "Resolva a falha e use Rearmar.";
   if (machine.state === "MAINTENANCE") return "A máquina está em manutenção.";
+  if (machine.sensors?.s1 || machine.sensors?.s2) {
+    return "Há uma peça sobre um sensor. Libere a esteira antes de iniciar.";
+  }
   if (machine.pending_review_inspection_id !== null) return "Decida a peça que aguarda revisão.";
   if (status.storage.status === "error") return "A gravação de dados está com falha.";
   if (status.model.status !== "ready") return "O modelo do produto não está carregado.";

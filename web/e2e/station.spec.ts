@@ -59,7 +59,8 @@ test("modo feira é somente leitura e cabe sem rolagem em Full HD", async ({ bro
   await page.goto("/feira");
   await expect(page.getByText("Castanha-do-pará")).toBeVisible();
   await expect(page.getByRole("button", { name: "Iniciar" })).toHaveCount(0);
-  await expect(page.getByText("Inspecionadas")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Cada foto ocupa o lugar da classe escolhida pela IA" })).toBeVisible();
+  await expect(page.getByText("Como a IA votou")).toBeVisible();
   const scroll = await page.evaluate(() => ({
     vertical: document.documentElement.scrollHeight - window.innerHeight,
     horizontal: document.documentElement.scrollWidth - window.innerWidth,

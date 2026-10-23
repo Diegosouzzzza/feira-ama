@@ -263,6 +263,7 @@ def train(
     }
     manifest["recommended_threshold"] = threshold
     manifest["metrics"] = {
+        "test_accuracy": metrics["test"]["accuracy"],
         "test_macro_f1": metrics["test"]["macro_f1"],
         "test_defective_false_approval_rate": metrics["test"]["policy"][
             "defective_false_approval_rate"

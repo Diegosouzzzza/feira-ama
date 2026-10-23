@@ -145,7 +145,7 @@ function LiveView({ lastCapture }: { lastCapture: DatasetSampleOut | null }) {
         )}
         {!failed && (
           <span className="absolute top-3 left-3 flex items-center gap-1.5 rounded-md bg-black/55 px-2 py-1 text-xs font-medium text-white">
-            <span className="size-2 animate-pulse rounded-full bg-[#ff6b6b]" aria-hidden />
+            <span className="size-2 animate-pulse rounded-full bg-signal-fault" aria-hidden />
             Ao vivo
           </span>
         )}

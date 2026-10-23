@@ -3,15 +3,21 @@
 uv run --group training python -m amazonvision.training sintetico --saida C:\\tmp\\ds
 uv run --group training python -m amazonvision.training treinar \\
     --manifesto C:\\tmp\\ds\\manifest.csv --produto tucuma
+uv run --group training python -m amazonvision.training anomalia \\
+    --manifesto C:\\tmp\\ds\\manifest.csv --produto castanha
 """
 
 import argparse
+import sys
 from pathlib import Path
 
 from amazonvision.config import Settings
 
 
 def main() -> None:
+    # torch.onnx prints emoji; a redirected Windows console (cp1252) would crash on them.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(errors="replace")
     parser = argparse.ArgumentParser(prog="amazonvision.training")
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -40,6 +46,18 @@ def main() -> None:
         help="janela de inspeção x,y,largura,altura em frações 0..1 (ex.: 0.2,0.1,0.6,0.8); "
         "padrão: quadro inteiro. Use o valor mostrado na tela Configuração",
     )
+    anomaly = sub.add_parser(
+        "anomalia", help="aprende só com peças boas (classe A) e marca o que foge do padrão"
+    )
+    anomaly.add_argument("--manifesto", type=Path, required=True)
+    anomaly.add_argument("--produto", required=True)
+    anomaly.add_argument(
+        "--saida", type=Path, default=None, help="padrão: <dados>/modelos-treinados"
+    )
+    anomaly.add_argument("--banco", type=int, default=4000, help="retalhos no banco de memória")
+    anomaly.add_argument("--limiar", type=float, default=0.80)
+    anomaly.add_argument("--sem-pre-treino", action="store_true")
+    anomaly.add_argument("--roi", default=None, help="igual ao do comando treinar")
     args = parser.parse_args()
 
     if args.command == "sintetico":
@@ -63,7 +81,6 @@ def main() -> None:
         write_manifest(args.manifesto, samples)
         print(f"partições gravadas em {args.manifesto}")
     else:
-        from amazonvision.training.train import train as run
         from amazonvision.vision.preprocess import RoiSpec
 
         roi = None
@@ -77,6 +94,24 @@ def main() -> None:
                 )
 
         out = args.saida or Settings().data_root / "modelos-treinados"
+        if args.command == "anomalia":
+            from amazonvision.training.anomaly import train_anomaly
+
+            package = train_anomaly(
+                args.manifesto,
+                product_id=args.produto,
+                out_dir=out,
+                pretrained=not args.sem_pre_treino,
+                bank_size=args.banco,
+                threshold=args.limiar,
+                roi=roi,
+            )
+            print(f"pacote do modelo: {package}")
+            print(f"relatório: {package / 'relatorio.md'}")
+            return
+
+        from amazonvision.training.train import train as run
+
         package = run(
             args.manifesto,
             product_id=args.produto,

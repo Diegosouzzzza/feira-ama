@@ -7,6 +7,7 @@ import { ControlDialog } from "@/components/station/control-dialog";
 import { Equipment } from "@/components/station/equipment";
 import { StationHeader } from "@/components/station/header";
 import { InspectionPhoto } from "@/components/station/inspection-photo";
+import { LotPulse } from "@/components/station/lot-pulse";
 import { LotSetup } from "@/components/station/lot-setup";
 import { RecentStrip } from "@/components/station/recent-strip";
 import { Totals } from "@/components/station/totals";
@@ -50,12 +51,19 @@ export function OperacaoPage() {
               <InspectionPhoto
                 inspection={latest}
                 onBelt={onBelt}
-                className="aspect-[4/3] xl:col-span-7 xl:aspect-auto xl:h-[min(54vh,620px)]"
+                className="aspect-[4/3] xl:col-span-7 xl:aspect-auto xl:min-h-[min(54vh,620px)]"
               />
               <Verdict
                 inspection={latest}
                 pendingReview={pendingReview}
                 interactive
+                footer={
+                  <LotPulse
+                    lotId={status.active_lot.id}
+                    inspected={status.active_lot_summary.inspected}
+                    inspection={latest}
+                  />
+                }
                 className="xl:col-span-5"
               />
             </div>

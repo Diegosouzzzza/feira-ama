@@ -59,6 +59,36 @@ Opções do `treinar`: `--epocas` (12), `--lote` (16), `--dispositivo` (`auto`, 
 
 Se os pesos instalados forem alterados ou corrompidos, o modelo não carrega, o status mostra erro e a bancada não inicia.
 
+## Só com peças boas: detecção de anomalia
+
+Quando ainda não há peças ruins para fotografar, o comando `anomalia` aprende **só com as peças boas** (classe A) e marca como "fora do padrão" o que foge delas: manchas, mofo, pedaço faltando, formato estranho ou um objeto que não é o produto. Detalhes e números em `docs/adr/0017-deteccao-de-anomalia.md`.
+
+```powershell
+cd api
+uv run --group training python -m amazonvision.training anomalia --manifesto C:\dados\manifest.csv --produto castanha --roi 0.2,0.1,0.6,0.8
+```
+
+Opções: `--banco` (4000 retalhos no banco de memória), `--limiar` (0,80), `--roi`, `--sem-pre-treino`, `--saida`. Linhas B ou C do manifesto, se existirem, só são usadas para medir no teste.
+
+O pacote se instala e ativa como qualquer outro: A vai para aprovados, C para rejeitados e o meio-termo para revisão. O relatório nunca dá o parecer "pronto", porque nenhum defeito real foi medido.
+
+### Refazer na bancada (obrigatório antes de deixar decidir)
+
+O modelo depende do fundo, da luz e da câmera. Com a bancada montada:
+
+1. Configure a região de inspeção do produto (tela Configuração).
+2. Na tela Coleta, fotografe 15 a 20 peças **boas**, classe A, 3 a 6 fotos cada, girando a peça.
+3. Exporte o manifesto e rode `anomalia` com o mesmo `--roi`. Leva poucos minutos: não há épocas de treino.
+4. Instale, leia o relatório, ative e passe algumas peças ruins: elas devem ir para rejeitados ou revisão.
+
+### Ensaiar com fotos reais na bancada simulada
+
+No modo simulado, `AV_SIM_PHOTOS` aponta para uma pasta de fotos (JPEG ou PNG) que a câmera simulada mostra no lugar dos desenhos, uma por peça, em ordem embaralhada. Use fotos que o modelo **não** viu no treino:
+
+```
+AV_SIM_PHOTOS=C:\Users\<você>\AppData\Local\AmazonVision\referencia\demonstracao-castanha
+```
+
 ## Limites
 
 - Fotos sintéticas só provam que o pipeline funciona; não dizem nada sobre tucumã ou castanha reais.

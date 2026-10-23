@@ -7,7 +7,7 @@ from starlette.requests import HTTPConnection
 
 from amazonvision.camera.base import Camera, NoCamera
 from amazonvision.camera.opencv_camera import OpenCvCamera
-from amazonvision.camera.simulated import SimulatedCamera
+from amazonvision.camera.simulated import SimulatedCamera, list_photos
 from amazonvision.config import RunMode, Settings
 from amazonvision.core.bus import EventBus
 from amazonvision.core.clock import to_db, utc_now
@@ -113,7 +113,12 @@ class Services:
             )
         if settings.mode is RunMode.SIMULADO:
             scenario = Scenario(settings.sim_seed)
-            sim_camera = None if settings.camera_source else SimulatedCamera(scenario)
+            photos = list_photos(settings.sim_photos) if settings.sim_photos else []
+            sim_camera = (
+                None
+                if settings.camera_source
+                else SimulatedCamera(scenario, photos=photos, seed=settings.sim_seed)
+            )
             if sim_camera is not None:
                 camera = sim_camera
             if settings.firmware_harness:

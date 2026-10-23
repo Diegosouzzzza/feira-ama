@@ -36,6 +36,9 @@ class Settings(BaseSettings):
     device_silence_ms: int = Field(default=3_000, ge=1_500)
     sim_speed: float = Field(default=1.0, ge=1.0)
     sim_seed: int | None = None
+    # Simulated mode only: folder of real photos (JPEG/PNG) the simulated camera shows instead of
+    # its drawings, one per piece, so a trained model can be rehearsed before the bench exists.
+    sim_photos: Path | None = None
     # Simulated mode only: run this command as the device instead of the Python simulator
     # (e.g. the native build of the firmware logic). JSON list in AV_FIRMWARE_HARNESS.
     firmware_harness: list[str] | None = None

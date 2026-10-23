@@ -55,7 +55,7 @@ function Station({
         r={18}
         className={cn("stroke-[3]", here ? "fill-card stroke-primary" : "fill-card stroke-border")}
       />
-      <text x={x} y={Y_MAIN + 52} textAnchor="middle" className="fill-foreground text-[24px] font-semibold">
+      <text x={x} y={Y_MAIN + 52} textAnchor="middle" className="fill-foreground text-[21px] font-medium">
         {label}
       </text>
       {sensor && (
@@ -66,7 +66,7 @@ function Station({
             r={8}
             className={sensorOn ? "fill-grade-a" : "fill-muted stroke-border"}
           />
-          <text x={x + 50} y={Y_MAIN - 25} className="fill-muted-foreground text-[20px]">
+          <text x={x + 50} y={Y_MAIN - 25} className="fill-muted-foreground text-[18px]">
             {sensor}
           </text>
         </g>
@@ -117,16 +117,16 @@ function BeltDiagram({ status, destination }: { status: SystemStatus; destinatio
       />
       <Station x={X.sorter} label="Pá" sensor="S2" sensorOn={sensors?.s2} here={position === "at-sorter"} />
 
-      <text x={X.end} y={Y_MAIN - 22} textAnchor="end" className={cn("text-[24px] font-semibold", approvedLit ? "fill-grade-a" : "fill-muted-foreground")}>
+      <text x={X.end} y={Y_MAIN - 22} textAnchor="end" className={cn("text-[21px] font-medium", approvedLit ? "fill-grade-a" : "fill-muted-foreground")}>
         Aprovados
       </text>
-      <text x={X.end} y={Y_REJECT - 22} textAnchor="end" className={cn("text-[24px] font-semibold", rejectedLit ? "fill-grade-c" : "fill-muted-foreground")}>
+      <text x={X.end} y={Y_REJECT - 22} textAnchor="end" className={cn("text-[21px] font-medium", rejectedLit ? "fill-grade-c" : "fill-muted-foreground")}>
         Rejeitados
       </text>
 
       {position !== "none" && (
         <g style={{ transform: `translate(${px}px, ${py}px)`, transition: "transform 700ms ease-in-out" }}>
-          <ellipse rx={20} ry={14} className="fill-[#a8672e] stroke-[3] stroke-card" />
+          <ellipse rx={20} ry={14} className="fill-piece stroke-[3] stroke-card" />
         </g>
       )}
     </svg>

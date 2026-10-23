@@ -3,10 +3,12 @@
 import time
 import uuid
 from collections.abc import Callable
+from io import BytesIO
 from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
+from PIL import Image
 
 from amazonvision.config import Settings
 from amazonvision.domain.quality import Grade
@@ -108,6 +110,12 @@ def test_approved_cycle_end_to_end(bench: TestClient, operator):
     assert image.status_code == 200
     assert image.headers["content-type"] == "image/png"
     assert image.content.startswith(b"\x89PNG")
+
+    thumbnail = bench.get(f"/api/inspections/{inspection['id']}/thumbnail")
+    assert thumbnail.status_code == 200
+    assert thumbnail.headers["content-type"] == "image/jpeg"
+    with Image.open(BytesIO(thumbnail.content)) as preview:
+        assert preview.size == (96, 96)
 
     events = [e["type"] for e in bench.get("/api/diagnostics/events?limit=200").json()]
     for expected in ("CAPTURE_READY", "CYCLE_COMPLETED", "MACHINE_START", "MACHINE_PAUSE"):

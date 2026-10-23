@@ -27,7 +27,33 @@ Confere, nesta ordem, e explica o que falta **sem ligar a esteira** (isso só ac
 3. Modelos instalados: confere o SHA-256 dos pesos de cada um contra o manifesto (pacote corrompido = bloqueio).
 4. Espaço livre em disco.
 
-Resolvidos os itens marcados `[falta]`, sobe o serviço e abre o navegador sozinho. `-SemNavegador` pula a abertura automática.
+Resolvidos os itens marcados `[falta]`, sobe o serviço e abre `/feira` no Microsoft Edge em modo quiosque. Havendo uma segunda tela, ela é escolhida automaticamente. `-SemNavegador` pula a abertura automática e `-SemQuiosque` abre no navegador padrão.
+
+## Tela para o público
+
+O modo feira mostra somente dados que o sistema realmente registrou:
+
+- foto usada na inspeção e o recorte configurado;
+- votos das classes A, B e C;
+- tempo real de inferência da peça;
+- destino comandado e indicação de revisão humana;
+- acurácia do conjunto de teste, quando publicada pelo modelo ativo;
+- mural limitado de miniaturas reais, com as fotos antigas agrupadas em `+N`.
+
+Atalhos para a equipe:
+
+- `Alt+M`: zera visualmente o mural nesta TV; novas peças começam um novo mural. Nenhum dado é apagado.
+- `Alt+E`: alterna o convite do modo de espera.
+
+O cursor fica escondido no modo feira. Para sair do quiosque do Edge, use `Alt+F4`.
+
+## Ajuste da TV
+
+1. No menu da TV, selecione a entrada como **PC** e use **Just Scan**, **Screen Fit** ou equivalente para eliminar overscan.
+2. No Windows, use **Estender estas telas** e coloque a TV como segunda tela.
+3. Desative suspensão, proteção de tela e notificações durante a apresentação.
+4. Confira a tela a 3 m de distância e com a iluminação real do local.
+5. Faça um ensaio contínuo de pelo menos 4 h no modo simulado e confirme que o mural permanece fluido.
 
 ## Backup
 

@@ -1,5 +1,5 @@
 import { ArrowDownRight, ArrowRight, CircleAlert, Hand } from "lucide-react";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, type ReactNode, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,7 +19,7 @@ function Headline({ inspection, large }: { inspection: InspectionOut; large: boo
     ? ` O modelo sugeriu ${GRADE[inspection.predicted_grade].title}.`
     : "";
   const title = decided
-    ? "Decidida pelo operador"
+    ? `${inspection.final_decision === "APPROVED" ? "Aprovada" : "Rejeitada"} pelo operador`
     : review
       ? "Inconclusivo"
       : inspection.predicted_grade
@@ -36,12 +36,12 @@ function Headline({ inspection, large }: { inspection: InspectionOut; large: boo
         className={cn(
           "font-wide font-bold tracking-tight",
           TONE[inspectionTone(inspection)].text,
-          large ? "text-[clamp(2.75rem,6vh,4rem)] leading-none" : "text-3xl leading-none sm:text-4xl",
+          large ? "text-[clamp(2.75rem,6vh,4rem)] leading-none" : "text-2xl leading-tight sm:text-3xl",
         )}
       >
         {title}
       </p>
-      <p className={cn("mt-2 text-muted-foreground", large ? "text-2xl" : "text-lg")}>{meaning}</p>
+      <p className={cn("mt-1.5 text-pretty text-muted-foreground", large ? "text-2xl" : "text-base")}>{meaning}</p>
     </div>
   );
 }
@@ -169,12 +169,15 @@ export function Verdict({
   pendingReview,
   large = false,
   interactive = false,
+  footer,
   className,
 }: {
   inspection: InspectionOut | null;
   pendingReview: boolean;
   large?: boolean;
   interactive?: boolean;
+  /** Pinned to the bottom of the card (lot summary on the operation screen). */
+  footer?: ReactNode;
   className?: string;
 }) {
   return (
@@ -188,7 +191,11 @@ export function Verdict({
       {inspection ? (
         <div aria-live="polite" className="flex flex-col gap-6">
           <div className="flex items-center gap-4 sm:gap-5">
-            <GradeMark inspection={inspection} size={large ? "feira" : "xl"} />
+            <GradeMark
+              inspection={inspection}
+              size={large ? "feira" : "lg"}
+              variant={large ? "solid" : "soft"}
+            />
             <Headline inspection={inspection} large={large} />
           </div>
           <Confidence inspection={inspection} large={large} />
@@ -205,6 +212,7 @@ export function Verdict({
           Nenhuma peça analisada neste lote ainda.
         </p>
       )}
+      {footer && <div className="mt-auto">{footer}</div>}
     </section>
   );
 }

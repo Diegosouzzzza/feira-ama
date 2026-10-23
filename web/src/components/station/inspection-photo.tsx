@@ -36,7 +36,7 @@ export function InspectionPhoto({
       <div
         className={cn(
           "relative grid min-h-0 flex-1 place-items-center",
-          dark ? "bg-black/30" : "bg-[#e4e8e1]",
+          dark ? "bg-black/30" : "bg-photo-mat",
         )}
       >
         {inspection && failed !== inspection.id ? (

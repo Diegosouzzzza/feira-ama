@@ -14,7 +14,7 @@ function Figure({
   large: boolean;
 }) {
   return (
-    <div className="min-w-0 px-4 py-3 first:pl-0 sm:px-6">
+    <div className="min-w-0 px-4 py-3 first:pl-0 max-sm:odd:pl-0 sm:px-6">
       <dt className={cn("text-muted-foreground", large ? "text-xl" : "text-sm")}>{label}</dt>
       <dd
         className={cn(

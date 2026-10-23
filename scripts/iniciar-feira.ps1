@@ -1,7 +1,10 @@
 ﻿# Preparação para o dia da feira: confere o ambiente, explica o que falta e, se puder, sobe o
 # serviço e abre o navegador. Nunca liga a esteira sozinho: isso só acontece quando alguém
 # clica em Iniciar na tela de Operação.
-param([switch]$SemNavegador)
+param(
+    [switch]$SemNavegador,
+    [switch]$SemQuiosque
+)
 . "$PSScriptRoot\_ambiente.ps1"
 Assert-Comando uv 'Instale com: python -m pip install --user uv'
 
@@ -149,7 +152,35 @@ try {
                 if ($resposta.StatusCode -eq 200) { break }
             } catch { }
         }
-        Start-Process 'http://127.0.0.1:8000'
+        $urlFeira = 'http://127.0.0.1:8000/feira'
+        if ($SemQuiosque) {
+            Start-Process $urlFeira
+        }
+        else {
+            $edge = Get-Command 'msedge.exe' -ErrorAction SilentlyContinue
+            if (-not $edge) {
+                $candidatosEdge = @(
+                    (Join-Path ${env:ProgramFiles(x86)} 'Microsoft\Edge\Application\msedge.exe'),
+                    (Join-Path $env:ProgramFiles 'Microsoft\Edge\Application\msedge.exe')
+                )
+                $edgePath = $candidatosEdge | Where-Object { Test-Path $_ } | Select-Object -First 1
+            }
+            else { $edgePath = $edge.Source }
+
+            if ($edgePath) {
+                Add-Type -AssemblyName System.Windows.Forms
+                $telas = @([System.Windows.Forms.Screen]::AllScreens)
+                $tela = $telas | Where-Object { -not $_.Primary } | Select-Object -First 1
+                if (-not $tela) { $tela = $telas | Select-Object -First 1 }
+                $posicao = "--window-position=$($tela.Bounds.X),$($tela.Bounds.Y)"
+                Start-Process -FilePath $edgePath -ArgumentList '--kiosk', $urlFeira, '--edge-kiosk-type=fullscreen', '--no-first-run', $posicao
+                Escrever-Ok "Modo feira aberto em tela cheia na tela $($tela.DeviceName)"
+            }
+            else {
+                Escrever-Aviso 'Microsoft Edge não encontrado; abrindo o modo feira no navegador padrão.'
+                Start-Process $urlFeira
+            }
+        }
     }
     Wait-Process -Id $servico.Id
 }

@@ -64,7 +64,7 @@ Bloco 7 (software) pronto: **câmera real** por OpenCV (`AV_CAMERA_SOURCE`, tamb
 
 Telas do Bloco 9 prontas no software: **Histórico** (`/historico`, filtros, foto, correção de decisão, distribuição por lote e CSV), **Configuração** (`/configuracao`, perfil e calibração da bancada por produto, com versão e registro) e **Diagnóstico** (`/diagnostico`, equipamentos, sensores ao vivo, modo manutenção com teste de motor e servo, registro de eventos). Falta a integração com a bancada real.
 
-Bloco 8 (software) pronto: **pipeline de treinamento** (divisão por peça física, MobileNetV3, ONNX, limiar calibrado, relatório com parecer, região de inspeção opcional) e **tela de Modelos** para instalar, validar e ativar. Falta treinar com fotos reais (ver `docs/treinamento.md`).
+Bloco 8 (software) pronto: **pipeline de treinamento** (divisão por peça física, MobileNetV3, ONNX, limiar calibrado, relatório com parecer, região de inspeção opcional) e **tela de Modelos** para instalar, validar e ativar. Sem peças ruins ainda, a **detecção de anomalia** aprende só com peças boas e marca o que foge do padrão; a câmera simulada pode mostrar fotos reais (`AV_SIM_PHOTOS`) para ensaiar (ADR 0017). Falta treinar com fotos da bancada (ver `docs/treinamento.md`).
 
 Bloco 10 (software) pronto: **inicialização conferida** (`scripts/iniciar-feira.ps1`), **backup e restauração** (pela tela Configuração ou `scripts/backup.ps1`/`restaurar.ps1`) e **limpeza automática de fotos antigas** — ver `docs/feira.md` e ADR 0014. Falta o ensaio final com peças reais.
 

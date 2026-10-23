@@ -35,6 +35,26 @@ const STATUS: Record<ModelOut["validation_status"], { label: string; tone: strin
   rejected: { label: "Reprovado", tone: "bg-grade-c-soft text-grade-c" },
 };
 
+/** Trained on good pieces only (`anomalia` command): A = within standard, C = out of standard. */
+function isAnomalyModel(model: ModelOut): boolean {
+  return model.architecture.startsWith("anomalia");
+}
+
+/** What each kind of model can honestly show from its test set. */
+function summaryMetrics(model: ModelOut): { label: string; key: string }[] {
+  return isAnomalyModel(model)
+    ? [
+        { label: "Boas rejeitadas por engano", key: "test_good_rejected_rate" },
+        { label: "Outros objetos rejeitados", key: "test_known_anomalies_rejected_rate" },
+        { label: "Vão para revisão", key: "test_review_rate" },
+      ]
+    : [
+        { label: "B/C aprovadas por engano", key: "test_defective_false_approval_rate" },
+        { label: "B/C rejeitadas sozinhas", key: "test_defective_rejected_rate" },
+        { label: "Vão para revisão", key: "test_review_rate" },
+      ];
+}
+
 function metric(model: ModelOut, key: string): number | null {
   const value = model.metrics?.[key];
   return typeof value === "number" ? value : null;
@@ -125,7 +145,13 @@ function ModelRow({
         </div>
       </div>
 
-      {typeof verdict === "boolean" ? (
+      {isAnomalyModel(model) ? (
+        <p className="mt-3 flex items-start gap-2 text-sm font-medium text-grade-b">
+          <CircleX className="mt-0.5 size-4 shrink-0" aria-hidden />
+          Detecção de anomalia: aprendeu só com peças boas. Refaça com fotos da bancada e confira com
+          peças ruins antes de deixar decidir sozinho.
+        </p>
+      ) : typeof verdict === "boolean" ? (
         <p className={cn("mt-3 flex items-center gap-2 text-sm font-medium", ready ? "text-grade-a" : "text-grade-b")}>
           {ready ? <CircleCheck className="size-4" aria-hidden /> : <CircleX className="size-4" aria-hidden />}
           {ready ? "Atingiu as metas do plano no teste" : "Não atingiu as metas do plano no teste"}
@@ -135,18 +161,12 @@ function ModelRow({
       )}
 
       <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-5">
-        <div>
-          <dt className="text-muted-foreground">B/C aprovadas por engano</dt>
-          <dd className="font-semibold">{formatPercent(metric(model, "test_defective_false_approval_rate"), true)}</dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground">B/C rejeitadas sozinhas</dt>
-          <dd className="font-semibold">{formatPercent(metric(model, "test_defective_rejected_rate"), true)}</dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground">Vão para revisão</dt>
-          <dd className="font-semibold">{formatPercent(metric(model, "test_review_rate"), true)}</dd>
-        </div>
+        {summaryMetrics(model).map((item) => (
+          <div key={item.key}>
+            <dt className="text-muted-foreground">{item.label}</dt>
+            <dd className="font-semibold">{formatPercent(metric(model, item.key), true)}</dd>
+          </div>
+        ))}
         <div>
           <dt className="text-muted-foreground">Limiar calibrado</dt>
           <dd className="font-semibold">

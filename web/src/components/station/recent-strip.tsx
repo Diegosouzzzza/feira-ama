@@ -19,9 +19,9 @@ export function RecentStrip({ items, className }: { items: InspectionOut[]; clas
       {items.length === 0 ? (
         <p className="mt-3 text-sm text-muted-foreground">As peças analisadas neste lote aparecem aqui.</p>
       ) : (
-        <ol className="mt-3 flex gap-3 overflow-x-auto pb-1">
+        <ol className="mt-3 grid grid-cols-[repeat(auto-fill,minmax(6.5rem,1fr))] gap-3">
           {items.map((item) => (
-            <li key={item.id} className="w-28 shrink-0">
+            <li key={item.id} className="min-w-0">
               <div className="relative overflow-hidden rounded-md border bg-muted">
                 <img
                   src={item.image_url}

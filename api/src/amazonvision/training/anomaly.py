@@ -94,20 +94,28 @@ class AnomalyScorer(nn.Module):
         self.scale = scale
         self.top_k = top_k
 
-    def distance(self, x: torch.Tensor) -> torch.Tensor:
+    def _patch_distances(self, x: torch.Tensor) -> torch.Tensor:
         patches = self.features(x)[0]
         squared = (
             (patches * patches).sum(dim=1, keepdim=True)
             - 2 * patches @ self.bank.T
             + self.bank_sq[None, :]
         )
-        nearest = torch.sqrt(torch.clamp(squared.min(dim=1).values, min=0.0))
-        # Mean of the few worst patches: one bad patch matters, one noisy pixel does not.
-        return torch.topk(nearest, self.top_k).values.mean()
+        return torch.sqrt(torch.clamp(squared.min(dim=1).values, min=0.0))
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        z = (self.distance(x) - self.center) / self.scale
-        return torch.stack([torch.zeros_like(z), torch.full_like(z, NEVER_LOGIT), z])[None, :]
+    def distance(self, x: torch.Tensor) -> torch.Tensor:
+        # Mean of the few worst patches: one bad patch matters, one noisy pixel does not.
+        return torch.topk(self._patch_distances(x), self.top_k).values.mean()
+
+    def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        nearest = self._patch_distances(x)
+        piece_dist = torch.topk(nearest, self.top_k).values.mean()
+        z = (piece_dist - self.center) / self.scale
+        logits = torch.stack([torch.zeros_like(z), torch.full_like(z, NEVER_LOGIT), z])[None, :]
+        grid_h = x.shape[-2] // 8
+        grid_w = x.shape[-1] // 8
+        patch_map = ((nearest - self.center) / self.scale).reshape(1, grid_h, grid_w)
+        return logits, patch_map
 
 
 def _views(image: Image.Image) -> list[Image.Image]:
@@ -190,7 +198,7 @@ def _export_onnx(model: nn.Module, spec: PreprocessSpec, path: Path) -> None:
         (dummy,),
         str(path),
         input_names=["image"],
-        output_names=["logits"],
+        output_names=["logits", "patch_map"],
         opset_version=18,
         dynamo=True,
         external_data=False,
@@ -286,13 +294,22 @@ def train_anomaly(
     classifier = OnnxClassifier(load_package(package_dir))
 
     # The exported graph must give the same answer as the PyTorch one.
+    # The region map is checked on its own, relative to its spread: a shifted or transposed map
+    # shows up in the report, while float noise amplified by a tiny calibration scale does not.
     max_diff = 0.0
+    max_map_diff = 0.0
     with torch.no_grad():
         for sample in parts["val"][:8]:
             array = prepare_image(_load(root, sample), spec)
-            expected = torch.softmax(scorer(torch.from_numpy(array)[None]), dim=1)[0].numpy()
-            got = classifier.classify_array(array)
+            logits, expected_map = scorer(torch.from_numpy(array)[None])
+            expected = torch.softmax(logits, dim=1)[0].numpy()
+            got, got_map = classifier.classify_array_with_map(array)
             max_diff = max(max_diff, abs(float(expected[2]) - got[Grade.C]))
+            if got_map is None or got_map.shape != tuple(expected_map.shape[1:]):
+                raise RuntimeError("o modelo exportado não devolveu o mapa de regiões esperado")
+            reference = expected_map[0].numpy()
+            spread = max(float(np.ptp(reference)), 1e-12)
+            max_map_diff = max(max_map_diff, float(np.max(np.abs(reference - got_map))) / spread)
 
     y_test, s_test, latencies = _onnx_scores(classifier, root, parts["test"])
     test_distances = _distances(raw, root, parts["test"], spec)
@@ -319,6 +336,7 @@ def train_anomaly(
             },
         },
         "export_max_prob_diff": max_diff,
+        "export_max_map_rel_diff": max_map_diff,
         "pretrained": pretrained,
         "seed": seed,
         "test": {

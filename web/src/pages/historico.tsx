@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Download, UserCheck } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
 import { GradeMark } from "@/components/station/grade-mark";
+import { InspectionStage } from "@/components/station/inspection-photo";
 import { useProducts } from "@/components/station/lot-setup";
 import { NeedControl, PageShell, useStation } from "@/components/station/page-shell";
 import { TONE } from "@/components/station/tone";
@@ -18,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { formatModelScoresText, isAnomalyModelId, visibleAnomalyRegions } from "@/lib/anomaly";
 import { apiGet } from "@/lib/api/client";
 import type {
   Destination,
@@ -265,6 +267,8 @@ function DetailDialog({ inspection, onClose }: { inspection: InspectionOut | nul
   if (!inspection) return <Dialog open={false} />;
   const product = products.data?.find((p) => p.id === inspection.product_id)?.name ?? inspection.product_id;
   const decision = decisionText(inspection);
+  const anomaly = isAnomalyModelId(inspection.model_id);
+  const regions = visibleAnomalyRegions(inspection);
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-3xl">
@@ -275,10 +279,10 @@ function DetailDialog({ inspection, onClose }: { inspection: InspectionOut | nul
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-5 md:grid-cols-2">
-          <img
-            src={inspection.image_url}
+          <InspectionStage
+            inspection={inspection}
             alt={`Foto analisada na inspeção ${inspection.id}`}
-            className="aspect-[4/3] w-full rounded-md bg-muted object-contain"
+            className="aspect-[4/3] w-full rounded-md border"
           />
           <dl className="space-y-2 text-sm">
             <div className="flex items-center gap-3">
@@ -286,7 +290,13 @@ function DetailDialog({ inspection, onClose }: { inspection: InspectionOut | nul
               <div>
                 <dt className="text-muted-foreground">Classe prevista</dt>
                 <dd className="font-semibold">
-                  {inspection.predicted_grade ? GRADE[inspection.predicted_grade].title : "Sem previsão"}
+                  {inspection.predicted_grade
+                    ? anomaly
+                      ? inspection.predicted_grade === "A"
+                        ? "Dentro do padrão (A)"
+                        : "Fora do padrão (C)"
+                      : GRADE[inspection.predicted_grade].title
+                    : "Sem previsão"}
                 </dd>
               </div>
             </div>
@@ -294,7 +304,15 @@ function DetailDialog({ inspection, onClose }: { inspection: InspectionOut | nul
               <div>
                 <dt className="text-muted-foreground">Escores do modelo</dt>
                 <dd className="font-medium tabular-nums">
-                  {GRADES.map((g) => `${g} ${formatPercent(inspection.scores?.[g] ?? 0)}`).join(" · ")}
+                  {formatModelScoresText(inspection.scores, anomaly)}
+                </dd>
+              </div>
+            )}
+            {regions.length > 0 && (
+              <div>
+                <dt className="text-muted-foreground">Regiões fora do padrão</dt>
+                <dd className="font-medium">
+                  {regions.length} {regions.length === 1 ? "região destacada" : "regiões destacadas"}
                 </dd>
               </div>
             )}

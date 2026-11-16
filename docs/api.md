@@ -56,6 +56,8 @@ Situação: rotas marcadas com ✅ estão implementadas e testadas. As demais en
 | `GET /api/dataset/agreement/summary` | `?product_id&session` | `AgreementSummary` (`409` com menos de 2 revisores) | 7 ✅ | não |
 | `GET /api/diagnostics/events` | `?limit(1–200)&offset&severity&source&type&lot_id` | `EventOut[]` (mais recente primeiro) | 3 ✅ | não |
 | `GET /api/diagnostics/serial-ports` | — | `SerialPortOut[]` | 9 ✅ | não |
+| `GET /api/diagnostics/cameras` | `?max_index(1–10, padrão 6)` | `CameraDiagnostics`: o que cada índice de câmera entrega, a fonte configurada e o guia do celular (`409` com a esteira em operação) | 9 ✅ | não |
+| `GET /api/diagnostics/cameras/{index}/snapshot` | — | JPEG do que a câmera do índice vê agora (`503` sem imagem) | 9 ✅ | não |
 | `POST /api/backups` | — | `BackupOut` (201; banco em instantâneo consistente, `VACUUM INTO`) | 10 ✅ | sim |
 | `GET /api/backups` | — | `BackupOut[]` (mais recente primeiro) | 10 ✅ | não |
 | `GET /api/backups/{name}/file` | — | `.zip` | 10 ✅ | não |

@@ -269,6 +269,40 @@ TEST(line_too_long_is_reported) {
   CHECK(r.saw(R"("code":"LINE_TOO_LONG")"));
 }
 
+TEST(pwm_duty_treats_zero_as_full_power) {
+  CHECK(av::pwm_duty(0, 255) == 255);  // not configured: full
+  CHECK(av::pwm_duty(100, 255) == 255);
+  CHECK(av::pwm_duty(200, 255) == 255);  // out of range never overflows the duty
+  CHECK(av::pwm_duty(50, 255) == 127);
+  CHECK(av::pwm_duty(1, 255) == 2);
+  CHECK(av::pwm_duty(60, 1023) == 613);
+}
+
+TEST(motor_test_before_configure_asks_for_unset_power) {
+  // Maintenance works on a board that was never configured: the driver gets power 0 and must
+  // turn that into full power (pwm_duty above).
+  Rig r;
+  r.cmd("HELLO");
+  r.cmd("ENTER_MAINTENANCE");
+  r.cmd("TEST_MOTOR", R"(,"payload":{"run_ms":200})");
+  CHECK(r.hal.motor_.on);
+  CHECK(r.hal.motor_.power == 0);
+  r.advance(300);
+  CHECK(!r.hal.motor_.on);
+}
+
+TEST(configured_power_reaches_the_motor_driver) {
+  Rig r;
+  r.cmd("HELLO");
+  std::string config(kConfig);
+  config.insert(config.size() - 1, R"(,"motor_power_pct":60)");
+  r.cmd("CONFIGURE", std::string(R"(,"payload":)") + config);
+  r.cmd("ENTER_MAINTENANCE");
+  r.cmd("TEST_MOTOR", R"(,"payload":{"run_ms":200})");
+  CHECK(r.hal.motor_.on);
+  CHECK(r.hal.motor_.power == 60);
+}
+
 TEST(transition_table_rejects_unknown_pairs) {
   av::State next;
   CHECK(!av::next_state(av::State::READY, av::Trigger::DECISION, &next));

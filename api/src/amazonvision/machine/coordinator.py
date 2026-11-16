@@ -188,6 +188,8 @@ class Coordinator:
         self._last_seq = -1
         self._last_seen_mono = 0.0
         self._lost_announced = False
+        # True from the moment a HELLO is requested until it is answered or given up.
+        self._handshaking = False
         self._pending: dict[str, asyncio.Future[Any]] = {}
         self._tasks: set[asyncio.Task[Any]] = set()
         self._loops: list[asyncio.Task[Any]] = []
@@ -223,8 +225,10 @@ class Coordinator:
         ]
         try:
             await self._handshake()
-        except ApiError:
-            log.warning("placa não respondeu ao HELLO na inicialização")
+        except (ApiError, DeviceRejected):
+            # Usual on Windows: opening the COM port resets the ESP32 (DTR/RTS) and it spends
+            # 1.5-2.5 s booting. Its first heartbeat without a session triggers a new HELLO.
+            log.warning("placa não respondeu ao HELLO na inicialização; aguardando o heartbeat")
 
     async def stop(self) -> None:
         if self._link is not None and self.connected and self.state in CYCLE_STATES:
@@ -331,10 +335,23 @@ class Coordinator:
         return reply
 
     async def _handshake(self) -> None:
+        self._handshaking = True
+        try:
+            await self._hello()
+        finally:
+            self._handshaking = False
+
+    async def _hello(self) -> None:
         self.session_id = secrets.token_hex(4)
-        ack = await self._exchange(
-            HelloCmd(session_id=self.session_id, cmd_id=secrets.token_hex(6))
-        )
+        try:
+            ack = await self._exchange(
+                HelloCmd(session_id=self.session_id, cmd_id=secrets.token_hex(6))
+            )
+        except (ApiError, DeviceRejected):
+            # A session the board never accepted must not be used: commands would get
+            # NAK NO_SESSION. The next device message without a valid session retries.
+            self.session_id = None
+            raise
         self.boot_id = ack.boot_id
         self.firmware = ack.payload.fw_version
         self.state = ack.state
@@ -402,8 +419,8 @@ class Coordinator:
         self._loops.append(asyncio.create_task(self._reader()))
         try:
             await self._handshake()
-        except ApiError:
-            log.warning("placa reconectada não respondeu ao HELLO")
+        except (ApiError, DeviceRejected):
+            log.warning("placa reconectada não respondeu ao HELLO; aguardando o heartbeat")
 
     async def _host_heartbeat(self) -> None:
         assert self._link is not None
@@ -465,6 +482,10 @@ class Coordinator:
             if future is not None and not future.done():
                 future.set_result(message)
             return
+        if self.session_id is None or message.session_id != self.session_id:
+            # The board has no session, or not ours (it booted after our HELLO expired, or the
+            # HELLO was lost in the bootloader noise): propose a session again.
+            self._request_handshake()
         if message.type == "hb":
             await self._apply_heartbeat(message)
             return
@@ -536,13 +557,20 @@ class Coordinator:
         )
         if self.cycle is not None:
             await self._finish_aborted(self.cycle.cycle_id, "DEVICE_REBOOTED")
+        self._request_handshake()
+
+    def _request_handshake(self) -> None:
+        """Start a HELLO in the background unless one is already under way."""
+        if self._handshaking:
+            return
+        self._handshaking = True
         self._spawn(self._rehandshake())
 
     async def _rehandshake(self) -> None:
         try:
             await self._handshake()
-        except ApiError:
-            log.warning("placa reiniciada não respondeu ao HELLO")
+        except (ApiError, DeviceRejected):
+            log.warning("placa sem sessão não respondeu ao HELLO; nova tentativa no próximo hb")
 
     async def _on_state_changed(self, message: Any) -> None:
         payload = message.payload
@@ -663,7 +691,9 @@ class Coordinator:
     async def _inspect(self, cycle: ActiveCycle) -> None:
         requested_at = self._clock()
         try:
-            frame = await self._camera.capture(not_before=requested_at, timeout_s=1.0)
+            frame = await self._camera.capture(
+                not_before=requested_at, timeout_s=self._settings.camera_capture_timeout_s
+            )
         except CameraError as exc:
             await self._halt(cycle, "CAMERA_UNAVAILABLE", Component.CAMERA, exc.message)
             return
@@ -709,6 +739,7 @@ class Coordinator:
             auto_decision=result.decision,
             review_reason=result.review_reason,
             created_at=to_db(self._clock()),
+            anomaly_regions=prediction.anomaly_regions,
         )
         try:
             inspection = await self._db.run(lambda conn: insp_repo.insert_inspection(conn, new))

@@ -2124,6 +2124,115 @@
         }
       }
     },
+    "/api/diagnostics/cameras": {
+      "get": {
+        "tags": [
+          "diagnóstico"
+        ],
+        "summary": "Cameras",
+        "description": "Câmeras visíveis ao sistema agora, para escolher AV_CAMERA_SOURCE.\n\nAbre cada índice por um instante (alguns segundos no total). O índice que a bancada já\nestá usando não é reaberto. Use `snapshot_url` para ver qual é a webcam do notebook e qual\né a webcam virtual do celular (DroidCam/Iriun).",
+        "operationId": "cameras_api_diagnostics_cameras_get",
+        "parameters": [
+          {
+            "name": "max_index",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 10,
+              "minimum": 1,
+              "description": "Quantos índices testar",
+              "default": 6,
+              "title": "Max Index"
+            },
+            "description": "Quantos índices testar"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CameraDiagnostics"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/diagnostics/cameras/{index}/snapshot": {
+      "get": {
+        "tags": [
+          "diagnóstico"
+        ],
+        "summary": "Camera Snapshot",
+        "description": "Foto do que a câmera deste índice está vendo agora (abre no navegador).",
+        "operationId": "camera_snapshot_api_diagnostics_cameras__index__snapshot_get",
+        "parameters": [
+          {
+            "name": "index",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "maximum": 9,
+              "minimum": 0,
+              "title": "Index"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "image/jpeg": {}
+            }
+          },
+          "4XX": {
+            "description": "Erro da requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Erro do serviço ou de um equipamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/diagnostics/events": {
       "get": {
         "tags": [
@@ -3622,6 +3731,49 @@
         ],
         "title": "AgreementSummary"
       },
+      "AnomalyRegionOut": {
+        "properties": {
+          "x": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "X"
+          },
+          "y": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Y"
+          },
+          "width": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Width"
+          },
+          "height": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Height"
+          },
+          "intensity": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Intensity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "x",
+          "y",
+          "width",
+          "height",
+          "intensity"
+        ],
+        "title": "AnomalyRegionOut"
+      },
       "ApiErrorBody": {
         "properties": {
           "code": {
@@ -3707,6 +3859,132 @@
           "dataset_photos"
         ],
         "title": "BackupOut"
+      },
+      "CameraDeviceOut": {
+        "properties": {
+          "index": {
+            "type": "integer",
+            "title": "Index",
+            "description": "Índice do OpenCV: o valor a usar em AV_CAMERA_SOURCE"
+          },
+          "available": {
+            "type": "boolean",
+            "title": "Available",
+            "description": "Abriu e entregou imagem"
+          },
+          "width": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Width"
+          },
+          "height": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height"
+          },
+          "in_use": {
+            "type": "boolean",
+            "title": "In Use",
+            "description": "É a câmera que a bancada está usando agora"
+          },
+          "snapshot_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snapshot Url",
+            "description": "Foto do que esta câmera está vendo, para reconhecer qual é qual"
+          }
+        },
+        "type": "object",
+        "required": [
+          "index",
+          "available",
+          "width",
+          "height",
+          "in_use",
+          "snapshot_url"
+        ],
+        "title": "CameraDeviceOut"
+      },
+      "CameraDiagnostics": {
+        "properties": {
+          "configured_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Configured Source",
+            "description": "AV_CAMERA_SOURCE em uso"
+          },
+          "source_kind": {
+            "type": "string",
+            "enum": [
+              "index",
+              "stream",
+              "none"
+            ],
+            "title": "Source Kind"
+          },
+          "rotate": {
+            "type": "integer",
+            "title": "Rotate",
+            "description": "AV_CAMERA_ROTATE em uso (graus, sentido horário)"
+          },
+          "capture_timeout_s": {
+            "type": "number",
+            "title": "Capture Timeout S"
+          },
+          "camera": {
+            "$ref": "#/components/schemas/CameraInfo"
+          },
+          "devices": {
+            "items": {
+              "$ref": "#/components/schemas/CameraDeviceOut"
+            },
+            "type": "array",
+            "title": "Devices"
+          },
+          "guide": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Guide",
+            "description": "Como ligar o celular e qual valor configurar"
+          }
+        },
+        "type": "object",
+        "required": [
+          "configured_source",
+          "source_kind",
+          "rotate",
+          "capture_timeout_s",
+          "camera",
+          "devices",
+          "guide"
+        ],
+        "title": "CameraDiagnostics"
       },
       "CameraInfo": {
         "properties": {
@@ -4654,6 +4932,20 @@
           },
           "cycle_status": {
             "$ref": "#/components/schemas/CycleStatus"
+          },
+          "anomaly_regions": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/AnomalyRegionOut"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Anomaly Regions"
           }
         },
         "type": "object",

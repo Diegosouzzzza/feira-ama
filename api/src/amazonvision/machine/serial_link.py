@@ -20,6 +20,42 @@ log = logging.getLogger("amazonvision.machine.serial")
 
 BAUD_RATE = 115200
 READ_TIMEOUT_S = 1.0  # bounds how long close() may wait for the reader thread to notice.
+WRITE_TIMEOUT_S = 1.0  # a stuck driver must not hang a command forever.
+
+
+def open_port(port: str, baud_rate: int) -> serial.Serial:
+    """Open the port without raising DTR/RTS.
+
+    On the ESP32 DevKit those two lines drive EN and GPIO0 (auto-reset circuit). pyserial raises
+    both when it opens a port, and on Windows that usually reboots the board. Setting them low
+    *before* opening keeps the board running with most CH340/CP210x drivers; when a driver
+    resets it anyway, the coordinator handshakes again on the first heartbeat."""
+    handle = serial.Serial()
+    handle.port = port
+    handle.baudrate = baud_rate
+    handle.timeout = READ_TIMEOUT_S
+    handle.write_timeout = WRITE_TIMEOUT_S
+    handle.dtr = False
+    handle.rts = False
+    handle.open()
+    with contextlib.suppress(OSError, serial.SerialException):
+        handle.reset_input_buffer()  # whatever the board printed before we were listening
+    return handle
+
+
+def clean_line(raw: bytes) -> bytes | None:
+    """Keep only what can be a protocol message (one JSON object per line).
+
+    At reset the ESP32 ROM bootloader prints text at 74880 baud ("ets Jun  8 2016...",
+    "rst:0x1 (POWERON_RESET)"), which arrives here as garbage, sometimes glued to the start of
+    the first real line. Returns None for lines to drop."""
+    start = raw.find(b"{")
+    if start < 0:
+        return None
+    line = raw[start:].strip()
+    if not line.endswith(b"}"):
+        return None  # cut in the middle (port opened or board reset mid-line)
+    return line + b"\n"
 
 
 def list_ports() -> list[dict[str, str | None]]:
@@ -40,12 +76,13 @@ class SerialLink:
     ) -> None:
         self.port = port
         self.baud_rate = baud_rate
-        self._opener = opener or (lambda: serial.Serial(port, baud_rate, timeout=READ_TIMEOUT_S))
+        self._opener = opener or (lambda: open_port(port, baud_rate))
         self._serial: serial.Serial | None = None
         self._queue: asyncio.Queue[bytes | None] = asyncio.Queue()
         self._thread: threading.Thread | None = None
         self._stop = threading.Event()
         self._loop: asyncio.AbstractEventLoop | None = None
+        self.discarded = 0  # lines dropped as noise (bootloader text, cut lines)
 
     async def start(self) -> None:
         self._loop = asyncio.get_running_loop()
@@ -68,6 +105,10 @@ class SerialLink:
                 break
             if not line:
                 continue  # read timed out; loop again to re-check _stop
+            line = clean_line(line)
+            if line is None:
+                self.discarded += 1
+                continue
             with contextlib.suppress(RuntimeError):  # loop closing during shutdown
                 loop.call_soon_threadsafe(self._queue.put_nowait, line)
         with contextlib.suppress(RuntimeError):

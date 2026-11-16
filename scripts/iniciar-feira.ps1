@@ -42,7 +42,9 @@ $config = @{}
 if (Test-Path $envPath) {
     Get-Content $envPath | Where-Object { $_ -match '^\s*[A-Za-z_][A-Za-z0-9_]*\s*=' } | ForEach-Object {
         $partes = $_ -split '=', 2
-        $config[$partes[0].Trim()] = $partes[1].Trim()
+        # Tira comentário no fim da linha ("COM5   # porta da placa") e aspas em volta do valor.
+        $valor = ($partes[1] -replace '\s+#.*$', '').Trim().Trim('"').Trim("'")
+        $config[$partes[0].Trim()] = $valor
     }
 }
 $modo = if ($config.AV_MODE) { $config.AV_MODE } else { 'simulado' }
@@ -66,11 +68,49 @@ if ($modo -eq 'real') {
         Escrever-Falta "Placa: porta $portaConfigurada não encontrada ($lista). Confira o cabo USB e o driver (CH340/CP210x)."
     }
 
-    if ($config.AV_CAMERA_SOURCE) {
-        Escrever-Ok "Câmera configurada (AV_CAMERA_SOURCE=$($config.AV_CAMERA_SOURCE))"
+    $camera = $config.AV_CAMERA_SOURCE
+    if (-not $camera) {
+        Escrever-Falta 'AV_CAMERA_SOURCE não está em api\.env: a bancada não vai enxergar as peças. Rode .\scripts\listar-cameras.ps1 para descobrir o valor.'
+    }
+    elseif ($camera -match '^\d+$') {
+        Escrever-Ok "Câmera: índice $camera (webcam, ou webcam virtual do celular: DroidCam/Iriun)"
+        Escrever-Aviso "Confira se o índice $camera é mesmo o celular e não a webcam do notebook: .\scripts\listar-cameras.ps1 salva uma foto de cada câmera. O app do celular e o cliente no Windows precisam estar conectados."
+    }
+    elseif ($camera -match '^(https?|rtsp)://') {
+        # Stream do celular (IP Webcam etc.): confere se o endereço responde antes de abrir.
+        try {
+            $uri = [Uri]$camera
+            $porta = if ($uri.Port -gt 0) { $uri.Port } elseif ($uri.Scheme -eq 'https') { 443 } elseif ($uri.Scheme -eq 'rtsp') { 554 } else { 80 }
+            $tcp = New-Object System.Net.Sockets.TcpClient
+            try {
+                $espera = $tcp.BeginConnect($uri.Host, $porta, $null, $null)
+                $respondeu = $espera.AsyncWaitHandle.WaitOne(2000) -and $tcp.Connected
+            } finally { $tcp.Close() }
+            if ($respondeu) {
+                Escrever-Ok "Câmera: stream do celular respondendo em $($uri.Host):$porta"
+            }
+            else {
+                $dica = if ($uri.Host -in @('127.0.0.1', 'localhost')) {
+                    "Inicie o servidor no app do celular e rode: adb forward tcp:$porta tcp:$porta (o encaminhamento se perde ao tirar o cabo)."
+                } else {
+                    'Inicie o servidor no app do celular e confira se ele e o notebook estão na mesma rede Wi-Fi.'
+                }
+                Escrever-Falta "Câmera: o stream $camera não responde. $dica"
+            }
+        } catch {
+            Escrever-Falta "AV_CAMERA_SOURCE não é um endereço válido: $camera"
+        }
     }
     else {
-        Escrever-Falta 'AV_CAMERA_SOURCE não está em api\.env: a bancada não vai enxergar as peças.'
+        Escrever-Falta "AV_CAMERA_SOURCE=$camera não é um índice (0, 1, 2...) nem um endereço http://, https:// ou rtsp://."
+    }
+
+    $giro = $config.AV_CAMERA_ROTATE
+    if ($giro -and ($giro -notin @('0', '90', '180', '270'))) {
+        Escrever-Falta "AV_CAMERA_ROTATE=$giro é inválido (use 0, 90, 180 ou 270): o serviço não vai iniciar."
+    }
+    elseif ($giro -and $giro -ne '0') {
+        Escrever-Ok "Imagem girada em $giro graus (AV_CAMERA_ROTATE)"
     }
 }
 

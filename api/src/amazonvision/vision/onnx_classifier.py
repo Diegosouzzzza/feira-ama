@@ -5,9 +5,10 @@ import onnxruntime as ort
 
 from amazonvision.camera.base import Frame
 from amazonvision.domain.quality import Grade
+from amazonvision.vision.anomaly_map import extract_anomaly_regions
 from amazonvision.vision.classifier import ClassifierError, Prediction
 from amazonvision.vision.package import ModelPackage
-from amazonvision.vision.preprocess import prepare_bytes
+from amazonvision.vision.preprocess import load_rgb, prepare_image
 
 
 def softmax(logits: np.ndarray) -> np.ndarray:
@@ -33,19 +34,40 @@ class OnnxClassifier:
         size = package.preprocess.input_size
         self.classify_array(np.zeros((3, size, size), dtype=np.float32))
 
-    def classify_array(self, array: np.ndarray) -> dict[Grade, float]:
-        logits = self._session.run(None, {self._input: array[np.newaxis, ...]})[0][0]
+    def classify_array_with_map(
+        self, array: np.ndarray
+    ) -> tuple[dict[Grade, float], np.ndarray | None]:
+        outputs = self._session.run(None, {self._input: array[np.newaxis, ...]})
+        logits = outputs[0][0]
         if logits.shape != (len(self.package.class_order),):
             raise ClassifierError(f"saída inesperada do modelo: {logits.shape}")
         probabilities = softmax(logits.astype(np.float64))
-        return {g: float(p) for g, p in zip(self.package.class_order, probabilities, strict=True)}
+        scores = {g: float(p) for g, p in zip(self.package.class_order, probabilities, strict=True)}
+        patch_map: np.ndarray | None = None
+        if len(outputs) >= 2 and isinstance(outputs[1], np.ndarray) and outputs[1].ndim == 3:
+            patch_map = outputs[1][0].astype(np.float32, copy=False)
+        return scores, patch_map
+
+    def classify_array(self, array: np.ndarray) -> dict[Grade, float]:
+        return self.classify_array_with_map(array)[0]
 
     def classify(self, frame: Frame) -> Prediction:
         started = time.perf_counter()
         try:
-            array = prepare_bytes(frame.data, self.package.preprocess)
+            rgb = load_rgb(frame.data)
+            image_size = (rgb.width, rgb.height)
+            array = prepare_image(rgb, self.package.preprocess)
         except OSError:
             # Unreadable image: not the model's call; the piece goes to review (INVALID_IMAGE).
             return Prediction(scores=None, latency_ms=(time.perf_counter() - started) * 1000)
-        scores = self.classify_array(array)
-        return Prediction(scores=scores, latency_ms=(time.perf_counter() - started) * 1000)
+        scores, patch_map = self.classify_array_with_map(array)
+        regions = (
+            extract_anomaly_regions(patch_map, image_size=image_size, spec=self.package.preprocess)
+            if patch_map is not None
+            else None
+        )
+        return Prediction(
+            scores=scores,
+            latency_ms=(time.perf_counter() - started) * 1000,
+            anomaly_regions=regions or None,
+        )

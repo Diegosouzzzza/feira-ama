@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { ActionBar } from "@/components/station/action-bar";
@@ -12,6 +13,8 @@ import { LotSetup } from "@/components/station/lot-setup";
 import { RecentStrip } from "@/components/station/recent-strip";
 import { Totals } from "@/components/station/totals";
 import { Verdict } from "@/components/station/verdict";
+import { apiGet } from "@/lib/api/client";
+import type { ProductConfigOut } from "@/lib/api/types";
 import { useLive } from "@/lib/realtime/store";
 import { currentInspection, decidedDestination } from "@/lib/station";
 
@@ -19,6 +22,12 @@ export function OperacaoPage() {
   const status = useLive((s) => s.status);
   const recent = useLive((s) => s.recent);
   const [controlOpen, setControlOpen] = useState(false);
+  const productId = status?.active_lot?.product_id;
+  const config = useQuery({
+    queryKey: ["product-config", productId],
+    enabled: productId !== undefined,
+    queryFn: ({ signal }) => apiGet<ProductConfigOut>(`/products/${productId}/config`, { signal }),
+  });
 
   if (!status) {
     return (
@@ -51,6 +60,7 @@ export function OperacaoPage() {
               <InspectionPhoto
                 inspection={latest}
                 onBelt={onBelt}
+                roi={config.data?.roi ?? null}
                 className="aspect-[4/3] xl:col-span-7 xl:aspect-auto xl:min-h-[min(54vh,620px)]"
               />
               <Verdict

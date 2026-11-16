@@ -3,7 +3,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Self
 
-from pydantic import Field, model_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -43,10 +43,19 @@ class Settings(BaseSettings):
     # (e.g. the native build of the firmware logic). JSON list in AV_FIRMWARE_HARNESS.
     firmware_harness: list[str] | None = None
     # Camera: index ("0") or stream URL. Unset: simulated camera in simulated mode, none in real.
+    # A phone works both ways: as a virtual webcam (DroidCam/Iriun: index "1" or "2") or as a
+    # stream (IP Webcam: "http://127.0.0.1:8080/video" through `adb forward`, or over Wi-Fi).
     camera_source: str | None = None
+    # Width, height and exposure apply to index sources only; a stream is set in the phone app.
     camera_width: int = 1280
     camera_height: int = 720
     camera_exposure: float | None = None  # driver units; None keeps the camera's own setting
+    # Clockwise rotation of every frame (0, 90, 180, 270), for a phone mounted sideways.
+    camera_rotate: int = 0
+    # How long an inspection waits for a frame newer than the piece's arrival. Streams deliver
+    # frames in bursts: too short gives false STALE_FRAME. Keep it well under the product's
+    # decision_timeout_ms, which the board enforces.
+    camera_capture_timeout_s: float = Field(default=2.0, gt=0, le=10)
     # Real mode only: USB serial port to the ESP32 (e.g. "COM5"). Unset: no board, API stays up.
     serial_port: str | None = None
     serial_baud_rate: int = 115_200
@@ -55,6 +64,19 @@ class Settings(BaseSettings):
     # (training collection) are never touched by this.
     image_retention_days: int = Field(default=30, ge=1)
     retention_check_minutes: int = Field(default=60, ge=1)
+
+    @field_validator("camera_source")
+    @classmethod
+    def _blank_camera_is_none(cls, value: str | None) -> str | None:
+        value = value.strip() if value else value
+        return value or None
+
+    @field_validator("camera_rotate")
+    @classmethod
+    def _valid_rotation(cls, value: int) -> int:
+        if value not in (0, 90, 180, 270):
+            raise ValueError("AV_CAMERA_ROTATE aceita 0, 90, 180 ou 270")
+        return value
 
     @model_validator(mode="after")
     def _default_data_dir(self) -> Self:

@@ -3,6 +3,7 @@ import { type FormEvent, type ReactNode, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { isAnomalyModelId } from "@/lib/anomaly";
 import type { Destination, InspectionOut, ReviewOut } from "@/lib/api/types";
 import { controlPost, useControl } from "@/lib/control";
 import { formatPercent } from "@/lib/format";
@@ -12,23 +13,37 @@ import { cn } from "@/lib/utils";
 import { GradeMark, inspectionTone } from "./grade-mark";
 import { TONE } from "./tone";
 
+const latencyFormat = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
+
+function formatLatency(ms: number): string {
+  return ms < 1 ? "< 1 ms" : `${latencyFormat.format(ms)} ms`;
+}
+
 function Headline({ inspection, large }: { inspection: InspectionOut; large: boolean }) {
+  const anomaly = isAnomalyModelId(inspection.model_id);
   const review = inspection.auto_decision === "REVIEW";
   const decided = review && inspection.decided_by === "operator";
-  const suggestion = inspection.predicted_grade
-    ? ` O modelo sugeriu ${GRADE[inspection.predicted_grade].title}.`
-    : "";
+  const predictedLabel = inspection.predicted_grade
+    ? anomaly
+      ? inspection.predicted_grade === "A"
+        ? "Dentro do padrão (A)"
+        : "Fora do padrão (C)"
+      : GRADE[inspection.predicted_grade].title
+    : null;
+  const suggestion = predictedLabel ? ` O modelo sugeriu ${predictedLabel}.` : "";
   const title = decided
     ? `${inspection.final_decision === "APPROVED" ? "Aprovada" : "Rejeitada"} pelo operador`
     : review
       ? "Inconclusivo"
-      : inspection.predicted_grade
-        ? GRADE[inspection.predicted_grade].title
-        : "Sem classe";
+      : predictedLabel ?? "Sem classe";
   const meaning = review
     ? `${REVIEW_REASON[inspection.review_reason ?? "LOW_CONFIDENCE"]}.${suggestion}`
     : inspection.predicted_grade
-      ? GRADE[inspection.predicted_grade].meaning
+      ? anomaly
+        ? inspection.predicted_grade === "A"
+          ? "Compatível com as peças boas de referência."
+          : "Desvio visual detectado frente às peças boas de referência."
+        : GRADE[inspection.predicted_grade].meaning
       : "";
   return (
     <div className="min-w-0">
@@ -51,8 +66,15 @@ function Confidence({ inspection, large }: { inspection: InspectionOut; large: b
   return (
     <div>
       <div className={cn("flex items-baseline justify-between gap-3", large ? "text-xl" : "text-base")}>
-        <span className="text-muted-foreground">Confiança estimada do modelo</span>
-        <span className="font-semibold">{formatPercent(inspection.confidence)}</span>
+        <span className="text-muted-foreground">Confiança do modelo</span>
+        <span className="font-semibold">
+          {formatPercent(inspection.confidence)}
+          {inspection.latency_ms !== null && (
+            <span className="ml-2 text-sm font-normal text-muted-foreground">
+              · {formatLatency(inspection.latency_ms)}
+            </span>
+          )}
+        </span>
       </div>
       <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted" aria-hidden>
         <div

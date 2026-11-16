@@ -541,6 +541,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/diagnostics/cameras": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Cameras
+         * @description Câmeras visíveis ao sistema agora, para escolher AV_CAMERA_SOURCE.
+         *
+         *     Abre cada índice por um instante (alguns segundos no total). O índice que a bancada já
+         *     está usando não é reaberto. Use `snapshot_url` para ver qual é a webcam do notebook e qual
+         *     é a webcam virtual do celular (DroidCam/Iriun).
+         */
+        get: operations["cameras_api_diagnostics_cameras_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/diagnostics/cameras/{index}/snapshot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Camera Snapshot
+         * @description Foto do que a câmera deste índice está vendo agora (abre no navegador).
+         */
+        get: operations["camera_snapshot_api_diagnostics_cameras__index__snapshot_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/diagnostics/events": {
         parameters: {
             query?: never;
@@ -943,6 +987,19 @@ export interface components {
             /** Disagreements */
             disagreements: components["schemas"]["AgreementSampleResult"][];
         };
+        /** AnomalyRegionOut */
+        AnomalyRegionOut: {
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+            /** Width */
+            width: number;
+            /** Height */
+            height: number;
+            /** Intensity */
+            intensity: number;
+        };
         /**
          * ApiErrorBody
          * @description Every non-2xx response from /api uses this body.
@@ -994,6 +1051,61 @@ export interface components {
              * @description Fotos de coleta incluídas
              */
             dataset_photos: number;
+        };
+        /** CameraDeviceOut */
+        CameraDeviceOut: {
+            /**
+             * Index
+             * @description Índice do OpenCV: o valor a usar em AV_CAMERA_SOURCE
+             */
+            index: number;
+            /**
+             * Available
+             * @description Abriu e entregou imagem
+             */
+            available: boolean;
+            /** Width */
+            width: number | null;
+            /** Height */
+            height: number | null;
+            /**
+             * In Use
+             * @description É a câmera que a bancada está usando agora
+             */
+            in_use: boolean;
+            /**
+             * Snapshot Url
+             * @description Foto do que esta câmera está vendo, para reconhecer qual é qual
+             */
+            snapshot_url: string | null;
+        };
+        /** CameraDiagnostics */
+        CameraDiagnostics: {
+            /**
+             * Configured Source
+             * @description AV_CAMERA_SOURCE em uso
+             */
+            configured_source: string | null;
+            /**
+             * Source Kind
+             * @enum {string}
+             */
+            source_kind: "index" | "stream" | "none";
+            /**
+             * Rotate
+             * @description AV_CAMERA_ROTATE em uso (graus, sentido horário)
+             */
+            rotate: number;
+            /** Capture Timeout S */
+            capture_timeout_s: number;
+            camera: components["schemas"]["CameraInfo"];
+            /** Devices */
+            devices: components["schemas"]["CameraDeviceOut"][];
+            /**
+             * Guide
+             * @description Como ligar o celular e qual valor configurar
+             */
+            guide: string[];
         };
         /** CameraInfo */
         CameraInfo: {
@@ -1321,6 +1433,8 @@ export interface components {
             final_decision: components["schemas"]["Destination"] | null;
             decided_by: components["schemas"]["DecidedBy"] | null;
             cycle_status: components["schemas"]["CycleStatus"];
+            /** Anomaly Regions */
+            anomaly_regions?: components["schemas"]["AnomalyRegionOut"][] | null;
         };
         /**
          * InspectionOutcome
@@ -3541,6 +3655,87 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SerialPortOut"][];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    cameras_api_diagnostics_cameras_get: {
+        parameters: {
+            query?: {
+                /** @description Quantos índices testar */
+                max_index?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CameraDiagnostics"];
+                };
+            };
+            /** @description Erro da requisição */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            /** @description Erro do serviço ou de um equipamento */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+        };
+    };
+    camera_snapshot_api_diagnostics_cameras__index__snapshot_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                index: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/jpeg": unknown;
                 };
             };
             /** @description Erro da requisição */

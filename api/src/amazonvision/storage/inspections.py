@@ -1,16 +1,18 @@
 import json
 import sqlite3
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 
 from amazonvision.core.clock import from_db
 from amazonvision.domain.quality import AutoDecision, Destination, Grade, ReviewReason
 from amazonvision.schemas.api import (
+    AnomalyRegionOut,
     CycleStatus,
     DecidedBy,
     InspectionOut,
     InspectionOutcome,
     ReviewOut,
 )
+from amazonvision.vision.anomaly_map import AnomalyRegion
 
 _SELECT = """
 SELECT i.*, c.lot_id AS lot_id, c.status AS cycle_status, l.product_id AS product_id
@@ -37,10 +39,17 @@ class NewInspection:
     auto_decision: AutoDecision
     review_reason: ReviewReason | None
     created_at: str
+    anomaly_regions: tuple[AnomalyRegion, ...] | None = None
 
 
 def _to_inspection(row: sqlite3.Row) -> InspectionOut:
     scores = json.loads(row["scores_json"]) if row["scores_json"] else None
+    raw_regions = row["anomaly_regions_json"]
+    regions = (
+        [AnomalyRegionOut.model_validate(item) for item in json.loads(raw_regions)]
+        if raw_regions
+        else None
+    )
     return InspectionOut(
         id=row["id"],
         cycle_id=row["cycle_id"],
@@ -58,17 +67,23 @@ def _to_inspection(row: sqlite3.Row) -> InspectionOut:
         final_decision=Destination(row["final_decision"]) if row["final_decision"] else None,
         decided_by=DecidedBy(row["decided_by"]) if row["decided_by"] else None,
         cycle_status=CycleStatus(row["cycle_status"]),
+        anomaly_regions=regions,
     )
 
 
 def insert_inspection(conn: sqlite3.Connection, new: NewInspection) -> InspectionOut:
     automatic = new.auto_decision is not AutoDecision.REVIEW
+    regions_json = (
+        json.dumps([asdict(r) for r in new.anomaly_regions])
+        if new.anomaly_regions
+        else None
+    )
     cur = conn.execute(
         """INSERT INTO inspections (cycle_id, image_path, image_sha256, captured_at, frame_age_ms,
                model_id, predicted_grade, scores_json, confidence, latency_ms, policy_threshold,
                policy_version, auto_decision, review_reason, final_decision, decided_by,
-               created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+               created_at, anomaly_regions_json)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (
             new.cycle_id,
             new.image_path,
@@ -87,6 +102,7 @@ def insert_inspection(conn: sqlite3.Connection, new: NewInspection) -> Inspectio
             new.auto_decision.value if automatic else None,
             "auto" if automatic else None,
             new.created_at,
+            regions_json,
         ),
     )
     inspection = get_inspection(conn, cur.lastrowid or 0)

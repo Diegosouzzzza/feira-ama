@@ -41,7 +41,7 @@ export const BENCH_GROUPS: { title: string; fields: Field[] }[] = [
       { key: "release_ms", label: "Liberação da saída", unit: "ms", min: 0, max: 10000, help: "Esteira ligada para tirar a peça aprovada." },
       { key: "release_max_ms", label: "Prazo máximo da liberação", unit: "ms", min: 500, max: 30000, help: "Saída ainda ocupada depois disso: falha." },
       { key: "link_timeout_ms", label: "Tempo sem comunicação", unit: "ms", min: 500, max: 10000, help: "A placa para tudo se o computador ficar mudo." },
-      { key: "motor_power_pct", label: "Potência do motor", unit: "%", min: 1, max: 100, help: "Só para driver com velocidade (BTS7960). Vazio: potência total.", optional: true },
+      { key: "motor_power_pct", label: "Potência do motor", unit: "%", min: 1, max: 100, help: "Velocidade da esteira por PWM (módulo MOSFET D4184 ou BTS7960). Vazio: potência total.", optional: true },
     ],
   },
 ];

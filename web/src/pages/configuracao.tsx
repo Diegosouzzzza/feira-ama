@@ -139,7 +139,7 @@ function RoiPreview({ draft }: { draft: Draft }) {
 
   return (
     <div className="space-y-2">
-      <div className="relative aspect-video overflow-hidden rounded-md bg-brand-deep">
+      <div className="relative aspect-video overflow-hidden rounded-md bg-neutral-900">
         {failed ? (
           <p className="grid h-full place-items-center p-4 text-center text-sm text-white/75">
             Sem imagem da câmera agora.

@@ -127,7 +127,7 @@ test("diagnóstico entra em manutenção, testa motor e servo e registra os even
 test("as telas novas cabem no celular sem rolagem horizontal", async ({ browser }) => {
   const context = await browser.newContext({ baseURL: "http://127.0.0.1:8010", viewport: { width: 375, height: 812 } });
   const page = await context.newPage();
-  for (const path of ["/historico", "/coleta", "/configuracao", "/diagnostico"]) {
+  for (const path of ["/feira", "/historico", "/coleta", "/configuracao", "/diagnostico"]) {
     await page.goto(path);
     await expect(page.locator("main h1")).toBeVisible();
     await page.waitForTimeout(300);

@@ -58,7 +58,7 @@ pio device monitor      # monitor serial (115200)
 
 Blocos 1 a 5 concluídos: fundação, contratos, núcleo da API, coordenador do ciclo com bancada simulada e interface (tela de **Operação** em `/` e **Modo feira** em `/feira`). No modo simulado, o sistema executa ciclos completos de ponta a ponta pela tela.
 
-Bloco 6 em andamento: a **lógica do firmware** está pronta e testada no PC contra o contrato e a API (ver `docs/firmware.md`), e o **link serial real** com o ESP32 (`AV_SERIAL_PORT`, reconexão automática) já está pronto no software (ADR 0013); faltam a escolha do motor, a pinagem definitiva e os ensaios na bancada.
+Bloco 6 em andamento: a **lógica do firmware** está pronta e testada no PC contra o contrato e a API (ver `docs/firmware.md`), e o **link serial real** com o ESP32 (`AV_SERIAL_PORT`, reconexão automática) já está pronto no software (ADR 0013). A **pinagem definitiva** e o **PWM de 20 kHz no módulo D4184** estão em `docs/firmware.md`; o passo a passo para gravar a placa, ligar o **celular como câmera** (`AV_CAMERA_SOURCE` por índice ou URL, `AV_CAMERA_ROTATE`, `scripts/listar-cameras.ps1`) e subir em modo real está em `docs/bancada-real.md`. Faltam os ensaios na bancada.
 
 Bloco 7 (software) pronto: **câmera real** por OpenCV (`AV_CAMERA_SOURCE`, também no modo simulado), **tela de Coleta** (`/coleta`) para fotografar, rotular, revisar e exportar o manifesto de treino, **região de inspeção (ROI) por produto** e **teste de concordância** entre dois revisores (`/concordancia`) — ver `docs/coleta.md`, `docs/manual-rotulagem.md` e ADRs 0015–0016. Faltam a câmera definitiva e os critérios A/B/C da equipe.
 

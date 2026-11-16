@@ -8,6 +8,7 @@ from amazonvision.config import RunMode, Settings
 from amazonvision.domain.quality import Grade
 from amazonvision.schemas.api import ModelInfo
 from amazonvision.simulation.scenario import PlannedItem
+from amazonvision.vision.anomaly_map import AnomalyRegion
 
 log = logging.getLogger("amazonvision.models")
 
@@ -20,6 +21,7 @@ class ClassifierError(Exception):
 class Prediction:
     scores: dict[Grade, float] | None  # None: image unusable
     latency_ms: float
+    anomaly_regions: tuple[AnomalyRegion, ...] | None = None
 
 
 class Classifier(Protocol):

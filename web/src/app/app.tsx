@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router";
+import { AppLayout } from "@/components/layout/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { startRealtime } from "@/lib/realtime/store";
 import { ColetaPage } from "@/pages/coleta";
@@ -18,17 +19,21 @@ const queryClient = new QueryClient({
 });
 
 const router = createBrowserRouter([
-  { index: true, element: <OperacaoPage /> },
-  { path: "feira", element: <FeiraPage /> },
-  { path: "historico", element: <HistoricoPage /> },
-  { path: "coleta", element: <ColetaPage /> },
-  { path: "concordancia", element: <ConcordanciaPage /> },
-  { path: "configuracao", element: <ConfiguracaoPage /> },
-  { path: "diagnostico", element: <DiagnosticoPage /> },
-  { path: "modelos", element: <ModelosPage /> },
-  { path: "*", element: <NaoEncontradaPage /> },
+  {
+    element: <AppLayout />,
+    children: [
+      { index: true, element: <OperacaoPage /> },
+      { path: "feira", element: <FeiraPage /> },
+      { path: "historico", element: <HistoricoPage /> },
+      { path: "coleta", element: <ColetaPage /> },
+      { path: "concordancia", element: <ConcordanciaPage /> },
+      { path: "configuracao", element: <ConfiguracaoPage /> },
+      { path: "diagnostico", element: <DiagnosticoPage /> },
+      { path: "modelos", element: <ModelosPage /> },
+      { path: "*", element: <NaoEncontradaPage /> },
+    ],
+  },
 ]);
-
 export function App() {
   useEffect(() => startRealtime(), []);
   return (

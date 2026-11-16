@@ -18,6 +18,13 @@ class MotorDriver {
   virtual bool supports_pwm() const = 0;
 };
 
+// PWM duty for a power percentage, for drivers with speed control. 0 means "not set" and gives
+// full power: TEST_MOTOR runs before any CONFIGURE, and CONFIGURE may omit motor_power_pct.
+inline uint32_t pwm_duty(uint8_t power_pct, uint32_t max_duty) {
+  if (power_pct == 0 || power_pct >= 100) return max_duty;
+  return static_cast<uint32_t>(power_pct) * max_duty / 100;
+}
+
 class Hal {
  public:
   virtual ~Hal() = default;

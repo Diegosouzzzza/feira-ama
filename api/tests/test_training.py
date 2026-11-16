@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pytest
@@ -163,14 +164,39 @@ def test_anomaly_model_learns_from_good_pieces_only(tmp_path: Path):
     assert {s.split for s in split if s.label is Grade.A} == {"train", "val", "test"}
 
     # Same output contract as any model: A/B/C scores summing to 1, B never predicted.
+    from datetime import UTC, datetime
+
     from PIL import Image
 
+    from amazonvision.camera.base import Frame
+
     sample = next(s for s in split if s.split == "test")
+    raw_bytes = (manifest.parent / sample.path).read_bytes()
     with Image.open(manifest.parent / sample.path) as raw:
         array = prepare_image(raw.convert("RGB"), package.preprocess)
-    scores = OnnxClassifier(package).classify_array(array)
+    classifier = OnnxClassifier(package)
+    scores, patch_map = classifier.classify_array_with_map(array)
     assert sum(scores.values()) == pytest.approx(1.0)
     assert scores[Grade.B] < 1e-9
+    assert patch_map is not None
+    assert patch_map.shape == (28, 28)
+    # The exported region map matches PyTorch on its own (not folded into the probabilities).
+    full_metrics = json.loads((package_dir / "metrics.json").read_text("utf-8"))
+    assert full_metrics["export_max_map_rel_diff"] < 1e-3
+
+    # Full Frame classification attaches normalized anomaly regions when anomalous patches appear.
+    pred = classifier.classify(
+        Frame(
+            data=raw_bytes,
+            media_type="image/png",
+            extension="png",
+            captured_at=datetime.now(UTC),
+            source="test",
+        )
+    )
+    assert pred.scores is not None
+    if pred.anomaly_regions is not None:
+        assert all(0.0 <= r.x <= 1.0 and 0.0 < r.width <= 1.0 for r in pred.anomaly_regions)
 
     report = (package_dir / "relatorio.md").read_text(encoding="utf-8")
     assert "detecção de anomalia" in report

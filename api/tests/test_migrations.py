@@ -132,6 +132,8 @@ def test_initial_profiles_are_seeded(db):
     rows = db.execute("SELECT id, name FROM product_profiles ORDER BY id").fetchall()
     assert [(r["id"], r["name"]) for r in rows] == [
         ("castanha", "Castanha-do-pará"),
+        ("pupunha", "Pupunha"),
+        ("tapereba", "Taperebá"),
         ("tucuma", "Tucumã"),
     ]
 
@@ -288,3 +290,64 @@ def test_empty_lot_summary_has_zeros(db):
     row = dict(db.execute("SELECT * FROM v_lot_summary WHERE lot_id = ?", (lot,)).fetchone())
     assert row["inspected"] == 0
     assert row["cycles_completed"] == 0
+
+
+def test_inspection_persists_anomaly_regions_roundtrip(db):
+    from amazonvision.domain.quality import AutoDecision, Grade
+    from amazonvision.storage.inspections import NewInspection, get_inspection, insert_inspection
+    from amazonvision.vision.anomaly_map import AnomalyRegion
+
+    lot = add_lot(db)
+    c1 = add_cycle(db, lot, 1, destination="REJECTED")
+    c2 = add_cycle(db, lot, 2, destination="APPROVED")
+    reg = AnomalyRegion(x=0.25, y=0.3, width=0.15, height=0.2, intensity=0.91)
+
+    saved = insert_inspection(
+        db,
+        NewInspection(
+            cycle_id=c1,
+            image_path="img/1.jpg",
+            image_sha256=SHA,
+            captured_at=NOW,
+            frame_age_ms=10.0,
+            model_id=None,
+            scores={Grade.A: 0.1, Grade.B: 0.0, Grade.C: 0.9},
+            predicted_grade=Grade.C,
+            confidence=0.9,
+            latency_ms=4.5,
+            policy_threshold=0.8,
+            policy_version="v1",
+            auto_decision=AutoDecision.REJECTED,
+            review_reason=None,
+            created_at=NOW,
+            anomaly_regions=(reg,),
+        ),
+    )
+    assert saved.anomaly_regions is not None
+    assert len(saved.anomaly_regions) == 1
+    assert saved.anomaly_regions[0].x == pytest.approx(0.25)
+    assert saved.anomaly_regions[0].intensity == pytest.approx(0.91)
+
+    plain = insert_inspection(
+        db,
+        NewInspection(
+            cycle_id=c2,
+            image_path="img/2.jpg",
+            image_sha256=SHA,
+            captured_at=NOW,
+            frame_age_ms=10.0,
+            model_id=None,
+            scores={Grade.A: 0.9, Grade.B: 0.05, Grade.C: 0.05},
+            predicted_grade=Grade.A,
+            confidence=0.9,
+            latency_ms=2.0,
+            policy_threshold=0.8,
+            policy_version="v1",
+            auto_decision=AutoDecision.APPROVED,
+            review_reason=None,
+            created_at=NOW,
+        ),
+    )
+    fetched = get_inspection(db, plain.id)
+    assert fetched is not None
+    assert fetched.anomaly_regions is None

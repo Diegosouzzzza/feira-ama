@@ -37,7 +37,11 @@ import { useLive } from "@/lib/realtime/store";
 import { nextPiece } from "@/lib/collection";
 import { cn } from "@/lib/utils";
 
-const GRADES: Grade[] = ["A", "B", "C"];
+const GRADES: Grade[] = ["A", "C"];
+const GRADE_CAPTION: Record<Extract<Grade, "A" | "C">, string> = {
+  A: "Aprovada (dentro do padrão)",
+  C: "Rejeitada (fora do padrão)",
+};
 const PAGE_SIZE = 24;
 const SETUP_KEY = "av-coleta";
 
@@ -125,7 +129,7 @@ function LiveView({ lastCapture }: { lastCapture: DatasetSampleOut | null }) {
 
   return (
     <section aria-label="Câmera" className="space-y-3">
-      <div className="relative aspect-video overflow-hidden rounded-lg bg-brand-deep">
+      <div className="relative aspect-video overflow-hidden rounded-lg bg-neutral-900">
         {failed ? (
           <div className="grid h-full place-items-center p-6 text-center text-white/75">
             <div className="space-y-2">
@@ -145,7 +149,7 @@ function LiveView({ lastCapture }: { lastCapture: DatasetSampleOut | null }) {
         )}
         {!failed && (
           <span className="absolute top-3 left-3 flex items-center gap-1.5 rounded-md bg-black/55 px-2 py-1 text-xs font-medium text-white">
-            <span className="size-2 animate-pulse rounded-full bg-signal-fault" aria-hidden />
+            <span className="size-2 animate-pulse rounded-full bg-red-500" aria-hidden />
             Ao vivo
           </span>
         )}
@@ -206,7 +210,7 @@ function CapturePanel({
     [busy, canCapture, validTags, setup, onCaptured],
   );
 
-  // Keyboard: 1/2/3 (or A/B/C) photograph with the class, 0 photographs to label later,
+  // Keyboard: 1/2 (or A/C) photograph with the class, 0 photographs to label later,
   // N moves to the next piece. Ignored while typing in a field.
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
@@ -214,7 +218,7 @@ function CapturePanel({
       if (event.ctrlKey || event.metaKey || event.altKey) return;
       if (target?.closest("input, textarea, select, [role=combobox], [role=dialog]")) return;
       const key = event.key.toLowerCase();
-      const grade = ({ "1": "A", a: "A", "2": "B", b: "B", "3": "C", c: "C" } as Record<string, Grade>)[key];
+      const grade = ({ "1": "A", a: "A", "2": "C", c: "C" } as Record<string, Grade>)[key];
       if (grade) {
         event.preventDefault();
         void capture(grade);
@@ -289,7 +293,7 @@ function CapturePanel({
 
       {blockedReason && <div className="rounded-md bg-muted p-3 text-sm">{blockedReason}</div>}
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         {GRADES.map((grade, i) => (
           <button
             key={grade}
@@ -304,7 +308,7 @@ function CapturePanel({
             )}
           >
             <span className="font-display text-5xl leading-none">{grade}</span>
-            <span className="text-sm font-medium">{GRADE[grade].meaning}</span>
+            <span className="text-sm font-medium">{GRADE_CAPTION[grade as "A" | "C"] ?? GRADE[grade].meaning}</span>
             <kbd className="rounded bg-black/20 px-1.5 text-xs">{i + 1}</kbd>
           </button>
         ))}

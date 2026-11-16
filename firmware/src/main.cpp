@@ -32,7 +32,8 @@ class BoardHal : public av::Hal {
   }
   bool read_s1() override { return active(AV_PIN_S1); }
   bool read_s2() override { return active(AV_PIN_S2); }
-  bool read_estop() override { return digitalRead(AV_PIN_ESTOP) == LOW; }
+  // Fail-safe NC contact (E12 NF 11-12 to GND): closed (normal) = LOW; open (pressed or broken wire) = HIGH.
+  bool read_estop() override { return digitalRead(AV_PIN_ESTOP) == HIGH; }
   av::MotorDriver& motor() override { return motor_; }
   void set_servo(uint8_t degrees) override {
     if (!servo_attached_) {
@@ -48,6 +49,8 @@ class BoardHal : public av::Hal {
  private:
 #if AV_MOTOR_DRIVER == 2
   Bts7960Motor motor_;
+#elif AV_MOTOR_DRIVER == 1
+  PwmMosfetMotor motor_{AV_PIN_MOTOR_EN};
 #else
   OnOffMotor motor_{AV_PIN_MOTOR_EN};
 #endif
@@ -86,25 +89,58 @@ void read_serial(uint32_t now) {
 
 void update_led(uint32_t now) {
   bool on;
+  bool led_r = false;
+  bool led_g = false;
+  bool led_y = false;
+  bool relay_k1 = false;
+  bool buzzer = false;
+
   switch (controller.state()) {
     case av::State::FAULT:
     case av::State::ESTOP:
       on = (now / 150) % 2;
+      led_r = true;
+      relay_k1 = false;  // Cut +12V_AT immediately on E-STOP or FAULT
+      buzzer = (now / 250) % 2;
       break;
     case av::State::DISARMED:
     case av::State::MAINTENANCE:
       on = (now / 700) % 2;
+      led_y = true;
+      relay_k1 = (controller.state() == av::State::MAINTENANCE) && !hal.read_estop();
       break;
     default:
       on = true;
+      led_g = true;
+      relay_k1 = !hal.read_estop();
+      break;
   }
   digitalWrite(AV_PIN_LED, on ? HIGH : LOW);
+  digitalWrite(AV_PIN_LED_R, led_r ? HIGH : LOW);
+  digitalWrite(AV_PIN_LED_G, led_g ? HIGH : LOW);
+  digitalWrite(AV_PIN_LED_Y, led_y ? HIGH : LOW);
+  digitalWrite(AV_PIN_RELAY_K1, relay_k1 ? HIGH : LOW);
+  digitalWrite(AV_PIN_BUZZER, buzzer ? HIGH : LOW);
 }
 
 }  // namespace
 
 void setup() {
+  // Safe boot initialization: drive all actuator/alarm outputs LOW before enabling OUTPUT drivers.
+  digitalWrite(AV_PIN_RELAY_K1, LOW);
+  digitalWrite(AV_PIN_BUZZER, LOW);
+  digitalWrite(AV_PIN_LED_R, LOW);
+  digitalWrite(AV_PIN_LED_G, LOW);
+  digitalWrite(AV_PIN_LED_Y, LOW);
+  digitalWrite(AV_PIN_LED, LOW);
+
+  pinMode(AV_PIN_RELAY_K1, OUTPUT);
+  pinMode(AV_PIN_BUZZER, OUTPUT);
+  pinMode(AV_PIN_LED_R, OUTPUT);
+  pinMode(AV_PIN_LED_G, OUTPUT);
+  pinMode(AV_PIN_LED_Y, OUTPUT);
   pinMode(AV_PIN_LED, OUTPUT);
+
   Serial.setRxBufferSize(2048);
   Serial.begin(AV_SERIAL_BAUD);
   hal.begin();

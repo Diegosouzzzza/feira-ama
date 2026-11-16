@@ -56,9 +56,9 @@ async def test_read_line_returns_what_the_port_sends():
     link = SerialLink("COM9", opener=lambda: port)
     await link.start()
     try:
-        port.push(b"hello\n")
+        port.push(b'{"a":1}\n')
         line = await asyncio.wait_for(link.read_line(), timeout=1)
-        assert line == b"hello\n"
+        assert line == b'{"a":1}\n'
     finally:
         await link.close()
 
@@ -111,11 +111,62 @@ async def test_reopening_the_same_link_object_works():
 
     await link.start()
     try:
-        ports[1].push(b"again\n")
+        ports[1].push(b'{"again":true}\n')
         line = await asyncio.wait_for(link.read_line(), timeout=1)
-        assert line == b"again\n"
+        assert line == b'{"again":true}\n'
     finally:
         await link.close()
+
+
+async def test_bootloader_noise_is_dropped_and_the_next_message_survives():
+    """Opening the port resets the ESP32: the ROM prints text at another baud rate first."""
+    port = FakeSerial()
+    link = SerialLink("COM9", opener=lambda: port)
+    await link.start()
+    try:
+        port.push(b"ets Jun  8 2016 00:22:57\r\n")
+        port.push(b"rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)\r\n")
+        port.push(b"\xff\xfe\x00\x8f\xc0\r\n")
+        port.push(b'"seq":4,"state":"DISARMED"}\n')  # tail of a line cut by the reset
+        port.push(b'{"protocol_version":1,"type":"hb"')  # head of a line cut by the reset
+        port.push(b'\x00\xf8\xe0{"protocol_version":1,"seq":1}\r\n')  # noise glued in front
+        line = await asyncio.wait_for(link.read_line(), timeout=1)
+        assert line == b'{"protocol_version":1,"seq":1}\n'
+        assert link.discarded == 5
+    finally:
+        await link.close()
+
+
+def test_port_is_opened_without_raising_dtr_and_rts(monkeypatch):
+    """DTR/RTS drive EN/GPIO0 on the DevKit: raising them at open reboots the board."""
+    seen: dict[str, object] = {}
+
+    class RecordingSerial:
+        def __init__(self) -> None:
+            self.port = None
+            self.baudrate = None
+            self.timeout = None
+            self.write_timeout = None
+            self.dtr = True
+            self.rts = True
+
+        def open(self) -> None:
+            seen.update(port=self.port, baud=self.baudrate, dtr=self.dtr, rts=self.rts)
+            seen["write_timeout"] = self.write_timeout
+
+        def reset_input_buffer(self) -> None:
+            seen["flushed"] = True
+
+    monkeypatch.setattr(serial_link.serial, "Serial", RecordingSerial)
+    serial_link.open_port("COM7", 115200)
+    assert seen == {
+        "port": "COM7",
+        "baud": 115200,
+        "dtr": False,
+        "rts": False,
+        "write_timeout": serial_link.WRITE_TIMEOUT_S,
+        "flushed": True,
+    }
 
 
 def test_list_ports_reports_device_description_and_hwid(monkeypatch):

@@ -14,7 +14,11 @@ import { GRADE } from "@/lib/labels";
 import { notifyError } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 
-const GRADES: Grade[] = ["A", "B", "C"];
+const GRADES: Grade[] = ["A", "C"];
+const GRADE_CAPTION: Record<Extract<Grade, "A" | "C">, string> = {
+  A: "Aprovada (dentro do padrão)",
+  C: "Rejeitada (fora do padrão)",
+};
 const SETUP_KEY = "av-concordancia";
 const TAG = /^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$/;
 const NAME = /^.{1,60}$/;
@@ -160,7 +164,7 @@ function Labeling({ setup }: { setup: Setup }) {
       <p className="text-center text-sm text-muted-foreground">
         Rotule pelo que você vê, sem olhar o rótulo da coleta. Ninguém vê sua resposta até o resumo.
       </p>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         {GRADES.map((grade) => (
           <button
             key={grade}
@@ -175,7 +179,7 @@ function Labeling({ setup }: { setup: Setup }) {
             )}
           >
             <span className="font-display text-5xl leading-none">{grade}</span>
-            <span className="text-sm font-medium">{GRADE[grade].meaning}</span>
+            <span className="text-sm font-medium">{GRADE_CAPTION[grade as "A" | "C"] ?? GRADE[grade].meaning}</span>
           </button>
         ))}
       </div>

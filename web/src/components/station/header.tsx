@@ -1,5 +1,4 @@
-import { Presentation } from "lucide-react";
-import { Link, NavLink } from "react-router";
+import { MobileNav } from "@/components/layout/sidebar";
 import type { SystemStatus } from "@/lib/api/types";
 import { formatTime } from "@/lib/format";
 import { MACHINE_STATE } from "@/lib/labels";
@@ -25,16 +24,6 @@ export function useProductName(productId: string | undefined): string | undefine
   return productId ? (products.data?.find((p) => p.id === productId)?.name ?? productId) : undefined;
 }
 
-const SCREENS = [
-  { to: "/", label: "Operação" },
-  { to: "/historico", label: "Histórico" },
-  { to: "/coleta", label: "Coleta" },
-  { to: "/concordancia", label: "Concordância" },
-  { to: "/modelos", label: "Modelos" },
-  { to: "/configuracao", label: "Configuração" },
-  { to: "/diagnostico", label: "Diagnóstico" },
-];
-
 /** Machine state in one place; the simulated bench is named here so it is never mistaken
  *  for the real one, without a second badge competing for attention. */
 function StateChip({ status }: { status: SystemStatus }) {
@@ -50,71 +39,35 @@ function StateChip({ status }: { status: SystemStatus }) {
           : "bg-signal-idle";
   const label = !machine.link.connected ? "Placa sem comunicação" : state ? MACHINE_STATE[state] : "Aguardando a placa";
   return (
-    <p className="flex shrink-0 items-center gap-2 rounded-md bg-white/8 px-3 py-1.5 text-sm whitespace-nowrap text-white">
+    <p className="flex shrink-0 items-center gap-2 rounded-md border px-3 py-1.5 text-sm whitespace-nowrap">
       <span className={cn("size-2.5 rounded-full", tone)} aria-hidden />
       <span className="font-medium">{label}</span>
-      {status.mode === "simulado" && (
-        <span className="border-l border-white/20 pl-2 text-signal-review">Simulada</span>
-      )}
+      {status.mode === "simulado" && <span className="border-l pl-2 text-review">Simulada</span>}
     </p>
   );
 }
 
+/** Thin top bar of every team screen: the open lot on the left, machine state on the right. */
 export function StationHeader({ status }: { status: SystemStatus | null }) {
   const lot = status?.active_lot;
   const product = useProductName(lot?.product_id);
   return (
-    <header className="bg-brand-deep text-white">
-      <div className="mx-auto flex max-w-[120rem] flex-wrap items-center gap-x-5 gap-y-2 px-4 pt-3 pb-2 sm:px-6 min-[1380px]:flex-nowrap min-[1380px]:pb-3">
-        <Brand />
-        <nav
-          aria-label="Telas"
-          className="order-last -mx-1 w-full overflow-x-auto min-[1380px]:order-none min-[1380px]:mx-0 min-[1380px]:w-auto min-[1380px]:overflow-visible"
-        >
-          <ul className="flex gap-0.5 px-1 min-[1380px]:px-0">
-            {SCREENS.map((item) => (
-              <li key={item.to} className="shrink-0">
-                <NavLink
-                  to={item.to}
-                  end
-                  className={({ isActive }) =>
-                    cn(
-                      "block rounded-md px-2.5 py-1.5 text-sm font-medium whitespace-nowrap",
-                      isActive ? "bg-white/15 text-white" : "text-white/70 hover:bg-white/10 hover:text-white",
-                    )
-                  }
-                >
-                  {item.label}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <div className="ml-auto flex min-w-0 items-center gap-3">
-          <div
-            className="min-w-0 text-right leading-tight max-sm:hidden"
-            title={lot ? `Lote ${lot.id}, aberto às ${formatTime(lot.started_at)} por ${lot.operator}` : undefined}
-          >
-            {lot ? (
-              <>
-                <p className="truncate font-semibold">{product}</p>
-                <p className="text-sm text-white/65">Lote {lot.id}</p>
-              </>
-            ) : (
-              <p className="text-sm text-white/65">Nenhum lote aberto</p>
-            )}
-          </div>
-          {status && <StateChip status={status} />}
-          <Link
-            to="/feira"
-            title="Abrir o modo feira"
-            className="flex shrink-0 items-center gap-2 rounded-md px-2.5 py-1.5 text-sm font-medium text-white ring-1 ring-white/25 hover:bg-white/10"
-          >
-            <Presentation className="size-4" aria-hidden />
-            <span className="max-2xl:sr-only">Modo feira</span>
-          </Link>
-        </div>
+    <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-3 border-b bg-background px-4 sm:px-6">
+      <MobileNav />
+      <div
+        className="min-w-0 flex-1 leading-tight"
+        title={lot ? `Lote ${lot.id}, aberto às ${formatTime(lot.started_at)} por ${lot.operator}` : undefined}
+      >
+        {lot ? (
+          <p className="flex min-w-0 items-baseline gap-2">
+            <span className="truncate font-semibold">{product}</span>
+            <span className="shrink-0 text-sm text-muted-foreground max-sm:hidden">Lote {lot.id}</span>
+          </p>
+        ) : (
+          <p className="text-sm text-muted-foreground">Nenhum lote aberto</p>
+        )}
       </div>
+      {status && <StateChip status={status} />}
     </header>
   );
 }

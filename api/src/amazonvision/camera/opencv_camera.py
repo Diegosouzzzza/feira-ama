@@ -1,4 +1,5 @@
-"""USB/UVC camera through OpenCV. A background thread keeps only the latest frame with its
+"""Camera through OpenCV: a USB/UVC device (or a phone's virtual webcam) by index, or a phone
+streaming over HTTP/RTSP by URL. A background thread keeps only the latest frame with its
 timestamp; captures wait for a frame newer than the request, never an old buffered one."""
 
 import asyncio
@@ -23,6 +24,22 @@ log = logging.getLogger("amazonvision.camera")
 
 STALE_AFTER = timedelta(seconds=2)
 REOPEN_DELAY_S = 1.0
+# Network streams: without these FFmpeg waits ~30 s (or forever) when the phone app dies, and
+# the reader thread would hang instead of reopening.
+STREAM_OPEN_TIMEOUT_MS = 5_000
+STREAM_READ_TIMEOUT_MS = 5_000
+
+ROTATIONS = {
+    90: cv2.ROTATE_90_CLOCKWISE,
+    180: cv2.ROTATE_180,
+    270: cv2.ROTATE_90_COUNTERCLOCKWISE,
+}
+
+
+def is_device_index(source: str) -> bool:
+    """ "0", "1"... is a local device (webcam, or DroidCam/Iriun virtual webcam); anything else
+    is a stream URL (http://, rtsp://) handled by FFmpeg."""
+    return source.strip().isdigit()
 
 
 class VideoSource(Protocol):
@@ -37,11 +54,22 @@ class VideoSource(Protocol):
 
 def open_device(source: str, width: int, height: int, exposure: float | None) -> VideoSource:
     """Open a camera index ("0") or a stream URL, with the settings that keep images stable."""
-    if source.isdigit():
-        backend = cv2.CAP_DSHOW if sys.platform == "win32" else cv2.CAP_ANY
-        capture = cv2.VideoCapture(int(source), backend)
-    else:
-        capture = cv2.VideoCapture(source)
+    if not is_device_index(source):
+        # A phone stream (IP Webcam, DroidCam over HTTP, RTSP): resolution, focus and white
+        # balance belong to the phone app. DirectShow properties mean nothing here and some
+        # make FFmpeg fail, so only the timeouts are set.
+        return cv2.VideoCapture(
+            source,
+            cv2.CAP_FFMPEG,
+            [
+                cv2.CAP_PROP_OPEN_TIMEOUT_MSEC,
+                STREAM_OPEN_TIMEOUT_MS,
+                cv2.CAP_PROP_READ_TIMEOUT_MSEC,
+                STREAM_READ_TIMEOUT_MS,
+            ],
+        )
+    backend = cv2.CAP_DSHOW if sys.platform == "win32" else cv2.CAP_ANY
+    capture = cv2.VideoCapture(int(source.strip()), backend)
     capture.set(cv2.CAP_PROP_FRAME_WIDTH, width)
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
     capture.set(cv2.CAP_PROP_BUFFERSIZE, 1)
@@ -63,10 +91,14 @@ class OpenCvCamera:
         width: int = 1280,
         height: int = 720,
         exposure: float | None = None,
+        rotate: int = 0,
         opener: Callable[[], VideoSource] | None = None,
         clock: Callable[[], datetime] = utc_now,
     ) -> None:
+        if rotate not in (0, *ROTATIONS):
+            raise ValueError(f"rotação inválida: {rotate} (use 0, 90, 180 ou 270)")
         self.source = source
+        self._rotation = ROTATIONS.get(rotate)
         self._opener = opener or (lambda: open_device(source, width, height, exposure))
         self._clock = clock
         self._lock = threading.Lock()
@@ -74,7 +106,13 @@ class OpenCvCamera:
         self._frame_at: datetime | None = None
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
-        self.settings = {"source": source, "width": width, "height": height, "exposure": exposure}
+        self.settings = {
+            "source": source,
+            "width": width,
+            "height": height,
+            "exposure": exposure,
+            "rotate": rotate,
+        }
 
     # ------------------------------------------------------------ lifecycle
 
@@ -112,6 +150,9 @@ class OpenCvCamera:
                 capture = None
                 self._stop.wait(REOPEN_DELAY_S)
                 continue
+            if self._rotation is not None:
+                # Done once here, so inspection photos, the dataset and the live view agree.
+                image = cv2.rotate(image, self._rotation)
             with self._lock:
                 self._frame = image
                 self._frame_at = self._clock()

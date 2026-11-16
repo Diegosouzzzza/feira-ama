@@ -10,7 +10,7 @@ from amazonvision.schemas.errors import ApiError, ErrorCode
 router = APIRouter(prefix="/camera", tags=["câmera"])
 
 BOUNDARY = "avframe"
-PREVIEW_FPS = 5
+PREVIEW_FPS = 15
 
 
 @router.get("/snapshot", responses={200: {"content": {"image/jpeg": {}}}})

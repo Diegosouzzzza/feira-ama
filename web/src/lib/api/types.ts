@@ -17,6 +17,7 @@ export type LotOut = Schemas["LotOut"];
 export type LotSummary = Schemas["LotSummary"];
 export type LotCreate = Schemas["LotCreate"];
 export type CycleOut = Schemas["CycleOut"];
+export type AnomalyRegionOut = Schemas["AnomalyRegionOut"];
 export type InspectionOut = Schemas["InspectionOut"];
 export type InspectionPage = Schemas["InspectionPage"];
 export type ReviewOut = Schemas["ReviewOut"];

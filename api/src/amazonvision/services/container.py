@@ -110,6 +110,7 @@ class Services:
                 width=settings.camera_width,
                 height=settings.camera_height,
                 exposure=settings.camera_exposure,
+                rotate=settings.camera_rotate,
             )
         if settings.mode is RunMode.SIMULADO:
             scenario = Scenario(settings.sim_seed)

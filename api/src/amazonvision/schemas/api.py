@@ -169,6 +169,14 @@ class DecidedBy(StrEnum):
     OPERATOR = "operator"
 
 
+class AnomalyRegionOut(BaseModel):
+    x: float = Field(ge=0.0, le=1.0)
+    y: float = Field(ge=0.0, le=1.0)
+    width: float = Field(gt=0.0, le=1.0)
+    height: float = Field(gt=0.0, le=1.0)
+    intensity: float = Field(ge=0.0, le=1.0)
+
+
 class InspectionOut(BaseModel):
     id: DbId
     cycle_id: DbId
@@ -186,6 +194,7 @@ class InspectionOut(BaseModel):
     final_decision: Destination | None
     decided_by: DecidedBy | None
     cycle_status: CycleStatus
+    anomaly_regions: list[AnomalyRegionOut] | None = None
 
 
 class InspectionOutcome(StrEnum):
@@ -428,6 +437,27 @@ class SerialPortOut(BaseModel):
     description: str | None
     hwid: str | None
     in_use: bool = Field(description="É a porta que a bancada está usando agora")
+
+
+class CameraDeviceOut(BaseModel):
+    index: int = Field(description="Índice do OpenCV: o valor a usar em AV_CAMERA_SOURCE")
+    available: bool = Field(description="Abriu e entregou imagem")
+    width: int | None
+    height: int | None
+    in_use: bool = Field(description="É a câmera que a bancada está usando agora")
+    snapshot_url: str | None = Field(
+        description="Foto do que esta câmera está vendo, para reconhecer qual é qual"
+    )
+
+
+class CameraDiagnostics(BaseModel):
+    configured_source: str | None = Field(description="AV_CAMERA_SOURCE em uso")
+    source_kind: Literal["index", "stream", "none"]
+    rotate: int = Field(description="AV_CAMERA_ROTATE em uso (graus, sentido horário)")
+    capture_timeout_s: float
+    camera: CameraInfo
+    devices: list[CameraDeviceOut]
+    guide: list[str] = Field(description="Como ligar o celular e qual valor configurar")
 
 
 # ---------------------------------------------------------------- product configuration

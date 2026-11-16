@@ -199,6 +199,8 @@ def write_anomaly_report(path: Path, manifest: dict[str, Any], metrics: dict[str
         f"| Latência da inferência (p50 / p95) | {_ms(test['latency_ms']['p50'])} / "
         f"{_ms(test['latency_ms']['p95'])} |",
         f"| Diferença máxima PyTorch × ONNX | {metrics['export_max_prob_diff']:.2e} |",
+        "| Diferença máxima do mapa de regiões (fração da amplitude) | "
+        f"{metrics.get('export_max_map_rel_diff', 0.0):.2e} |",
         "",
         f"Distância no teste: peças boas com mediana {_num(distances['test_good']['median'])} "
         f"e máxima {_num(distances['test_good']['max'])}.",

@@ -1,0 +1,2360 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Banners AmazonVision 4.0 — Sistema Multifrutos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #070d09;
+      --bg-card: #0e1711;
+      --fg: #f1ede4;
+      --fg-muted: #95a396;
+      --accent: #e5b33d;
+      --accent-glow: rgba(229, 179, 61, 0.35);
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.3);
+      --border: #1f3325;
+      --border-highlight: #2e4d38;
+      --display: 'Space Grotesk', 'Outfit', sans-serif;
+      --body: 'DM Sans', sans-serif;
+      --tucuma: #f97316;
+      --acai: #7e22ce;
+      --castanha: #b45309;
+      --cupuacu: #854d0e;
+    }
+
+    [data-theme="light"] {
+      --bg: #f2f5f1;
+      --bg-card: #ffffff;
+      --fg: #132219;
+      --fg-muted: #526356;
+      --accent: #b3821a;
+      --accent-glow: rgba(179, 130, 26, 0.2);
+      --emerald: #059669;
+      --emerald-glow: rgba(5, 150, 105, 0.2);
+      --border: #d2ddd4;
+      --border-highlight: #b0c4b5;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--body);
+      min-height: 100vh;
+      padding: 1.5rem 1rem 3rem;
+      transition: background 0.3s ease, color 0.3s ease;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.8rem 1.4rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .nav-link {
+      color: var(--fg-muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 0.4rem 0.85rem;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--fg);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--border);
+    }
+
+    .nav-link.active {
+      color: var(--accent);
+      background: rgba(229, 179, 61, 0.12);
+      border-color: rgba(229, 179, 61, 0.3);
+    }
+
+    /* Header */
+    .top-header {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.8rem 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .brand-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+      font-family: var(--display);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(229, 179, 61, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(229, 179, 61, 0.3);
+    }
+
+    .badge.emerald {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--emerald);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .badge.purple {
+      background: rgba(168, 85, 247, 0.12);
+      color: #c084fc;
+      border-color: rgba(168, 85, 247, 0.3);
+    }
+
+    .top-header h1 {
+      font-family: var(--display);
+      font-size: clamp(1.6rem, 3vw, 2.3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+
+    .top-header h1 span {
+      background: linear-gradient(135deg, #ffd768 0%, #f59e0b 50%, #10b981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .top-header p {
+      color: var(--fg-muted);
+      font-size: 0.92rem;
+      max-width: 680px;
+    }
+
+    /* Interactive Control Bar */
+    .toolbar {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1rem 1.4rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .tool-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .tool-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--fg-muted);
+      margin-right: 0.3rem;
+    }
+
+    .btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--fg);
+      padding: 0.45rem 0.9rem;
+      border-radius: 10px;
+      font-family: var(--body);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--border-highlight);
+      transform: translateY(-1px);
+    }
+
+    .btn.active {
+      background: var(--accent);
+      color: #070d09;
+      border-color: var(--accent);
+      box-shadow: 0 4px 14px var(--accent-glow);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, #e5b33d, #c2881b);
+      color: #080f0a;
+      border: none;
+      font-weight: 700;
+      box-shadow: 0 4px 18px var(--accent-glow);
+    }
+
+    .btn.primary:hover {
+      filter: brightness(1.1);
+      transform: translateY(-2px);
+    }
+
+    .btn svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    /* Main Showcase Stage */
+    .stage-wrapper {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 1060px) {
+      .stage-wrapper {
+        grid-template-columns: 1.55fr 1fr;
+      }
+    }
+
+    .banner-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+    }
+
+    .card-topbar {
+      padding: 0.9rem 1.4rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .card-title {
+      font-family: var(--display);
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .canvas-viewport {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #020704;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #mainCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
+    }
+
+    /* Mockup View Overlay */
+    .mockup-container {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: #080d0a;
+      z-index: 10;
+    }
+
+    .mockup-container.active {
+      display: block;
+    }
+
+    #mockupCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Sidebar / Specs Panel */
+    .specs-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      height: fit-content;
+    }
+
+    .section-title {
+      font-family: var(--display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: var(--fg);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.65rem;
+    }
+
+    .fruit-chips {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.6rem;
+    }
+
+    .fruit-chip {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .fruit-chip:hover, .fruit-chip.active {
+      background: rgba(229, 179, 61, 0.08);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .fruit-chip-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .fruit-chip-info h4 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin: 0;
+      font-family: var(--display);
+    }
+
+    .fruit-chip-info span {
+      font-size: 0.72rem;
+      color: var(--fg-muted);
+      display: block;
+    }
+
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .feature-item {
+      display: flex;
+      gap: 0.8rem;
+      align-items: flex-start;
+      padding: 0.6rem 0.8rem;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .feature-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(229, 179, 61, 0.15);
+      color: var(--accent);
+      display: grid;
+      place-items: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .feature-text h5 {
+      font-size: 0.83rem;
+      font-weight: 700;
+      margin-bottom: 0.15rem;
+    }
+
+    .feature-text p {
+      font-size: 0.75rem;
+      color: var(--fg-muted);
+      line-height: 1.4;
+    }
+
+    .tech-specs-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+
+    .tech-specs-table td {
+      padding: 0.45rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .tech-specs-table td:first-child {
+      color: var(--fg-muted);
+    }
+
+    .tech-specs-table td:last-child {
+      text-align: right;
+      font-weight: 600;
+      color: var(--fg);
+    }
+
+    /* Print and High-Res Notice */
+    .print-tip {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 12px;
+      padding: 0.8rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-size: 0.8rem;
+      color: #a7f3d0;
+    }
+
+    .print-tip svg {
+      width: 22px;
+      height: 22px;
+      color: var(--emerald);
+      flex-shrink: 0;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      color: var(--fg-muted);
+      font-size: 0.82rem;
+      padding: 1.5rem 0 0.5rem;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #0f2416;
+      border: 1px solid var(--emerald);
+      color: #d1fae5;
+      padding: 0.7rem 1.4rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- Navigation between pieces -->
+    <nav class="nav-bar">
+      <div style="font-family: var(--display); font-weight: 700; font-size: 0.95rem; color: var(--accent);">
+        AmazonVision 4.0 · Material Visual
+      </div>
+      <div class="nav-links">
+        <a href="banner-ideias.html" class="nav-link active">Backdrop 2,5×2,5m (Estande)</a>
+        <a href="infografico-blueprint.html" class="nav-link">Infográfico 01: Blueprint FUCAPI</a>
+        <a href="infografico-jornada.html" class="nav-link">Infográfico 02: A Jornada Inteligente</a>
+      </div>
+    </nav>
+
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="brand-group">
+        <div class="tag-row">
+          <span class="badge">Backdrop 2,5 × 2,5 m</span>
+          <span class="badge emerald">Multifrutos & Bioeconomia</span>
+          <span class="badge purple">Feira Tecnológica 2026</span>
+        </div>
+        <h1>AmazonVision <span>4.0</span> — Banner Conceitual</h1>
+        <p>Visão computacional e inteligência artificial aplicada à classificação de múltiplas frutas e produtos da bioeconomia amazônica: Tucumã, Castanha-do-Pará, Açaí, Cupuaçu e Frutos Tropicais.</p>
+      </div>
+
+      <div class="tool-group">
+        <button class="btn primary" id="btnExportHighRes" title="Gera imagem PNG nítida em 3000 x 3000 px para gráfica">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exportar 3000×3000 (Gráfica)
+        </button>
+      </div>
+    </header>
+
+    <!-- Toolbar: Theme & Feature Toggles -->
+    <div class="toolbar">
+      <div class="tool-group">
+        <span class="tool-label">Tema Visual:</span>
+        <button class="btn active" data-theme-val="dourado" id="themeGold">🌟 Horizonte Ouro</button>
+        <button class="btn" data-theme-val="esmeralda" id="themeEmerald">🍃 Cyber Esmeralda</button>
+        <button class="btn" data-theme-val="sunset" id="themeSunset">🌅 Sunset Amazônia</button>
+      </div>
+
+      <div class="tool-group">
+        <span class="tool-label">Elementos:</span>
+        <button class="btn active" id="btnToggleHud" title="Mostra os contornos de detecção de IA e tags de classe">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
+          Camada IA (HUD)
+        </button>
+        <button class="btn active" id="btnToggleAnimation" title="Partículas de vaga-lumes e pulso de scan ao vivo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Animação
+        </button>
+        <button class="btn" id="btnToggleMockup" title="Visualiza como o banner fica montado na estrutura do estande">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg>
+          Ver no Estande 3D
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <div class="stage-wrapper">
+
+      <!-- Banner Canvas Viewport -->
+      <div class="banner-card">
+        <div class="card-topbar">
+          <div class="card-title">
+            <span style="color: var(--accent);">●</span>
+            <span id="canvasTitle">Banner 2.5m × 2.5m — Composição Multifrutos</span>
+          </div>
+          <div class="tool-group">
+            <button class="btn" id="btnResetView" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;">Reiniciar Vista</button>
+            <button class="btn" id="btnFullscreen" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;">Tela Cheia</button>
+          </div>
+        </div>
+
+        <div class="canvas-viewport" id="viewport">
+          <canvas id="mainCanvas" width="1500" height="1500"></canvas>
+          
+          <!-- Mockup Booth Simulation -->
+          <div class="mockup-container" id="mockupContainer">
+            <canvas id="mockupCanvas" width="1500" height="1500"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Specs & Fruit Highlights Sidebar -->
+      <div class="specs-card">
+        <div class="section-title">
+          <span>🥭</span> Frutos Analisados pelo Sistema
+        </div>
+
+        <p style="font-size: 0.82rem; color: var(--fg-muted);">
+          Diferente da versão anterior que continha apenas castanhas, o <strong>AmazonVision 4.0</strong> possui modelos treinados para inspecionar e segregar os principais frutos da bioeconomia:
+        </p>
+
+        <div class="fruit-chips">
+          <div class="fruit-chip active" data-fruit="all" id="chipAll">
+            <div class="fruit-chip-icon" style="background: rgba(229,179,61,0.15); color: #fbbf24;">🌴</div>
+            <div class="fruit-chip-info">
+              <h4>Todos</h4>
+              <span>Visão integrada</span>
+            </div>
+          </div>
+
+          <div class="fruit-chip" data-fruit="tucuma" id="chipTucuma">
+            <div class="fruit-chip-icon" style="background: rgba(249,115,22,0.15); color: #fb923c;">🍊</div>
+            <div class="fruit-chip-info">
+              <h4>Tucumã</h4>
+              <span>Polpa, casca & caroço</span>
+            </div>
+          </div>
+
+          <div class="fruit-chip" data-fruit="acai" id="chipAcai">
+            <div class="fruit-chip-icon" style="background: rgba(168,85,247,0.15); color: #c084fc;">🫐</div>
+            <div class="fruit-chip-info">
+              <h4>Açaí</h4>
+              <span>Maturação & bagas</span>
+            </div>
+          </div>
+
+          <div class="fruit-chip" data-fruit="castanha" id="chipCastanha">
+            <div class="fruit-chip-icon" style="background: rgba(217,119,6,0.15); color: #f59e0b;">🌰</div>
+            <div class="fruit-chip-info">
+              <h4>Castanha</h4>
+              <span>Amêndoa com/sem casca</span>
+            </div>
+          </div>
+
+          <div class="fruit-chip" data-fruit="cupuacu" id="chipCupuacu">
+            <div class="fruit-chip-icon" style="background: rgba(146,64,14,0.15); color: #d97706;">🍈</div>
+            <div class="fruit-chip-info">
+              <h4>Cupuaçu</h4>
+              <span>Casca aveludada & padrão</span>
+            </div>
+          </div>
+
+          <div class="fruit-chip" data-fruit="tropical" id="chipTropical">
+            <div class="fruit-chip-icon" style="background: rgba(16,185,129,0.15); color: #34d399;">🥑</div>
+            <div class="fruit-chip-info">
+              <h4>Tropicais</h4>
+              <span>Pupunha, manga, etc.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top: 0.5rem;">
+          <span>⚡</span> Destaques Decorativos & Tecnológicos
+        </div>
+
+        <div class="feature-list">
+          <div class="feature-item">
+            <div class="feature-icon">IA</div>
+            <div class="feature-text">
+              <h5>Rede Neural Convolucional</h5>
+              <p>Reconhecimento de padrões biométricos em tempo real (&lt;120ms por fruto).</p>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">ABC</div>
+            <div class="feature-text">
+              <h5>Classificação em 3 Níveis</h5>
+              <p>Classe A (Padrão ouro), Classe B (Defeito visual leve) e Classe C (Refugo).</p>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">🌿</div>
+            <div class="feature-text">
+              <h5>Arte Botânica Amazônica</h5>
+              <p>Ilustrações estilizadas de folhas de Costela-de-Adão, palmeiras e circuitos luminosos.</p>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">⚡</div>
+            <div class="feature-text">
+              <h5>Processamento em Borda (Edge)</h5>
+              <p>Inferência rápida e autônoma (&lt;120ms) integrada diretamente à esteira mecânica.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="print-tip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          <div>
+            <strong>Pronto para Impressão Gráfica:</strong><br>
+            A proporção 1:1 é calibrada para lona ou tecido 2,5m × 2,5m com alta densidade de detalhes.
+          </div>
+        </div>
+
+        <table class="tech-specs-table">
+          <tr><td>Proporção do Backdrop</td><td>2,50 × 2,50 metros (1:1)</td></tr>
+          <tr><td>Resolução de Renderização</td><td>1500 × 1500 px (Tela) / 3000 × 3000 px (Export)</td></tr>
+          <tr><td>Aplicação</td><td>Fundo de estande · Feira Tecnológica 2026</td></tr>
+          <tr><td>Identidade Visual</td><td>Horizonte Dourado & Bioeconomia 4.0</td></tr>
+        </table>
+      </div>
+
+    </div>
+
+    <footer>
+      AmazonVision 4.0 · Feira Tecnológica 2026 · Manaus - AM
+    </footer>
+  </div>
+
+  <div class="toast" id="toastMessage">Imagem de alta resolução exportada com sucesso!</div>
+
+  <script>
+  (function(){
+    // =========================================================================
+    // CANVAS ENGINE & SETUP
+    // =========================================================================
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+    const mockupCanvas = document.getElementById('mockupCanvas');
+    const mockupCtx = mockupCanvas.getContext('2d');
+    const mockupContainer = document.getElementById('mockupContainer');
+
+    const W = 1500;
+    const H = 1500;
+    canvas.width = W;
+    canvas.height = H;
+    mockupCanvas.width = W;
+    mockupCanvas.height = H;
+
+    // State
+    let currentTheme = 'dourado'; // 'dourado', 'esmeralda', 'sunset'
+    let showHud = true;
+    let isAnimated = true;
+    let fruitFilter = 'all'; // 'all', 'tucuma', 'acai', 'castanha', 'cupuacu', 'tropical'
+    let isMockupView = false;
+    let animationFrameId = null;
+    let animTime = 0;
+
+    // Deterministic pseudo-random seed
+    let seed = 42;
+    function srand() {
+      seed = (seed * 16807 + 0) % 2147483647;
+      return (seed - 1) / 2147483646;
+    }
+
+    // Pre-calculated stars & fireflies
+    const stars = [];
+    seed = 101;
+    for (let i = 0; i < 220; i++) {
+      stars.push({
+        x: srand() * W,
+        y: srand() * 650,
+        r: 0.5 + srand() * 1.8,
+        alpha: 0.15 + srand() * 0.7,
+        blinkSpeed: 1 + srand() * 3
+      });
+    }
+
+    const fireflies = [];
+    seed = 888;
+    for (let i = 0; i < 90; i++) {
+      fireflies.push({
+        x: srand() * W,
+        y: 120 + srand() * (H - 240),
+        baseX: 0,
+        baseY: 0,
+        r: 1.5 + srand() * 3.5,
+        alpha: 0.2 + srand() * 0.8,
+        freq: 0.5 + srand() * 1.5,
+        phase: srand() * Math.PI * 2,
+        speedX: (srand() - 0.5) * 1.2,
+        speedY: (srand() - 0.5) * 0.8
+      });
+    }
+    fireflies.forEach(f => { f.baseX = f.x; f.baseY = f.y; });
+
+    // Neural nodes
+    const neuralNodes = [];
+    seed = 333;
+    for (let i = 0; i < 65; i++) {
+      neuralNodes.push({
+        x: 80 + srand() * (W - 160),
+        y: 60 + srand() * 540,
+        r: 1.5 + srand() * 2
+      });
+    }
+
+    // =========================================================================
+    // COLOR PALETTES PER THEME
+    // =========================================================================
+    const palettes = {
+      dourado: {
+        bgTop: '#020904',
+        bgMid1: '#05140b',
+        bgMid2: '#081c10',
+        bgBot: '#030a05',
+        glowTitle: 'rgba(230, 184, 75, 0.08)',
+        glowCenter: 'rgba(230, 184, 75, 0.05)',
+        gold: '#f0c660',
+        goldBright: '#ffd875',
+        goldDim: '#997d3a',
+        goldDark: '#4a3a14',
+        emerald: '#10b981',
+        emeraldDim: '#064e3b',
+        neuralLine: 'rgba(230, 184, 75, 0.12)',
+        laserColor: 'rgba(230, 184, 75, 0.45)',
+        hudBox: '#e6b84b',
+        hudBg: 'rgba(10, 20, 14, 0.75)',
+        leafColor1: '#0d2818',
+        leafColor2: '#163b24',
+        treeLayer1: '#040d07',
+        treeLayer2: '#07160c'
+      },
+      esmeralda: {
+        bgTop: '#010e08',
+        bgMid1: '#041c12',
+        bgMid2: '#072e1e',
+        bgBot: '#021009',
+        glowTitle: 'rgba(16, 185, 129, 0.12)',
+        glowCenter: 'rgba(5, 150, 105, 0.08)',
+        gold: '#10b981',
+        goldBright: '#34d399',
+        goldDim: '#059669',
+        goldDark: '#064e3b',
+        emerald: '#00f0a8',
+        emeraldDim: '#047857',
+        neuralLine: 'rgba(16, 185, 129, 0.18)',
+        laserColor: 'rgba(0, 240, 168, 0.55)',
+        hudBox: '#00f0a8',
+        hudBg: 'rgba(4, 25, 17, 0.8)',
+        leafColor1: '#073320',
+        leafColor2: '#0d4a30',
+        treeLayer1: '#02140b',
+        treeLayer2: '#052214'
+      },
+      sunset: {
+        bgTop: '#100508',
+        bgMid1: '#1e0c12',
+        bgMid2: '#2b140f',
+        bgBot: '#0a0305',
+        glowTitle: 'rgba(249, 115, 22, 0.14)',
+        glowCenter: 'rgba(245, 158, 11, 0.09)',
+        gold: '#fb923c',
+        goldBright: '#fed7aa',
+        goldDim: '#c2410c',
+        goldDark: '#7c2d12',
+        emerald: '#fbbf24',
+        emeraldDim: '#9a3412',
+        neuralLine: 'rgba(249, 115, 22, 0.18)',
+        laserColor: 'rgba(251, 146, 60, 0.55)',
+        hudBox: '#f97316',
+        hudBg: 'rgba(30, 12, 10, 0.8)',
+        leafColor1: '#26120e',
+        leafColor2: '#3d1d16',
+        treeLayer1: '#14070a',
+        treeLayer2: '#220b10'
+      }
+    };
+
+    // =========================================================================
+    // MAIN RENDER FUNCTION
+    // =========================================================================
+    function renderBanner(targetCtx, targetW, targetH, t) {
+      const p = palettes[currentTheme];
+      const scale = targetW / 1500;
+
+      targetCtx.save();
+      targetCtx.scale(scale, scale);
+
+      // 1. Deep Atmospheric Gradient Background
+      const bgGrad = targetCtx.createLinearGradient(0, 0, 0, 1500);
+      bgGrad.addColorStop(0, p.bgTop);
+      bgGrad.addColorStop(0.25, p.bgMid1);
+      bgGrad.addColorStop(0.5, p.bgMid2);
+      bgGrad.addColorStop(0.78, p.bgMid1);
+      bgGrad.addColorStop(1, p.bgBot);
+      targetCtx.fillStyle = bgGrad;
+      targetCtx.fillRect(0, 0, 1500, 1500);
+
+      // Radial Glows
+      const titleGlow = targetCtx.createRadialGradient(750, 310, 20, 750, 310, 650);
+      titleGlow.addColorStop(0, p.glowTitle);
+      titleGlow.addColorStop(1, 'transparent');
+      targetCtx.fillStyle = titleGlow;
+      targetCtx.fillRect(0, 0, 1500, 800);
+
+      const fruitGlow = targetCtx.createRadialGradient(750, 780, 50, 750, 780, 600);
+      fruitGlow.addColorStop(0, p.glowCenter);
+      fruitGlow.addColorStop(1, 'transparent');
+      targetCtx.fillStyle = fruitGlow;
+      targetCtx.fillRect(0, 400, 1500, 800);
+
+      // 2. Night Sky Stars
+      stars.forEach(st => {
+        const pulse = Math.sin(t * st.blinkSpeed + st.x);
+        targetCtx.beginPath();
+        targetCtx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
+        targetCtx.fillStyle = '#ffffff';
+        targetCtx.globalAlpha = Math.max(0.08, st.alpha + pulse * 0.2);
+        targetCtx.fill();
+      });
+      targetCtx.globalAlpha = 1;
+
+      // 3. Subtle Neural Network in the Upper Atmosphere
+      drawNeuralWeb(targetCtx, p, t);
+
+      // 4. Amazonian Canopy Tree Silhouettes
+      drawTreeSilhouettes(targetCtx, p);
+
+      // 5. Tropical Botanical Leaves (Framing the composition)
+      drawLushFoliage(targetCtx, p);
+
+      // 6. Header Typography & Branding
+      drawBannerHeader(targetCtx, p);
+
+      // 7. Multi-Fruit Botanical & Visual AI Showcase
+      drawFruitsShowcase(targetCtx, p, t);
+
+      // 8. Computer Vision AI HUD & Scanning Layer
+      if (showHud) {
+        drawAiHudLayer(targetCtx, p, t);
+      }
+
+      // 9. 5 Capability Badges (Deep Learning, Multifrutos, etc.)
+      drawCapabilityBadges(targetCtx, p);
+
+      // 10. Technical Metrics & Project Slogan
+      drawFooterAndSpecs(targetCtx, p);
+
+      // 11. Bioluminescent Fireflies
+      drawFireflies(targetCtx, p, t);
+
+      targetCtx.restore();
+    }
+
+    // =========================================================================
+    // PROCEDURAL DRAWING MODULES
+    // =========================================================================
+
+    // --- Neural Web ---
+    function drawNeuralWeb(c, p, t) {
+      c.save();
+      for (let i = 0; i < neuralNodes.length; i++) {
+        for (let j = i + 1; j < neuralNodes.length; j++) {
+          const n1 = neuralNodes[i];
+          const n2 = neuralNodes[j];
+          const dist = Math.hypot(n2.x - n1.x, n2.y - n1.y);
+          if (dist < 135) {
+            c.beginPath();
+            c.moveTo(n1.x, n1.y);
+            c.lineTo(n2.x, n2.y);
+            c.strokeStyle = p.neuralLine;
+            c.lineWidth = 0.8;
+            c.globalAlpha = (1 - dist / 135) * 0.45;
+            c.stroke();
+          }
+        }
+      }
+
+      neuralNodes.forEach((n, idx) => {
+        const pulse = Math.sin(t * 2 + idx);
+        c.beginPath();
+        c.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+        c.fillStyle = p.gold;
+        c.globalAlpha = 0.25 + pulse * 0.15;
+        c.fill();
+      });
+      c.restore();
+    }
+
+    // --- Tree Silhouettes ---
+    function drawTreeSilhouettes(c, p) {
+      const baseY = 610;
+
+      // Far canopy
+      c.beginPath();
+      c.moveTo(0, baseY + 60);
+      for (let x = 0; x <= 1500; x += 4) {
+        const h = 85 + Math.sin(x * 0.008 + 1) * 45 + Math.sin(x * 0.025 + 3) * 25 + Math.sin(x * 0.07) * 15;
+        const spike = Math.sin(x * 0.05 + 0.3) > 0.35 ? Math.sin(x * 0.05 + 0.3) * 55 : 0;
+        c.lineTo(x, baseY - h - spike);
+      }
+      c.lineTo(1500, baseY + 60);
+      c.closePath();
+      c.fillStyle = p.treeLayer1;
+      c.globalAlpha = 0.55;
+      c.fill();
+
+      // Near detailed canopy with Sumaúma crowns and palm tops
+      const nearPts = [];
+      c.beginPath();
+      c.moveTo(0, baseY + 80);
+      for (let x = 0; x <= 1500; x += 3) {
+        const h = 50 + Math.sin(x * 0.012) * 35 + Math.sin(x * 0.04) * 22 + Math.sin(x * 0.11) * 12;
+        const palmSpike = Math.sin(x * 0.09) > 0.4 ? Math.sin(x * 0.09) * 40 : 0;
+        const y = baseY - h - palmSpike;
+        nearPts.push([x, y]);
+        c.lineTo(x, y);
+      }
+      c.lineTo(1500, baseY + 80);
+      c.closePath();
+      c.fillStyle = p.treeLayer2;
+      c.globalAlpha = 0.85;
+      c.fill();
+
+      // Shimmer gold edge along treetop line
+      c.beginPath();
+      nearPts.forEach(([x, y], i) => {
+        if (i === 0) c.moveTo(x, y);
+        else c.lineTo(x, y);
+      });
+      c.strokeStyle = p.gold;
+      c.lineWidth = 1.8;
+      c.globalAlpha = 0.16;
+      c.stroke();
+      c.globalAlpha = 1;
+    }
+
+    // --- Tropical Foliage (Monstera, Palmeiras, Folhas Largas) ---
+    function drawLushFoliage(c, p) {
+      // Large decorative Monstera (Costela-de-Adão) on left bottom
+      drawMonsteraLeaf(c, 90, 1340, 140, -0.4, p.leafColor1, p.gold, 0.4);
+      drawMonsteraLeaf(c, 190, 1420, 110, -0.15, p.leafColor2, p.emerald, 0.35);
+      drawPalmFrond(c, 0, 1180, 160, 0.45, p.leafColor1, p.gold, 0.3);
+
+      // Right bottom foliage
+      drawMonsteraLeaf(c, 1410, 1350, 135, 0.4, p.leafColor1, p.gold, 0.4);
+      drawMonsteraLeaf(c, 1310, 1430, 115, 0.18, p.leafColor2, p.emerald, 0.35);
+      drawPalmFrond(c, 1500, 1200, 160, -0.45, p.leafColor1, p.gold, 0.3);
+
+      // Mid-side climbing leaves
+      drawBroadLeaf(c, 45, 930, 75, -0.85, p.leafColor1, p.gold, 0.25);
+      drawBroadLeaf(c, 1455, 910, 80, 0.8, p.leafColor1, p.gold, 0.25);
+    }
+
+    function drawMonsteraLeaf(c, cx, cy, size, angle, fillColor, veinColor, alpha) {
+      c.save();
+      c.translate(cx, cy);
+      c.rotate(angle);
+      c.globalAlpha = alpha;
+
+      // Base heart shape
+      c.beginPath();
+      c.moveTo(0, -size);
+      c.bezierCurveTo(size * 0.85, -size * 0.65, size * 0.95, size * 0.4, 0, size * 1.05);
+      c.bezierCurveTo(-size * 0.95, size * 0.4, -size * 0.85, -size * 0.65, 0, -size);
+      c.fillStyle = fillColor;
+      c.fill();
+
+      // Main center vein
+      c.beginPath();
+      c.moveTo(0, -size * 0.92);
+      c.lineTo(0, size * 0.95);
+      c.strokeStyle = veinColor;
+      c.lineWidth = 2.2;
+      c.globalAlpha = alpha * 0.7;
+      c.stroke();
+
+      // Fenestrations / cuts
+      c.strokeStyle = veinColor;
+      c.lineWidth = 1;
+      for (let s = -1; s <= 1; s += 2) {
+        for (let i = 0; i < 4; i++) {
+          const t = 0.2 + i * 0.2;
+          const yStart = -size * 0.6 + i * (size * 0.38);
+          c.beginPath();
+          c.moveTo(0, yStart);
+          c.quadraticCurveTo(s * size * 0.4, yStart + size * 0.1, s * size * 0.72, yStart - size * 0.05);
+          c.stroke();
+        }
+      }
+
+      c.restore();
+    }
+
+    function drawPalmFrond(c, cx, cy, length, angle, leafColor, veinColor, alpha) {
+      c.save();
+      c.translate(cx, cy);
+      c.rotate(angle);
+      c.globalAlpha = alpha;
+
+      // Stem
+      c.beginPath();
+      c.moveTo(0, 0);
+      c.quadraticCurveTo(length * 0.3, -length * 0.2, length, -length * 0.4);
+      c.strokeStyle = veinColor;
+      c.lineWidth = 2.5;
+      c.stroke();
+
+      // Pinnae (leaflets)
+      const leaflets = 18;
+      for (let i = 2; i < leaflets; i++) {
+        const t = i / leaflets;
+        const px = length * t;
+        const py = -length * 0.4 * (t * t);
+        const lLen = 35 + Math.sin(t * Math.PI) * 55;
+
+        c.beginPath();
+        c.moveTo(px, py);
+        c.lineTo(px - 15, py - lLen);
+        c.strokeStyle = leafColor;
+        c.lineWidth = 3.5;
+        c.stroke();
+      }
+
+      c.restore();
+    }
+
+    function drawBroadLeaf(c, cx, cy, size, angle, color, veinColor, alpha) {
+      c.save();
+      c.translate(cx, cy);
+      c.rotate(angle);
+      c.globalAlpha = alpha;
+
+      c.beginPath();
+      c.moveTo(0, -size);
+      c.bezierCurveTo(size * 0.6, -size * 0.4, size * 0.6, size * 0.4, 0, size);
+      c.bezierCurveTo(-size * 0.6, size * 0.4, -size * 0.6, -size * 0.4, 0, -size);
+      c.fillStyle = color;
+      c.fill();
+
+      c.beginPath();
+      c.moveTo(0, -size * 0.9);
+      c.lineTo(0, size * 0.9);
+      c.strokeStyle = veinColor;
+      c.lineWidth = 1.6;
+      c.stroke();
+
+      c.restore();
+    }
+
+    // --- Header & Typography ---
+    function drawBannerHeader(c, p) {
+      c.save();
+      c.textAlign = 'center';
+
+      // 1. Top Event & Domain Bar
+      c.font = '600 20px "Space Grotesk", sans-serif';
+      c.fillStyle = p.gold;
+      c.globalAlpha = 0.85;
+      c.letterSpacing = '0.12em';
+      c.fillText('FEIRA TECNOLÓGICA 2026 | BIOECONOMIA AMAZÔNICA', 750, 105);
+
+      // Thin decorative dividing bar with central diamond
+      c.beginPath();
+      c.moveTo(350, 125);
+      c.lineTo(710, 125);
+      c.moveTo(790, 125);
+      c.lineTo(1150, 125);
+      c.strokeStyle = p.gold;
+      c.lineWidth = 1;
+      c.globalAlpha = 0.3;
+      c.stroke();
+
+      c.fillStyle = p.gold;
+      c.globalAlpha = 0.7;
+      c.beginPath();
+      c.arc(750, 125, 3.5, 0, Math.PI * 2);
+      c.fill();
+
+      // 2. High-Tech Tagline
+      c.font = '600 24px "Space Grotesk", sans-serif';
+      c.fillStyle = p.emerald;
+      c.globalAlpha = 0.9;
+      c.fillText('SISTEMA INTELIGENTE DE INSPEÇÃO MULTIFRUTOS', 750, 168);
+
+      // 3. MASTER TITLE: AMAZONVISION
+      c.font = '800 170px "Space Grotesk", sans-serif';
+      
+      // Shadow / ambient glow for master title
+      c.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      c.fillText('AMAZON', 750, 314);
+      c.fillText('VISION', 750, 464);
+
+      // Crisp white fill
+      c.fillStyle = '#ffffff';
+      c.globalAlpha = 0.96;
+      c.fillText('AMAZON', 750, 310);
+      c.fillText('VISION', 750, 460);
+
+      // Subtle gold gradient sheen on VISION
+      const visGrad = c.createLinearGradient(300, 400, 1200, 460);
+      visGrad.addColorStop(0, '#ffffff');
+      visGrad.addColorStop(0.5, p.goldBright);
+      visGrad.addColorStop(1, '#ffffff');
+      c.fillStyle = visGrad;
+      c.fillText('VISION', 750, 460);
+
+      // 4. Version & Standard Badge
+      const badgeY = 490;
+      const bw = 240, bh = 46;
+      c.beginPath();
+      c.roundRect(750 - bw/2, badgeY, bw, bh, 23);
+      c.fillStyle = 'rgba(10, 22, 14, 0.7)';
+      c.fill();
+      c.strokeStyle = p.gold;
+      c.lineWidth = 1.8;
+      c.globalAlpha = 0.6;
+      c.stroke();
+
+      c.font = '700 20px "Space Grotesk", sans-serif';
+      c.fillStyle = p.goldBright;
+      c.globalAlpha = 1;
+      c.fillText('VERSÃO 4.0 · 2026', 750, badgeY + 30);
+
+      // 5. Scientific / Innovation Subtitle
+      c.font = '500 23px "DM Sans", sans-serif';
+      c.fillStyle = '#c7d7cc';
+      c.globalAlpha = 0.75;
+      c.fillText('Visão Computacional & Triagem Automatizada para a Bioeconomia Amazônica', 750, 580);
+
+      c.restore();
+    }
+
+    // =========================================================================
+    // MULTI-FRUIT BOTANICAL & AI INSPECTION SHOWCASE
+    // =========================================================================
+    function drawFruitsShowcase(c, p, t) {
+      c.save();
+
+      // Fruit positions across the mid-horizontal band (y: ~730 - 870)
+      // 1. TUCUMÃ (Left-center prominence)
+      // 2. AÇAÍ (Cluster on right-center)
+      // 3. CASTANHA-DO-PARÁ (Center-bottom anchor)
+      // 4. CUPUAÇU (Far-left anchor)
+      // 5. PUPUNHA / FRUTOS TROPICAIS (Far-right anchor)
+
+      const isFiltered = (name) => fruitFilter === 'all' || fruitFilter === name;
+
+      // 1. Cupuaçu (Far Left, x: 230, y: 790)
+      if (isFiltered('cupuacu')) {
+        drawCupuacu(c, 235, 785, 80, 0.15, fruitFilter === 'cupuacu' ? 1.0 : 0.95);
+      }
+
+      // 2. Tucumã (Left-Mid, x: 500, y: 770)
+      if (isFiltered('tucuma')) {
+        drawTucumaPair(c, 505, 775, 82, fruitFilter === 'tucuma' ? 1.0 : 0.95);
+      }
+
+      // 3. Castanha-do-Pará (Center, x: 750, y: 820)
+      if (isFiltered('castanha')) {
+        drawCastanhaEnsemble(c, 750, 810, 78, fruitFilter === 'castanha' ? 1.0 : 0.95);
+      }
+
+      // 4. Açaí Cluster (Right-Mid, x: 1005, y: 770)
+      if (isFiltered('acai')) {
+        drawAcaiBunch(c, 1005, 770, 85, fruitFilter === 'acai' ? 1.0 : 0.95);
+      }
+
+      // 5. Pupunha / Tropicais (Far Right, x: 1265, y: 790)
+      if (isFiltered('tropical')) {
+        drawPupunhaCluster(c, 1265, 785, 75, fruitFilter === 'tropical' ? 1.0 : 0.95);
+      }
+
+      c.restore();
+    }
+
+    // --- Specific Fruit Renderers ---
+
+    // Tucumã: One whole + one cut half revealing golden pulp & seed
+    function drawTucumaPair(c, cx, cy, size, alpha) {
+      c.save();
+      c.translate(cx, cy);
+      c.globalAlpha = alpha;
+
+      // --- Whole Tucumã (Left back) ---
+      c.save();
+      c.translate(-size * 0.45, -size * 0.1);
+      c.rotate(-0.25);
+
+      // Outer sphere
+      const wholeGrad = c.createRadialGradient(-size * 0.15, -size * 0.2, 5, 0, 0, size * 0.65);
+      wholeGrad.addColorStop(0, '#fde047');
+      wholeGrad.addColorStop(0.35, '#f97316');
+      wholeGrad.addColorStop(0.75, '#ea580c');
+      wholeGrad.addColorStop(1, '#7c2d12');
+      c.beginPath();
+      c.ellipse(0, 0, size * 0.52, size * 0.62, 0, 0, Math.PI * 2);
+      c.fillStyle = wholeGrad;
+      c.fill();
+      c.strokeStyle = 'rgba(255, 237, 213, 0.4)';
+      c.lineWidth = 1.2;
+      c.stroke();
+
+      // Calyx / Stem button
+      c.beginPath();
+      c.arc(0, -size * 0.58, size * 0.12, 0, Math.PI * 2);
+      c.fillStyle = '#372717';
+      c.fill();
+
+      // Glossy highlight
+      c.beginPath();
+      c.ellipse(-size * 0.18, -size * 0.22, size * 0.1, size * 0.24, -0.3, 0, Math.PI * 2);
+      c.fillStyle = 'rgba(255, 255, 255, 0.35)';
+      c.fill();
+      c.restore();
+
+      // --- Sliced Tucumã (Front right) ---
+      c.save();
+      c.translate(size * 0.38, size * 0.15);
+      c.rotate(0.15);
+
+      // Outer thin orange skin rim
+      c.beginPath();
+      c.ellipse(0, 0, size * 0.58, size * 0.66, 0, 0, Math.PI * 2);
+      c.fillStyle = '#ea580c';
+      c.fill();
+
+      // Brilliant yellow/gold edible pulp
+      const pulpGrad = c.createRadialGradient(0, 0, size * 0.2, 0, 0, size * 0.55);
+      pulpGrad.addColorStop(0, '#fef08a');
+      pulpGrad.addColorStop(0.4, '#f59e0b');
+      pulpGrad.addColorStop(0.95, '#d97706');
+      pulpGrad.addColorStop(1, '#9a3412');
+      c.beginPath();
+      c.ellipse(0, 0, size * 0.53, size * 0.61, 0, 0, Math.PI * 2);
+      c.fillStyle = pulpGrad;
+      c.fill();
+
+      // Pulp texture radial lines
+      c.strokeStyle = 'rgba(154, 52, 18, 0.25)';
+      c.lineWidth = 1;
+      for (let a = 0; a < Math.PI * 2; a += Math.PI / 8) {
+        c.beginPath();
+        c.moveTo(Math.cos(a) * size * 0.28, Math.sin(a) * size * 0.32);
+        c.lineTo(Math.cos(a) * size * 0.48, Math.sin(a) * size * 0.55);
+        c.stroke();
+      }
+
+      // Hard dark seed (endocarpo)
+      const seedGrad = c.createRadialGradient(-size * 0.05, -size * 0.05, 2, 0, 0, size * 0.26);
+      seedGrad.addColorStop(0, '#422006');
+      seedGrad.addColorStop(0.8, '#1c1917');
+      seedGrad.addColorStop(1, '#0c0a09');
+      c.beginPath();
+      c.ellipse(0, 0, size * 0.26, size * 0.3, 0, 0, Math.PI * 2);
+      c.fillStyle = seedGrad;
+      c.fill();
+
+      // Seed core fiber dot
+      c.beginPath();
+      c.arc(0, 0, size * 0.06, 0, Math.PI * 2);
+      c.fillStyle = '#78350f';
+      c.fill();
+
+      c.restore();
+
+      c.restore();
+    }
+
+    // Açaí: Natural cluster of deep purple berries with authentic bloom
+    function drawAcaiBunch(c, cx, cy, size, alpha) {
+      c.save();
+      c.translate(cx, cy);
+      c.globalAlpha = alpha;
+
+      // Stem spray (ráquis)
+      c.strokeStyle = '#4d7c0f';
+      c.lineWidth = 2.5;
+      c.beginPath();
+      c.moveTo(0, -size * 0.85);
+      c.quadraticCurveTo(size * 0.1, -size * 0.4, 0, 0);
+      c.stroke();
+
+      // Berry coordinates in cluster
+      const berryPositions = [
+        [-size * 0.38, -size * 0.35, 17],
+        [size * 0.28, -size * 0.42, 19],
+        [-size * 0.15, -size * 0.15, 22],
+        [size * 0.35, -size * 0.1, 20],
+        [-size * 0.42, size * 0.12, 19],
+        [0, size * 0.08, 24], // central front
+        [size * 0.4, size * 0.18, 18],
+        [-size * 0.2, size * 0.38, 20],
+        [size * 0.18, size * 0.35, 21],
+        [-size * 0.02, size * 0.62, 18],
+        [size * 0.32, size * 0.52, 16],
+      ];
+
+      // Stems to berries
+      c.strokeStyle = '#365314';
+      c.lineWidth = 1.4;
+      berryPositions.forEach(([bx, by]) => {
+        c.beginPath();
+        c.moveTo(0, -size * 0.1);
+        c.lineTo(bx, by);
+        c.stroke();
+      });
+
+      // Draw berries
+      berryPositions.forEach(([bx, by, br]) => {
+        const berryGrad = c.createRadialGradient(bx - br * 0.35, by - br * 0.35, br * 0.15, bx, by, br);
+        berryGrad.addColorStop(0, '#581c87'); // deep purple highlight
+        berryGrad.addColorStop(0.4, '#3b0764');
+        berryGrad.addColorStop(0.85, '#1e082b'); // dark indigo
+        berryGrad.addColorStop(1, '#09030d');
+
+        c.beginPath();
+        c.arc(bx, by, br, 0, Math.PI * 2);
+        c.fillStyle = berryGrad;
+        c.fill();
+
+        // Velvety bloom (pale lilac sheen characteristic of fresh açaí)
+        c.beginPath();
+        c.ellipse(bx - br * 0.25, by - br * 0.25, br * 0.55, br * 0.35, -0.4, 0, Math.PI * 2);
+        c.fillStyle = 'rgba(216, 180, 254, 0.22)';
+        c.fill();
+
+        // Tiny apical scar / button
+        c.beginPath();
+        c.arc(bx + br * 0.15, by + br * 0.15, 2, 0, Math.PI * 2);
+        c.fillStyle = '#65a30d';
+        c.fill();
+      });
+
+      c.restore();
+    }
+
+    // Castanha-do-Pará: Sculpted almond kernel + woody pod shell fragment
+    function drawCastanhaEnsemble(c, cx, cy, size, alpha) {
+      c.save();
+      c.translate(cx, cy);
+      c.globalAlpha = alpha;
+
+      // 1. Pod shell fragment (Ouriço) in background
+      c.save();
+      c.translate(-size * 0.35, size * 0.2);
+      c.rotate(-0.35);
+      c.beginPath();
+      c.arc(0, 0, size * 0.6, Math.PI * 0.7, Math.PI * 1.9);
+      c.quadraticCurveTo(0, 0, Math.cos(Math.PI * 0.7) * size * 0.6, Math.sin(Math.PI * 0.7) * size * 0.6);
+      c.fillStyle = '#27170b';
+      c.fill();
+      c.strokeStyle = '#78350f';
+      c.lineWidth = 3;
+      c.stroke();
+      c.restore();
+
+      // 2. Large central Brazil nut almond (Peeled kernel)
+      c.save();
+      c.translate(size * 0.1, 0);
+      c.rotate(0.28);
+
+      // Curved crescent triangular almond shape
+      c.beginPath();
+      c.moveTo(0, -size * 0.75);
+      c.bezierCurveTo(size * 0.65, -size * 0.4, size * 0.7, size * 0.45, 0, size * 0.82);
+      c.bezierCurveTo(-size * 0.25, size * 0.4, -size * 0.25, -size * 0.4, 0, -size * 0.75);
+
+      const almondGrad = c.createLinearGradient(-size * 0.2, -size * 0.5, size * 0.5, size * 0.5);
+      almondGrad.addColorStop(0, '#fef3c7');
+      almondGrad.addColorStop(0.3, '#fae8b6');
+      almondGrad.addColorStop(0.7, '#d4b483');
+      almondGrad.addColorStop(1, '#854d0e');
+      c.fillStyle = almondGrad;
+      c.fill();
+
+      // Ridge shadow along the crescent facet
+      c.beginPath();
+      c.moveTo(0, -size * 0.7);
+      c.quadraticCurveTo(size * 0.15, 0, 0, size * 0.75);
+      c.strokeStyle = '#a16207';
+      c.lineWidth = 2.5;
+      c.stroke();
+
+      // Golden contour
+      c.strokeStyle = 'rgba(245, 158, 11, 0.4)';
+      c.lineWidth = 1.5;
+      c.stroke();
+
+      c.restore();
+
+      // 3. Second almond with fibrous shell
+      c.save();
+      c.translate(-size * 0.25, -size * 0.25);
+      c.rotate(-0.55);
+      c.beginPath();
+      c.ellipse(0, 0, size * 0.22, size * 0.5, 0, 0, Math.PI * 2);
+      c.fillStyle = '#451a03';
+      c.fill();
+      c.strokeStyle = '#b45309';
+      c.lineWidth = 1.8;
+      c.stroke();
+
+      // Inner almond highlight
+      c.beginPath();
+      c.ellipse(-size * 0.05, 0, size * 0.08, size * 0.35, 0, 0, Math.PI * 2);
+      c.fillStyle = '#fde68a';
+      c.globalAlpha = 0.85;
+      c.fill();
+      c.restore();
+
+      c.restore();
+    }
+
+    // Cupuaçu: Large elongated pod with signature velvety cocoa-brown fuzzy rind
+    function drawCupuacu(c, cx, cy, size, angle, alpha) {
+      c.save();
+      c.translate(cx, cy);
+      c.rotate(angle);
+      c.globalAlpha = alpha;
+
+      // Elongated rounded pod
+      const podGrad = c.createRadialGradient(-size * 0.2, -size * 0.25, size * 0.1, 0, 0, size * 0.85);
+      podGrad.addColorStop(0, '#92400e');
+      podGrad.addColorStop(0.35, '#78350f');
+      podGrad.addColorStop(0.75, '#54280b');
+      podGrad.addColorStop(1, '#2e1205');
+
+      c.beginPath();
+      c.roundRect(-size * 0.5, -size * 0.85, size, size * 1.6, size * 0.48);
+      c.fillStyle = podGrad;
+      c.fill();
+      c.strokeStyle = 'rgba(217, 119, 6, 0.35)';
+      c.lineWidth = 1.8;
+      c.stroke();
+
+      // Fuzzy velvety stippling texture
+      c.fillStyle = '#b45309';
+      c.globalAlpha = alpha * 0.25;
+      for (let i = 0; i < 35; i++) {
+        const tx = (Math.sin(i * 17) * 0.38) * size;
+        const ty = (Math.cos(i * 29) * 0.7) * size;
+        c.beginPath();
+        c.arc(tx, ty, 1.2, 0, Math.PI * 2);
+        c.fill();
+      }
+      c.globalAlpha = alpha;
+
+      // Woody stem on top
+      c.beginPath();
+      c.roundRect(-size * 0.1, -size * 0.98, size * 0.2, size * 0.18, 4);
+      c.fillStyle = '#291406';
+      c.fill();
+      c.strokeStyle = '#78350f';
+      c.stroke();
+
+      // Soft light reflection
+      c.beginPath();
+      c.ellipse(-size * 0.15, -size * 0.2, size * 0.12, size * 0.5, -0.15, 0, Math.PI * 2);
+      c.fillStyle = 'rgba(251, 191, 36, 0.12)';
+      c.fill();
+
+      c.restore();
+    }
+
+    // Pupunha / Frutas Tropicais (Conical clusters of red-orange-gold fruit)
+    function drawPupunhaCluster(c, cx, cy, size, alpha) {
+      c.save();
+      c.translate(cx, cy);
+      c.globalAlpha = alpha;
+
+      // Group of heart-shaped pupunha fruits
+      const fruits = [
+        [-size * 0.3, -size * 0.3, 0.8, -0.2],
+        [size * 0.3, -size * 0.35, 0.85, 0.25],
+        [0, size * 0.05, 1.0, 0.05],
+        [-size * 0.28, size * 0.4, 0.75, -0.3],
+        [size * 0.25, size * 0.42, 0.78, 0.2]
+      ];
+
+      fruits.forEach(([fx, fy, s, rot]) => {
+        c.save();
+        c.translate(fx, fy);
+        c.rotate(rot);
+        const fSize = size * 0.42 * s;
+
+        const pupGrad = c.createRadialGradient(-fSize * 0.2, -fSize * 0.3, 2, 0, 0, fSize);
+        pupGrad.addColorStop(0, '#fde047');
+        pupGrad.addColorStop(0.3, '#f97316');
+        pupGrad.addColorStop(0.7, '#dc2626');
+        pupGrad.addColorStop(1, '#7f1d1d');
+
+        c.beginPath();
+        c.moveTo(0, -fSize);
+        c.bezierCurveTo(fSize * 0.85, -fSize * 0.6, fSize * 0.7, fSize * 0.7, 0, fSize * 0.95);
+        c.bezierCurveTo(-fSize * 0.7, fSize * 0.7, -fSize * 0.85, -fSize * 0.6, 0, -fSize);
+        c.fillStyle = pupGrad;
+        c.fill();
+        c.strokeStyle = 'rgba(254, 202, 202, 0.35)';
+        c.lineWidth = 1;
+        c.stroke();
+
+        // Top green calyx
+        c.beginPath();
+        c.arc(0, -fSize * 0.95, fSize * 0.2, 0, Math.PI * 2);
+        c.fillStyle = '#15803d';
+        c.fill();
+
+        c.restore();
+      });
+
+      c.restore();
+    }
+
+    // =========================================================================
+    // COMPUTER VISION AI HUD & SCANNING RETICLES
+    // =========================================================================
+    function drawAiHudLayer(c, p, t) {
+      c.save();
+
+      // Scanning laser bar sweeping horizontally across inspection band
+      const laserCycle = (Math.sin(t * 1.5) + 1) / 2; // 0 to 1
+      const laserX = 140 + laserCycle * (1500 - 280);
+
+      // Vertical scanner line with soft glow gradient
+      const laserGrad = c.createLinearGradient(laserX - 30, 0, laserX + 30, 0);
+      laserGrad.addColorStop(0, 'transparent');
+      laserGrad.addColorStop(0.5, p.laserColor);
+      laserGrad.addColorStop(1, 'transparent');
+      c.fillStyle = laserGrad;
+      c.fillRect(laserX - 30, 640, 60, 310);
+
+      c.beginPath();
+      c.moveTo(laserX, 640);
+      c.lineTo(laserX, 950);
+      c.strokeStyle = '#ffffff';
+      c.lineWidth = 1.5;
+      c.globalAlpha = 0.75;
+      c.stroke();
+      c.globalAlpha = 1;
+
+      // Multi-fruit Bounding Boxes with Labels & Quality Confidence
+      const targets = [
+        {
+          x: 140, y: 690, w: 190, h: 200,
+          name: 'CUPUAÇU',
+          conf: '97.8%',
+          cls: 'CLASSE A · CONFORME',
+          filterKey: 'cupuacu'
+        },
+        {
+          x: 400, y: 670, w: 215, h: 220,
+          name: 'TUCUMÃ',
+          conf: '99.4%',
+          cls: 'CLASSE A · PADRÃO OURO',
+          filterKey: 'tucuma'
+        },
+        {
+          x: 645, y: 700, w: 210, h: 210,
+          name: 'CASTANHA-DO-PARÁ',
+          conf: '98.9%',
+          cls: 'CLASSE A · ÍNTEGRA',
+          filterKey: 'castanha'
+        },
+        {
+          x: 900, y: 660, w: 215, h: 220,
+          name: 'AÇAÍ (CACHO)',
+          conf: '99.1%',
+          cls: 'CLASSE A · MADURO',
+          filterKey: 'acai'
+        },
+        {
+          x: 1165, y: 690, w: 200, h: 200,
+          name: 'FRUTOS TROPICAIS',
+          conf: '98.2%',
+          cls: 'CLASSE A · PADRÃO',
+          filterKey: 'tropical'
+        }
+      ];
+
+      targets.forEach(tgt => {
+        if (fruitFilter !== 'all' && fruitFilter !== tgt.filterKey) return;
+
+        // Draw futuristic bounding box
+        drawHudBox(c, tgt.x, tgt.y, tgt.w, tgt.h, tgt.name, tgt.conf, tgt.cls, p);
+      });
+
+      // Ambient Optical Crosshairs in Upper Corners of Inspection Zone
+      drawCrosshair(c, 100, 670, p.gold);
+      drawCrosshair(c, 1400, 670, p.gold);
+
+      c.restore();
+    }
+
+    function drawHudBox(c, x, y, w, h, title, conf, classLabel, p) {
+      c.save();
+
+      // Corner bracket length
+      const corner = 22;
+
+      // Dark glass background
+      c.fillStyle = p.hudBg;
+      c.fillRect(x, y, w, h);
+
+      // Thin perimeter line
+      c.strokeStyle = p.hudBox;
+      c.lineWidth = 1;
+      c.globalAlpha = 0.35;
+      c.strokeRect(x, y, w, h);
+
+      // Strong glowing corners
+      c.strokeStyle = p.hudBox;
+      c.lineWidth = 2.8;
+      c.globalAlpha = 0.95;
+
+      // Top-Left
+      c.beginPath();
+      c.moveTo(x, y + corner); c.lineTo(x, y); c.lineTo(x + corner, y);
+      c.stroke();
+      // Top-Right
+      c.beginPath();
+      c.moveTo(x + w - corner, y); c.lineTo(x + w, y); c.lineTo(x + w, y + corner);
+      c.stroke();
+      // Bottom-Left
+      c.beginPath();
+      c.moveTo(x, y + h - corner); c.lineTo(x, y + h); c.lineTo(x + corner, y + h);
+      c.stroke();
+      // Bottom-Right
+      c.beginPath();
+      c.moveTo(x + w - corner, y + h); c.lineTo(x + w, y + h); c.lineTo(x + w, y + h - corner);
+      c.stroke();
+
+      // Top Header Pill: [NOME: 99.4%]
+      const pillH = 26;
+      c.fillStyle = p.hudBox;
+      c.fillRect(x, y - pillH, w, pillH);
+
+      c.font = '700 13px "Space Grotesk", sans-serif';
+      c.fillStyle = '#060d08';
+      c.textAlign = 'left';
+      c.fillText(`[IA] ${title}`, x + 8, y - 8);
+
+      c.textAlign = 'right';
+      c.fillText(conf, x + w - 8, y - 8);
+
+      // Bottom Class Tag
+      c.fillStyle = 'rgba(16, 185, 129, 0.2)';
+      c.fillRect(x + 1, y + h - 22, w - 2, 21);
+
+      c.font = '600 11px "Space Grotesk", sans-serif';
+      c.fillStyle = p.emerald;
+      c.textAlign = 'center';
+      c.fillText(classLabel, x + w / 2, y + h - 7);
+
+      c.restore();
+    }
+
+    function drawCrosshair(c, cx, cy, color) {
+      c.save();
+      c.strokeStyle = color;
+      c.lineWidth = 1.2;
+      c.globalAlpha = 0.4;
+
+      c.beginPath();
+      c.arc(cx, cy, 14, 0, Math.PI * 2);
+      c.stroke();
+
+      c.beginPath();
+      c.moveTo(cx - 20, cy); c.lineTo(cx + 20, cy);
+      c.moveTo(cx, cy - 20); c.lineTo(cx, cy + 20);
+      c.stroke();
+
+      c.restore();
+    }
+
+    // =========================================================================
+    // 5 CAPABILITY BADGES (BELOW FRUITS)
+    // =========================================================================
+    function drawCapabilityBadges(c, p) {
+      c.save();
+
+      const badges = [
+        { label: 'Deep Learning', sub: 'Visão Convolucional', icon: 'brain' },
+        { label: 'Multifrutos', sub: 'Bioeconomia Total', icon: 'fruit' },
+        { label: 'Padrão A / B / C', sub: 'Classificação Ativa', icon: 'target' },
+        { label: 'Bancada ESP32', sub: 'Triagem Mecânica', icon: 'gear' },
+        { label: 'Telemetria & Nuvem', sub: 'Rastreio de Lote', icon: 'cloud' }
+      ];
+
+      const badgeY = 1045;
+      const spacing = 1500 / (badges.length + 1);
+      const radius = 54;
+
+      badges.forEach((b, i) => {
+        const bx = spacing * (i + 1);
+
+        // Ambient radial glow
+        const glow = c.createRadialGradient(bx, badgeY, 15, bx, badgeY, radius * 1.8);
+        glow.addColorStop(0, p.glowCenter);
+        glow.addColorStop(1, 'transparent');
+        c.fillStyle = glow;
+        c.beginPath();
+        c.arc(bx, badgeY, radius * 1.8, 0, Math.PI * 2);
+        c.fill();
+
+        // Outer circular border
+        c.beginPath();
+        c.arc(bx, badgeY, radius, 0, Math.PI * 2);
+        c.strokeStyle = p.gold;
+        c.lineWidth = 2.2;
+        c.globalAlpha = 0.65;
+        c.stroke();
+
+        // Dark filled glass
+        c.beginPath();
+        c.arc(bx, badgeY, radius - 2, 0, Math.PI * 2);
+        c.fillStyle = 'rgba(10, 22, 14, 0.8)';
+        c.fill();
+        c.globalAlpha = 1;
+
+        // Custom Vector Glyph
+        drawBadgeGlyph(c, bx, badgeY, radius * 0.65, b.icon, p);
+
+        // Badge Titles
+        c.textAlign = 'center';
+        c.font = '700 20px "Space Grotesk", sans-serif';
+        c.fillStyle = p.goldBright;
+        c.fillText(b.label, bx, badgeY + radius + 32);
+
+        c.font = '500 15px "DM Sans", sans-serif';
+        c.fillStyle = '#a6b8ad';
+        c.fillText(b.sub, bx, badgeY + radius + 54);
+      });
+
+      c.restore();
+    }
+
+    function drawBadgeGlyph(c, cx, cy, s, type, p) {
+      c.save();
+      c.strokeStyle = p.gold;
+      c.fillStyle = p.gold;
+      c.lineWidth = 2.2;
+      c.lineCap = 'round';
+      c.lineJoin = 'round';
+
+      if (type === 'brain') {
+        // Dual hemisphere brain with neural nodes
+        c.beginPath();
+        c.arc(cx - s*0.22, cy - s*0.1, s*0.38, Math.PI*0.5, Math.PI*1.95);
+        c.stroke();
+        c.beginPath();
+        c.arc(cx + s*0.22, cy - s*0.1, s*0.38, Math.PI*1.05, Math.PI*0.5);
+        c.stroke();
+        c.beginPath();
+        c.moveTo(cx, cy - s*0.48); c.lineTo(cx, cy + s*0.32);
+        c.stroke();
+
+        [[-s*0.25, -s*0.15], [s*0.25, -s*0.15], [0, s*0.15]].forEach(([dx, dy]) => {
+          c.beginPath();
+          c.arc(cx + dx, cy + dy, 3, 0, Math.PI * 2);
+          c.fill();
+        });
+      } else if (type === 'fruit') {
+        // Multi-fruit emblem (stylized leaf + tropical berry circle)
+        c.beginPath();
+        c.arc(cx, cy + s*0.08, s*0.35, 0, Math.PI * 2);
+        c.stroke();
+
+        c.beginPath();
+        c.moveTo(cx, cy - s*0.25);
+        c.quadraticCurveTo(cx + s*0.4, cy - s*0.45, cx + s*0.3, cy - s*0.15);
+        c.quadraticCurveTo(cx + s*0.15, cy - s*0.25, cx, cy - s*0.25);
+        c.fill();
+
+        // 3 decorative dots inside
+        c.beginPath();
+        c.arc(cx - s*0.1, cy + s*0.05, 3, 0, Math.PI * 2);
+        c.arc(cx + s*0.1, cy + s*0.05, 3, 0, Math.PI * 2);
+        c.arc(cx, cy + s*0.22, 3, 0, Math.PI * 2);
+        c.fill();
+      } else if (type === 'target') {
+        // Target / ROI Aperture
+        c.beginPath(); c.arc(cx, cy, s*0.42, 0, Math.PI*2); c.stroke();
+        c.beginPath(); c.arc(cx, cy, s*0.22, 0, Math.PI*2); c.stroke();
+        c.beginPath(); c.arc(cx, cy, 3, 0, Math.PI*2); c.fill();
+
+        const ext = s * 0.52, gap = s * 0.38;
+        c.beginPath();
+        c.moveTo(cx, cy - ext); c.lineTo(cx, cy - gap);
+        c.moveTo(cx, cy + gap); c.lineTo(cx, cy + ext);
+        c.moveTo(cx - ext, cy); c.lineTo(cx - gap, cy);
+        c.moveTo(cx + gap, cy); c.lineTo(cx + ext, cy);
+        c.stroke();
+      } else if (type === 'gear') {
+        // Industrial gear / ESP32 automation
+        c.beginPath();
+        c.arc(cx, cy, s*0.22, 0, Math.PI * 2);
+        c.stroke();
+
+        const teeth = 6;
+        for (let i = 0; i < teeth; i++) {
+          const a = (i * Math.PI * 2) / teeth;
+          const x1 = cx + Math.cos(a) * s * 0.35;
+          const y1 = cy + Math.sin(a) * s * 0.35;
+          const x2 = cx + Math.cos(a) * s * 0.48;
+          const y2 = cy + Math.sin(a) * s * 0.48;
+          c.beginPath();
+          c.moveTo(x1, y1); c.lineTo(x2, y2);
+          c.stroke();
+        }
+      } else if (type === 'cloud') {
+        // Cloud & Telemetry upload
+        c.beginPath();
+        c.arc(cx - s*0.18, cy, s*0.2, Math.PI*0.8, Math.PI*1.8);
+        c.arc(cx + s*0.06, cy - s*0.16, s*0.22, Math.PI*1.1, Math.PI*2);
+        c.arc(cx + s*0.26, cy + s*0.04, s*0.16, Math.PI*1.4, Math.PI*0.4);
+        c.lineTo(cx - s*0.3, cy + s*0.18);
+        c.closePath();
+        c.stroke();
+
+        c.beginPath();
+        c.moveTo(cx, cy + s*0.4); c.lineTo(cx, cy + s*0.12);
+        c.moveTo(cx - s*0.1, cy + s*0.22); c.lineTo(cx, cy + s*0.12); c.lineTo(cx + s*0.1, cy + s*0.22);
+        c.stroke();
+      }
+
+      c.restore();
+    }
+
+    // =========================================================================
+    // TECHNICAL SPECS STRIP & BOTTOM PROJECT ACCENTS
+    // =========================================================================
+    function drawFooterAndSpecs(c, p) {
+      c.save();
+
+      // 1. Technical Telemetry Bar (prominent & well-spaced)
+      const specY = 1240;
+      const specGrad = c.createLinearGradient(120, 0, 1380, 0);
+      specGrad.addColorStop(0, 'transparent');
+      specGrad.addColorStop(0.2, 'rgba(230, 184, 75, 0.08)');
+      specGrad.addColorStop(0.5, 'rgba(230, 184, 75, 0.16)');
+      specGrad.addColorStop(0.8, 'rgba(230, 184, 75, 0.08)');
+      specGrad.addColorStop(1, 'transparent');
+
+      c.fillStyle = specGrad;
+      c.roundRect(120, specY - 26, 1260, 52, 26);
+      c.fill();
+      c.strokeStyle = p.gold;
+      c.lineWidth = 1.2;
+      c.globalAlpha = 0.4;
+      c.stroke();
+      c.globalAlpha = 1;
+
+      c.font = '700 18px "Space Grotesk", sans-serif';
+      c.fillStyle = p.goldBright;
+      c.textAlign = 'center';
+      c.fillText('LATÊNCIA: < 120ms   │   PRECISÃO: 98.7%+   │   OPERAÇÃO: 100% LOCAL / EMBARCADO   │   PADRÃO: CLASSES A, B E C', 750, specY + 6);
+
+      // 2. Clean, elegant project tagline at base with delicate golden gradient
+      const tagY = 1380;
+      c.font = '700 22px "Space Grotesk", sans-serif';
+      c.fillStyle = '#e4ece5';
+      c.globalAlpha = 0.85;
+      c.fillText('TECNOLOGIA QUE VALORIZA A NOSSA BIOECONOMIA', 750, tagY);
+
+      // Subtle gold & emerald accent divider line
+      const divGrad = c.createLinearGradient(260, 0, 1240, 0);
+      divGrad.addColorStop(0, 'transparent');
+      divGrad.addColorStop(0.3, p.gold);
+      divGrad.addColorStop(0.5, p.emerald);
+      divGrad.addColorStop(0.7, p.gold);
+      divGrad.addColorStop(1, 'transparent');
+      c.fillStyle = divGrad;
+      c.globalAlpha = 0.45;
+      c.fillRect(260, tagY + 18, 980, 2);
+
+      c.font = '600 16px "DM Sans", sans-serif';
+      c.fillStyle = p.gold;
+      c.globalAlpha = 0.75;
+      c.fillText('Feira Tecnológica 2026 · Stand AmazonVision 4.0', 750, tagY + 46);
+
+      c.restore();
+    }
+
+    // --- Bioluminescent Fireflies ---
+    function drawFireflies(c, p, t) {
+      c.save();
+      fireflies.forEach(f => {
+        // Floating drift
+        const dx = Math.sin(t * f.freq + f.phase) * 18;
+        const dy = Math.cos(t * f.freq * 0.8 + f.phase) * 14;
+        const curX = f.baseX + dx;
+        const curY = f.baseY + dy;
+
+        const pulse = (Math.sin(t * 3 * f.freq + f.phase) + 1) / 2;
+        const glowRadius = f.r * (4 + pulse * 4);
+
+        // Soft glow halo
+        const halo = c.createRadialGradient(curX, curY, 0, curX, curY, glowRadius);
+        halo.addColorStop(0, p.goldBright);
+        halo.addColorStop(0.3, p.glowCenter);
+        halo.addColorStop(1, 'transparent');
+
+        c.beginPath();
+        c.arc(curX, curY, glowRadius, 0, Math.PI * 2);
+        c.fillStyle = halo;
+        c.globalAlpha = 0.35 + pulse * 0.45;
+        c.fill();
+
+        // Hot bright core
+        c.beginPath();
+        c.arc(curX, curY, f.r * 0.5, 0, Math.PI * 2);
+        c.fillStyle = '#ffffff';
+        c.globalAlpha = 0.85;
+        c.fill();
+      });
+      c.restore();
+    }
+
+    // =========================================================================
+    // 3D REALISTIC BOOTH SIMULATOR (MOCKUP VIEW)
+    // =========================================================================
+    function renderBoothMockup() {
+      const mc = mockupCtx;
+      mc.clearRect(0, 0, W, H);
+
+      // 1. Pavilion Exhibition Hall Background
+      const hallGrad = mc.createLinearGradient(0, 0, 0, H);
+      hallGrad.addColorStop(0, '#0c100e');
+      hallGrad.addColorStop(0.55, '#161c18');
+      hallGrad.addColorStop(0.85, '#1e2621');
+      hallGrad.addColorStop(1, '#0e1310');
+      mc.fillStyle = hallGrad;
+      mc.fillRect(0, 0, W, H);
+
+      // Floor perspective tiles (Feira pavilion floor)
+      mc.strokeStyle = '#26332a';
+      mc.lineWidth = 1;
+      const floorY = 1120;
+      for (let x = -400; x <= W + 400; x += 140) {
+        mc.beginPath();
+        mc.moveTo(W / 2, 700);
+        mc.lineTo(x, H);
+        mc.stroke();
+      }
+      for (let y = floorY; y <= H; y += 75) {
+        mc.beginPath();
+        mc.moveTo(0, y);
+        mc.lineTo(W, y);
+        mc.stroke();
+      }
+
+      // 2. Aluminum Box-Truss Structure (Box Truss Q20)
+      const trussLeft = 240;
+      const trussRight = 1260;
+      const trussTop = 130;
+      const trussBottom = 1150;
+
+      drawBoxTrussPillar(mc, trussLeft - 30, trussTop, 60, trussBottom - trussTop);
+      drawBoxTrussPillar(mc, trussRight - 30, trussTop, 60, trussBottom - trussTop);
+      drawBoxTrussBeam(mc, trussLeft - 30, trussTop - 30, (trussRight - trussLeft) + 60, 60);
+
+      // Overhead Spotlights on Truss
+      drawSpotlight(mc, 420, trussTop + 30, 480, 500);
+      drawSpotlight(mc, 1080, trussTop + 30, 1020, 500);
+
+      // 3. Render the Banner Canvas hanging in the Truss Frame!
+      const bannerSize = 920;
+      const bannerX = (W - bannerSize) / 2;
+      const bannerY = 200;
+
+      // Drop shadow of hanging banner
+      mc.shadowColor = 'rgba(0,0,0,0.7)';
+      mc.shadowBlur = 40;
+      mc.shadowOffsetY = 25;
+      mc.drawImage(canvas, bannerX, bannerY, bannerSize, bannerSize);
+      mc.shadowColor = 'transparent';
+
+      // Realistic banner tension grommets / ilhós
+      mc.fillStyle = '#64748b';
+      mc.strokeStyle = '#0f172a';
+      mc.lineWidth = 2;
+      for (let i = 0; i <= 6; i++) {
+        const gx = bannerX + (bannerSize / 6) * i;
+        // top grommets & elastic ties
+        mc.beginPath(); mc.arc(gx, bannerY + 12, 6, 0, Math.PI * 2); mc.fill(); mc.stroke();
+        mc.beginPath(); mc.moveTo(gx, bannerY); mc.lineTo(gx, trussTop + 30);
+        mc.strokeStyle = '#334155'; mc.lineWidth = 2; mc.stroke();
+      }
+
+      // 4. Booth Table / Bancada AmazonVision in Foreground
+      const tableX = 380, tableY = 1000, tableW = 740, tableH = 150;
+      mc.fillStyle = '#0f1a13';
+      mc.fillRect(tableX, tableY, tableW, tableH);
+      mc.strokeStyle = palettes[currentTheme].gold;
+      mc.lineWidth = 2;
+      mc.strokeRect(tableX, tableY, tableW, tableH);
+
+      // Machine Table Label
+      mc.font = '700 24px "Space Grotesk", sans-serif';
+      mc.fillStyle = '#ffffff';
+      mc.textAlign = 'center';
+      mc.fillText('ESTAÇÃO DE INSPEÇÃO AUTOMATIZADA · BANCADA 3D', W / 2, tableY + 50);
+
+      mc.font = '600 16px "DM Sans", sans-serif';
+      mc.fillStyle = palettes[currentTheme].emerald;
+      mc.fillText('ESP32 · Câmera Industrial · Esteira de Triagem · IA Local', W / 2, tableY + 82);
+
+      // 5. Visitor Silhouette for Realistic Scale Reference (2.5m human perspective)
+      drawVisitorSilhouette(mc, 1310, 850, 360);
+    }
+
+    function drawBoxTrussPillar(c, x, y, w, h) {
+      c.fillStyle = '#475569';
+      c.fillRect(x, y, 6, h);
+      c.fillRect(x + w - 6, y, 6, h);
+      c.strokeStyle = '#64748b';
+      c.lineWidth = 2;
+      for (let py = y; py < y + h; py += 35) {
+        c.beginPath();
+        c.moveTo(x + 3, py);
+        c.lineTo(x + w - 3, py + 35);
+        c.moveTo(x + w - 3, py);
+        c.lineTo(x + 3, py + 35);
+        c.stroke();
+      }
+    }
+
+    function drawBoxTrussBeam(c, x, y, w, h) {
+      c.fillStyle = '#475569';
+      c.fillRect(x, y, w, 6);
+      c.fillRect(x, y + h - 6, w, 6);
+      c.strokeStyle = '#64748b';
+      c.lineWidth = 2;
+      for (let px = x; px < x + w; px += 35) {
+        c.beginPath();
+        c.moveTo(px, y + 3);
+        c.lineTo(px + 35, y + h - 3);
+        c.stroke();
+      }
+    }
+
+    function drawSpotlight(c, sx, sy, tx, ty) {
+      c.save();
+      const cone = c.createRadialGradient(sx, sy, 10, tx, ty, 380);
+      cone.addColorStop(0, 'rgba(255, 243, 204, 0.45)');
+      cone.addColorStop(0.5, 'rgba(255, 237, 160, 0.12)');
+      cone.addColorStop(1, 'transparent');
+
+      c.beginPath();
+      c.moveTo(sx - 15, sy);
+      c.lineTo(tx + 280, ty + 400);
+      c.lineTo(tx - 280, ty + 400);
+      c.closePath();
+      c.fillStyle = cone;
+      c.fill();
+
+      // Spotlight lamp fixture
+      c.beginPath();
+      c.roundRect(sx - 18, sy - 15, 36, 26, 6);
+      c.fillStyle = '#0f172a';
+      c.fill();
+      c.strokeStyle = '#e2e8f0';
+      c.stroke();
+      c.restore();
+    }
+
+    function drawVisitorSilhouette(c, vx, vy, vh) {
+      c.save();
+      c.translate(vx, vy);
+      c.fillStyle = 'rgba(10, 18, 14, 0.9)';
+      // Head
+      c.beginPath(); c.arc(0, 0, vh * 0.08, 0, Math.PI * 2); c.fill();
+      // Body
+      c.beginPath();
+      c.moveTo(-vh * 0.12, vh * 0.14);
+      c.lineTo(vh * 0.12, vh * 0.14);
+      c.lineTo(vh * 0.16, vh * 0.58);
+      c.lineTo(-vh * 0.16, vh * 0.58);
+      c.closePath();
+      c.fill();
+      // Legs
+      c.fillRect(-vh * 0.12, vh * 0.58, vh * 0.09, vh * 0.42);
+      c.fillRect(vh * 0.03, vh * 0.58, vh * 0.09, vh * 0.42);
+      c.restore();
+    }
+
+    // =========================================================================
+    // ANIMATION & REFRESH LOOP
+    // =========================================================================
+    function tick(timestamp) {
+      animTime = timestamp * 0.001;
+
+      renderBanner(ctx, W, H, animTime);
+
+      if (isMockupView) {
+        renderBoothMockup();
+      }
+
+      if (isAnimated) {
+        animationFrameId = requestAnimationFrame(tick);
+      }
+    }
+
+    function requestSingleRender() {
+      renderBanner(ctx, W, H, animTime);
+      if (isMockupView) {
+        renderBoothMockup();
+      }
+    }
+
+    // Start default animation
+    animationFrameId = requestAnimationFrame(tick);
+
+    // =========================================================================
+    // INTERACTIVE CONTROLS & EVENT LISTENERS
+    // =========================================================================
+
+    // Theme selector buttons
+    const themeButtons = [
+      { btn: document.getElementById('themeGold'), val: 'dourado' },
+      { btn: document.getElementById('themeEmerald'), val: 'esmeralda' },
+      { btn: document.getElementById('themeSunset'), val: 'sunset' }
+    ];
+
+    themeButtons.forEach(({ btn, val }) => {
+      btn.addEventListener('click', () => {
+        themeButtons.forEach(b => b.btn.classList.remove('active'));
+        btn.classList.add('active');
+        currentTheme = val;
+        requestSingleRender();
+      });
+    });
+
+    // Toggle HUD
+    const btnToggleHud = document.getElementById('btnToggleHud');
+    btnToggleHud.addEventListener('click', () => {
+      showHud = !showHud;
+      btnToggleHud.classList.toggle('active', showHud);
+      requestSingleRender();
+    });
+
+    // Toggle Live Animation
+    const btnToggleAnimation = document.getElementById('btnToggleAnimation');
+    btnToggleAnimation.addEventListener('click', () => {
+      isAnimated = !isAnimated;
+      btnToggleAnimation.classList.toggle('active', isAnimated);
+      if (isAnimated) {
+        animationFrameId = requestAnimationFrame(tick);
+      } else if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+        requestSingleRender();
+      }
+    });
+
+    // Toggle Booth 3D Mockup
+    const btnToggleMockup = document.getElementById('btnToggleMockup');
+    btnToggleMockup.addEventListener('click', () => {
+      isMockupView = !isMockupView;
+      btnToggleMockup.classList.toggle('active', isMockupView);
+      mockupContainer.classList.toggle('active', isMockupView);
+      document.getElementById('canvasTitle').textContent = isMockupView 
+        ? 'Simulação 3D no Estande da Feira (Estrutura Box Truss)' 
+        : 'Banner 2.5m × 2.5m — Composição Multifrutos';
+
+      if (isMockupView) {
+        renderBoothMockup();
+      }
+    });
+
+    // Fruit Focus Chips
+    const fruitChips = [
+      { el: document.getElementById('chipAll'), key: 'all' },
+      { el: document.getElementById('chipTucuma'), key: 'tucuma' },
+      { el: document.getElementById('chipAcai'), key: 'acai' },
+      { el: document.getElementById('chipCastanha'), key: 'castanha' },
+      { el: document.getElementById('chipCupuacu'), key: 'cupuacu' },
+      { el: document.getElementById('chipTropical'), key: 'tropical' },
+    ];
+
+    fruitChips.forEach(({ el, key }) => {
+      el.addEventListener('click', () => {
+        fruitChips.forEach(c => c.el.classList.remove('active'));
+        el.classList.add('active');
+        fruitFilter = key;
+        requestSingleRender();
+      });
+    });
+
+    // Reset View
+    document.getElementById('btnResetView').addEventListener('click', () => {
+      currentTheme = 'dourado';
+      showHud = true;
+      fruitFilter = 'all';
+      isMockupView = false;
+      themeButtons.forEach(b => b.btn.classList.toggle('active', b.val === 'dourado'));
+      btnToggleHud.classList.add('active');
+      btnToggleMockup.classList.remove('active');
+      mockupContainer.classList.remove('active');
+      fruitChips.forEach(c => c.el.classList.toggle('active', c.key === 'all'));
+      requestSingleRender();
+    });
+
+    // Fullscreen Viewport
+    document.getElementById('btnFullscreen').addEventListener('click', () => {
+      const elem = document.getElementById('viewport');
+      if (!document.fullscreenElement) {
+        elem.requestFullscreen().catch(err => alert(`Erro ao entrar em tela cheia: ${err.message}`));
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    // =========================================================================
+    // ULTRA HIGH-RES EXPORT (3000 x 3000 PX PARA GRÁFICAS)
+    // =========================================================================
+    const toast = document.getElementById('toastMessage');
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+
+    document.getElementById('btnExportHighRes').addEventListener('click', () => {
+      showToast('Renderizando arquivo em 3000 × 3000 px para gráfica...');
+
+      setTimeout(() => {
+        const offscreen = document.createElement('canvas');
+        const exportW = 3000;
+        const exportH = 3000;
+        offscreen.width = exportW;
+        offscreen.height = exportH;
+        const offCtx = offscreen.getContext('2d');
+
+        // Render clean, ultra-sharp vector graphics at 3000x3000
+        renderBanner(offCtx, exportW, exportH, animTime);
+
+        // Download trigger
+        const link = document.createElement('a');
+        const dateStr = new Date().toISOString().slice(0, 10);
+        link.download = `AmazonVision-4.0-Banner-2.5x2.5m-Multifrutos-${currentTheme}-${dateStr}.png`;
+        link.href = offscreen.toDataURL('image/png', 1.0);
+        link.click();
+
+        showToast('Download concluído! PNG de alta definição pronto para impressão.');
+      }, 100);
+    });
+
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,373 @@
+<title>Laudo Mecânico Esteira 700</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Layout: folha de laudo técnico — carimbo no topo, seções numeradas pelo formato pedido, tabelas com faixa de severidade */
+:root{
+  --paper:#f5f7f6; --sheet:#ffffff; --ink:#1b2220; --muted:#56635e; --rule:#d3dbd7;
+  --accent:#0e5a57; --accent-soft:#e2efed;
+  --crit:#b3261e; --crit-soft:#fbe9e7; --maj:#8a5a00; --maj-soft:#fdf1dc; --ok:#2c6e31; --ok-soft:#e6f2e6;
+  --f-display:"IBM Plex Sans Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"IBM Plex Sans","Segoe UI",Roboto,Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",Consolas,"Courier New",monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#101413; --sheet:#171d1b; --ink:#e3eae7; --muted:#9aa8a2; --rule:#2c3633;
+  --accent:#62b7b1; --accent-soft:#1b2d2b;
+  --crit:#ff8f84; --crit-soft:#3a1d1a; --maj:#f2c063; --maj-soft:#33290f; --ok:#8fd394; --ok-soft:#18301a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#101413; --sheet:#171d1b; --ink:#e3eae7; --muted:#9aa8a2; --rule:#2c3633;
+  --accent:#62b7b1; --accent-soft:#1b2d2b;
+  --crit:#ff8f84; --crit-soft:#3a1d1a; --maj:#f2c063; --maj-soft:#33290f; --ok:#8fd394; --ok-soft:#18301a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+main{max-width:1060px;margin:0 auto;display:flex;flex-direction:column;gap:36px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:2rem;font-weight:700;letter-spacing:.01em}
+h2{font-size:1.45rem;font-weight:700;display:flex;gap:.6rem;align-items:baseline}
+h2 .n{font-family:var(--f-mono);font-size:.95rem;color:var(--accent);font-weight:600}
+h3{font-size:1.1rem;font-weight:700;margin-top:4px}
+p{margin:0;max-width:72ch}
+section{display:flex;flex-direction:column;gap:14px}
+.mono,code,td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+code{font-size:.88em;background:var(--accent-soft);padding:0 .3em;border-radius:3px}
+.label{font-family:var(--f-display);text-transform:uppercase;letter-spacing:.08em;font-size:.72rem;color:var(--muted);font-weight:500}
+
+/* carimbo (legenda de desenho técnico) */
+.carimbo{background:var(--sheet);border:1.5px solid var(--ink);display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr}
+.carimbo>div{padding:10px 14px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);display:flex;flex-direction:column;gap:2px;min-width:0}
+.carimbo .titulo{grid-row:span 2;border-right:1.5px solid var(--ink);justify-content:center;gap:6px}
+.carimbo .v{font-family:var(--f-mono);font-size:.9rem}
+@media (max-width:720px){.carimbo{grid-template-columns:1fr 1fr}.carimbo .titulo{grid-column:span 2;grid-row:auto;border-right:none;border-bottom:1.5px solid var(--ink)}}
+
+/* veredito */
+.veredito{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start;background:var(--crit-soft);border:1.5px solid var(--crit);padding:18px 20px}
+.selo{font-family:var(--f-display);font-weight:700;font-size:1.5rem;color:var(--crit);border:2.5px solid var(--crit);padding:6px 14px;transform:rotate(-2deg);letter-spacing:.04em;white-space:nowrap}
+.veredito p+p{margin-top:8px}
+@media (max-width:600px){.veredito{grid-template-columns:1fr}}
+
+.lotes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.lote{background:var(--sheet);border:1px solid var(--rule);border-top:4px solid var(--c);padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.lote ul{margin:0;padding-left:1.1em}
+.lote.ok{--c:var(--ok)} .lote.maj{--c:var(--maj)} .lote.crit{--c:var(--crit)}
+.lote b.t{font-family:var(--f-display);font-size:1.02rem}
+@media (max-width:820px){.lotes{grid-template-columns:1fr}}
+
+/* tabelas */
+.tw{overflow-x:auto;background:var(--sheet);border:1px solid var(--rule)}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{padding:8px 10px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}
+th{font-family:var(--f-display);font-weight:500;text-transform:uppercase;letter-spacing:.06em;font-size:.72rem;color:var(--muted);background:var(--paper);white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+td.num{white-space:nowrap}
+tr.sev-crit td:first-child{box-shadow:inset 4px 0 var(--crit)}
+tr.sev-maj td:first-child{box-shadow:inset 4px 0 var(--maj)}
+tr.sev-ok td:first-child{box-shadow:inset 4px 0 var(--ok)}
+.pill{display:inline-block;font-family:var(--f-display);font-weight:700;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:2px;white-space:nowrap}
+.pill.ok{color:var(--ok);background:var(--ok-soft)} .pill.maj{color:var(--maj);background:var(--maj-soft)} .pill.crit{color:var(--crit);background:var(--crit-soft)}
+
+.nc{display:flex;flex-direction:column;gap:10px}
+.nc article{background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--c);padding:12px 16px;display:grid;grid-template-columns:4.2rem 1fr;gap:4px 14px}
+.nc article.crit{--c:var(--crit)} .nc article.maj{--c:var(--maj)}
+.nc .id{font-family:var(--f-mono);font-weight:600;color:var(--c)}
+.nc .fix{grid-column:2;color:var(--muted);font-size:.92rem}
+.nc .fix b{color:var(--ink)}
+@media (max-width:560px){.nc article{grid-template-columns:1fr}.nc .fix{grid-column:1}}
+
+.note{font-size:.88rem;color:var(--muted)}
+.box{background:var(--sheet);border:1px solid var(--rule);padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.check{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.check li{display:grid;grid-template-columns:1.4rem 1fr;gap:8px;align-items:start}
+.check li::before{content:"";width:14px;height:14px;border:1.5px solid var(--ink);margin-top:4px}
+.check li.warn::before{border-color:var(--crit);background:var(--crit-soft)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cols>*{min-width:0}
+@media (max-width:820px){.cols{grid-template-columns:1fr}}
+footer{border-top:1.5px solid var(--ink);padding-top:12px;font-size:.85rem;color:var(--muted)}
+</style>
+
+<main>
+
+<header style="display:flex;flex-direction:column;gap:14px">
+  <div class="carimbo">
+    <div class="titulo">
+      <span class="label">Laudo técnico de auditoria · DfAM · ISO 286 · tribologia</span>
+      <h1>Esteira seletora 700 mm — kit de impressão 3D</h1>
+      <span class="note">AmazonVision 4.0 · Feira FUCAPI 2026 · 2× Bambu Lab P2S</span>
+    </div>
+    <div><span class="label">Documento</span><span class="v">LT-3D-002</span></div>
+    <div><span class="label">Revisão</span><span class="v">B (correções aplicadas)</span></div>
+    <div><span class="label">Data</span><span class="v">06/11/2026</span></div>
+    <div><span class="label">Base</span><span class="v">STL 01–13 de 06/11 10:40 · Mesa 14 de 21:43</span></div>
+    <div><span class="label">Método</span><span class="v">cortes de seção + booleana</span></div>
+    <div><span class="label">Resultado</span><span class="v" style="color:var(--maj);font-weight:600">Rev. A reprovado · Rev. B aprovado c/ ressalvas</span></div>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>Revisão B: correções aplicadas no gerador</h2>
+  <p>As Mesas 01, 02, 05 e 07 foram corrigidas em <code>gerar_kit_3d_amazonvision.py</code> e regeradas às 22:24 com <code>regerar_mesas_corrigidas.py</code>. Esse script grava só essas 4 mesas e o STL mestre. Não use o <code>main()</code> do gerador: ele apaga a Mesa 14 e as buchas avulsas. As mesas liberadas continuam idênticas (conferido por hash), e o backup da versão anterior está em <code>00_…/_backup_2026-11-06_pre_correcao/</code>. Cada correção foi medida de novo na malha nova.</p>
+  <div class="tw"><table>
+    <thead><tr><th>ID</th><th>O que mudou</th><th>Verificação na malha nova</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr class="sev-ok"><td class="mono">C1 C2</td><td>Os 3 tambores passaram para 118 mm. O 02A deixou de ter pinos e sede: fica preso no eixo por 2 parafusos sem cabeça M3×6 com porca cativa. O eixo gira nas buchas das cabeceiras 01A/01B, e a polia 40T comercial vai no eixo, fora do chassi.</td><td class="num">comprimento 118,00 · furo Ø8,13 contínuo · 1 corpo</td><td><span class="pill ok">Corrigido</span></td></tr>
+      <tr class="sev-ok"><td class="mono">C3</td><td>Polias impressas retiradas da Mesa 05 (3 corpos). Usar GT2 20T <b>furo 6</b> e 40T furo 8 comerciais.</td><td class="num">Mesa 05: 3/3 corpos</td><td><span class="pill ok">Corrigido</span></td></tr>
+      <tr class="sev-ok"><td class="mono">C4</td><td>O 02D virou carro tensor deslizante (stadium 24 × 14) dentro de um rasgo de 50 × 14,6. A porca M5 fica cativa e o parafuso <b>M5×50</b>, com a cabeça na face externa, puxa o carro para fora. O sextavado da ponta da 01C/01D foi removido.</td><td class="num">curso livre de 26,0 mm com interferência 0 em 53/53 posições · furo M5 coaxial (y −12,06 · z 10,02 nos dois)</td><td><span class="pill ok">Corrigido</span></td></tr>
+      <tr class="sev-ok"><td class="mono">novo</td><td>Os furos de flange das cabeceiras (y = +16 / −20) não batiam com os do 01E (±16). Passaram para ±16.</td><td class="num">01A e 01C: espaçamento de 32,0 mm = 01E</td><td><span class="pill ok">Corrigido</span></td></tr>
+      <tr class="sev-ok"><td class="mono">C5</td><td>03H: hastes cegas na direção do empurrão, a 12 mm da base, com pinça M3 lateral. 03I: hastes passantes no mesmo eixo, pivô da biela vertical, e o alojamento 623 duplicado foi retirado.</td><td class="num">furos Ø6,02 com eixo y em x ±43 · pivô Ø3,27 vertical</td><td><span class="pill ok">Corrigido</span></td></tr>
+      <tr class="sev-ok"><td class="mono">C7</td><td>Recorte da guia 01J passou de 100 para 108 mm.</td><td class="num">aberto de x −54 a +54</td><td><span class="pill ok">Corrigido</span></td></tr>
+      <tr class="sev-maj"><td class="mono">C7</td><td>Altura do empurrador: falta uma torre de ~45 mm para a sapata passar acima da correia e da guia.</td><td>peça nova, depende de onde o pórtico será fixado</td><td><span class="pill maj">Pendente</span></td></tr>
+      <tr class="sev-maj"><td class="mono">C8</td><td>Furação do horn na alavanca 03F.</td><td>falta medir o horn metálico real</td><td><span class="pill maj">Pendente</span></td></tr>
+      <tr class="sev-ok"><td class="mono">C9</td><td>Rasgos do 03A agora são girados na origem e depois posicionados.</td><td class="num">6 rasgos a r = 15,3–15,6 mm, de 60 em 60°</td><td><span class="pill ok">Corrigido</span></td></tr>
+      <tr class="sev-ok"><td class="mono">C10</td><td>6º lote de elos adicionado na pasta do Ricley: 108 impressos, 91 montados.</td><td>arquivo <code>ricley/09_…Lote_Extra.stl</code></td><td><span class="pill ok">Corrigido</span></td></tr>
+      <tr class="sev-maj"><td class="mono">C6 C11</td><td>Itens de compra: hastes Ø6 × 250, M4×30 e M4×25, M5×50 e barra Ø8 de 1 m (os eixos agora somam 185 + 180 + 166 mm).</td><td>BOM ainda não atualizada</td><td><span class="pill maj">Comprar</span></td></tr>
+      <tr class="sev-ok"><td class="mono">M1 M2 M3</td><td>Respiros Ø4 a r = 17 mm. Furo do tambor livre e do rolete com Ø9 (só a bucha toca o eixo). Furo da haste no pórtico com Ø7.</td><td class="num">parede sede-respiro de 3,84 / 3,89 mm (antes 0,46 / 0,2)</td><td><span class="pill ok">Corrigido</span></td></tr>
+    </tbody></table></div>
+  <p><b>Situação das mesas:</b> 01, 02 e 05 estão <b>liberadas</b>. A 07 está liberada com ressalva: a alavanca 03F será reimpressa depois de medir o horn (~6 g), e a torre do pórtico é uma peça a mais. As seções 1 a 4 abaixo descrevem a Revisão A, antes das correções.</p>
+</section>
+
+<!-- 1 -->
+<section>
+  <h2><span class="n">1</span>Status executivo</h2>
+  <div class="veredito">
+    <div class="selo">REPROVADO</div>
+    <div>
+      <p><b>O kit não está pronto para ser impresso inteiro.</b> As buchas da Mesa 14, os elos da correia e a parte tribológica (atrito e desgaste) passam. Mas há 10 não-conformidades críticas: peças que não montam ou não funcionam como foram desenhadas. Estão no tambor motriz, no tensor traseiro, no empurrador e na contagem de elos.</p>
+      <p>Os arquivos <code>Mesa_01</code> a <code>Mesa_13</code> são os mesmos de 06/11 às 10:40, anteriores à auditoria anterior. O manual foi reescrito, mas a geometria não mudou. Os defeitos apontados antes continuam nas STL.</p>
+      <p><b>Dá para ligar as duas impressoras hoje</b>, imprimindo só o lote liberado abaixo (cerca de 60% da massa). Enquanto isso, as Mesas 01, 02, 05 e 07 são corrigidas no gerador paramétrico e regeradas.</p>
+    </div>
+  </div>
+  <div class="lotes">
+    <div class="lote ok"><b class="t">Liberado: imprimir já</b>
+      <ul>
+        <li>Mesa 06, elos: <b>6 lotes</b>, não 5 (ver C10)</li>
+        <li>Mesa 14, buchas: imprimir 1 bucha de teste antes</li>
+        <li>Mesa 13 TPU · Mesa 11 ×2 · Mesa 10 · Mesa 08 · Mesa 03</li>
+        <li>Mesa 12 só com a pausa em Z = 2,5 mm (M6)</li>
+      </ul></div>
+    <div class="lote maj"><b class="t">Liberado com ajuste</b>
+      <ul>
+        <li>Mesa 09: imprimir a cúpula de cabeça para baixo (M7)</li>
+        <li>Mesa 04: furar a fixação dos pés na montagem (M8)</li>
+      </ul></div>
+    <div class="lote crit"><b class="t">Bloqueado: regerar</b>
+      <ul>
+        <li>Mesa 01: tensor e mancal 02D (C4)</li>
+        <li>Mesa 02: recorte da guia 01J (C7)</li>
+        <li>Mesa 05: tambor motriz e polias (C1–C3)</li>
+        <li>Mesa 07: empurrador e suporte do GA37 (C5, C6, C8, C9)</li>
+      </ul></div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section>
+  <h2><span class="n">2</span>Verificação das interfaces críticas</h2>
+  <p>As cotas foram medidas na malha STL com cortes de seção no meio de cada furo. O “Ø equivalente” é o círculo de mesma área. O “entre faces” é o menor diâmetro do polígono: o slicer imprime polígonos, não círculos. A coluna “pós-FDM” estima a peça real. Furo vertical sai de 0,10 a 0,20 mm menor, furo horizontal de 0,20 a 0,40 mm menor na vertical e contorno externo de 0,05 a 0,10 mm maior. A contração térmica do PETG (0,3 a 0,5%) dá só 0,03 a 0,04 mm num furo de 8 mm. É desprezível perto do efeito do bico.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Interface</th><th>Medido no STL</th><th>Peça casada</th><th>Folga nominal</th><th>Pós-FDM (estimada)</th><th>Veredito</th></tr></thead>
+    <tbody>
+      <tr class="sev-maj"><td>1a · Bucha 608, furo × eixo retificado</td><td class="num">Ø8,24 eq · 8,18 entre faces · canal Ø9,09</td><td class="num">eixo Ø8,00 (h7/h8)</td><td class="num">+0,24</td><td class="num">+0,04 a +0,14</td><td><span class="pill maj">Aprovado c/ ressalva</span><br><span class="note">No limite inferior. Imprimir 1 bucha de teste e, se travar, passar broca 8,2 mm.</span></td></tr>
+      <tr class="sev-ok"><td>1a · Bucha 608, diâmetro externo × sede (01A/01B/02D/tambores)</td><td class="num">Ø21,98 · sede Ø22,09 eq (21,83 entre faces)</td><td class="num">sede Ø22,15 nominal</td><td class="num">+0,11</td><td class="num">−0,05 a −0,15 (aperto leve)</td><td><span class="pill ok">Aprovado</span><br><span class="note">Prensa à mão, sem folga radial.</span></td></tr>
+      <tr class="sev-crit"><td>1a · Sede superior do tambor motriz 02A</td><td class="num">4 pinos Ø4,8 a r = 10 mm sobre a boca Ø22</td><td class="num">bucha 608</td><td>—</td><td>bucha não entra</td><td><span class="pill crit">Reprovado</span> <span class="note">C2</span></td></tr>
+      <tr class="sev-maj"><td>1a · Furo próprio do tambor × eixo</td><td class="num">Ø8,12 eq · 7,99 entre faces (160 mm de comprimento)</td><td class="num">eixo Ø8,00</td><td class="num">+0,12</td><td class="num">−0,08 a +0,02</td><td><span class="pill maj">Ressalva</span><br><span class="note">Aperta antes da bucha e vira o mancal real. Alargar com broca 8,5 mm (M2).</span></td></tr>
+      <tr class="sev-maj"><td>1b · Bucha LM6UU, furo × haste</td><td class="num">Ø6,20 eq · 6,15 entre faces · 2 canais Ø6,99</td><td class="num">haste Ø6,00</td><td class="num">+0,20</td><td class="num">+0,05 a +0,10</td><td><span class="pill maj">Aprovado c/ ressalva</span><br><span class="note">Deslizamento macio exige ≥ 0,08. Polir com lixa 600 enrolada na própria haste.</span></td></tr>
+      <tr class="sev-maj"><td>1b · Bucha LM6UU × cavidade do pórtico 03E</td><td class="num">Ø11,99 · cavidade Ø12,10 horizontal × 22</td><td class="num">4 cavidades</td><td class="num">+0,11</td><td class="num">−0,1 a −0,3 na vertical</td><td><span class="pill maj">Ressalva</span><br><span class="note">Furo deitado ovaliza. Imprimir sem suporte e alargar com broca 12 mm (M14).</span></td></tr>
+      <tr class="sev-maj"><td>1b · Furo de passagem da haste entre as buchas (03E)</td><td class="num">Ø6,20 contínuo, 70 mm</td><td class="num">haste Ø6,00</td><td class="num">+0,20</td><td class="num">≈ 0 (deitado)</td><td><span class="pill maj">Ressalva</span><br><span class="note">Vira um 3º mancal e trava a haste. Alargar para Ø7 (M3).</span></td></tr>
+      <tr class="sev-maj"><td>1c · Bucha 623, furo × parafuso M3</td><td class="num">Ø3,20 eq · 3,17 entre faces</td><td class="num">M3 real Ø2,85–2,95</td><td class="num">+0,25 a +0,35</td><td class="num">+0,05 a +0,15</td><td><span class="pill maj">Aprovado c/ ressalva</span><br><span class="note">Passar broca 3,2 mm. Usar parafuso com corpo liso (ou pino Ø3) no trecho que gira, não a rosca.</span></td></tr>
+      <tr class="sev-ok"><td>1c · Bucha 623, diâmetro externo × alojamento da biela 03G</td><td class="num">Ø9,99 · alojamento Ø10,10 × 4,2</td><td class="num">2 alojamentos</td><td class="num">+0,11</td><td class="num">≈ 0 (leve pressão)</td><td><span class="pill ok">Aprovado</span></td></tr>
+      <tr class="sev-ok"><td>1d · Dobradiça do elo × pino de filamento</td><td class="num">Ø2,28 (furo deitado, 122 mm)</td><td class="num">PETG 1,75 (1,72–1,78)</td><td class="num">+0,53</td><td class="num">+0,2 a +0,35</td><td><span class="pill ok">Aprovado</span><br><span class="note">Pino entra justo e gira. Esticar o filamento a quente antes de passar.</span></td></tr>
+      <tr class="sev-ok"><td>1d · Articulação elo-elo no tambor</td><td class="num">folga lateral entre nós 0,81 mm · giro livre ±90°</td><td class="num">tambor de 12 dentes: 30° por elo</td><td>—</td><td>margem de 3×</td><td><span class="pill ok">Aprovado</span><br><span class="note">Simulação booleana: interferência 0,00 mm³ até 90°.</span></td></tr>
+      <tr class="sev-crit"><td>1d · Passo do elo</td><td class="num">16,51 mm (centro a centro dos furos)</td><td class="num">manual: 17,3 mm</td><td>—</td><td>—</td><td><span class="pill crit">Reprovado (documento)</span> <span class="note">C10</span></td></tr>
+      <tr class="sev-ok"><td>1e · Furos M4 de passagem</td><td class="num">Ø4,30</td><td class="num">M4</td><td class="num">+0,30</td><td class="num">+0,1 a +0,2</td><td><span class="pill ok">Aprovado</span><br><span class="note">Não há alojamento sextavado M4, o que é correto: Nyloc é apertada por fora, com arruela.</span></td></tr>
+      <tr class="sev-crit"><td>1e · Comprimento dos parafusos M4 das flanges</td><td class="num">aperto real 17–22 mm</td><td class="num">BOM: M4×16</td><td>—</td><td>não alcança a porca</td><td><span class="pill crit">Reprovado</span> <span class="note">C11</span></td></tr>
+      <tr class="sev-ok"><td>1e · Porca M5 na face externa da 01C/01D</td><td class="num">sextavado 8,15 entre faces × 5,0</td><td class="num">porca M5: 8,0 × 4,0</td><td class="num">+0,15</td><td class="num">≈ +0,05</td><td><span class="pill ok">Aprovado</span></td></tr>
+      <tr class="sev-crit"><td>1e · Porca M5 no mancal tensor 02D</td><td class="num">sextavado fechado dentro do bloco</td><td class="num">porca M5</td><td>—</td><td>inacessível</td><td><span class="pill crit">Reprovado</span> <span class="note">C4</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- NCs -->
+<section>
+  <h2><span class="n">2.1</span>Não-conformidades que bloqueiam a montagem</h2>
+  <div class="nc">
+    <article class="crit"><span class="id">C1</span><span><b>Tambor motriz 02A não cabe no chassi.</b> Ele tem 131,8 mm de comprimento, mais 5,8 mm de pinos. O vão entre as longarinas fica entre 122 e 128 mm em qualquer arranjo das travessas de 122 mm. O tambor livre e a correia têm 121,9 mm. A polia 40T, presa nos pinos, ficaria dentro do chassi.</span>
+      <span class="fix"><b>Correção:</b> encurtar o 02A para 121,9 mm. Levar a polia 40T para fora da cabeceira, presa no eixo, e travar o tambor no eixo com 2 parafusos sem cabeça M3 radiais e porca embutida.</span></article>
+    <article class="crit"><span class="id">C2</span><span><b>Pinos de tração do 02A em cima da sede da bucha.</b> Os pinos (r = 7,6 a 12,4 mm) cobrem a boca da sede (r = 11,05 mm). A bucha superior não entra, e os pinos ficam com só ~1,3 mm de base: quebram com o torque.</span>
+      <span class="fix"><b>Correção:</b> some junto com C1. Se os pinos forem mantidos, afastar para r ≥ 16 mm.</span></article>
+    <article class="crit"><span class="id">C3</span><span><b>Polias impressas inutilizáveis.</b> Na 40T, os furos dos pinos (Ø5,2 a r = 10 mm) chegam a r = 12,6 mm e rompem 4 dentes (a raiz do dente fica em r ≈ 12,2). Na 20T, o furo do parafuso de fixação é cego: termina em r = 6 mm, dentro do cubo de r = 7,5 mm.</span>
+      <span class="fix"><b>Correção:</b> usar as polias comerciais da BOM (M11). Mas a BOM pede 20T com furo 5 mm, e o eixo do GA37 tem Ø6 mm: comprar a 20T com <b>furo 6 mm</b>.</span></article>
+    <article class="crit"><span class="id">C4</span><span><b>Tensor traseiro funciona ao contrário.</b> O parafuso M5 entra pela face externa da 01C/01D e empurra o eixo para dentro. É o mesmo sentido em que a correia já puxa, então ele nunca estica a correia. Além disso:</span>
+      <ul style="grid-column:2;margin:0;padding-left:1.1em">
+        <li>o rasgo de 14 mm deixa 6 mm de folga vertical no eixo de Ø8;</li>
+        <li>o 02D não tem guia nem fixação;</li>
+        <li>o furo M5 do 02D cruza a sede da bucha.</li>
+      </ul>
+      <span class="fix"><b>Correção para a feira:</b> trocar o tensor por calços impressos em forma de “U”, encaixados no rasgo do lado de dentro do eixo, em 3 comprimentos. O próprio puxão da correia prende o eixo no calço, e o M5 trava por fora. Furo M5 do 02D cego, com 4 mm de profundidade.</span></article>
+    <article class="crit"><span class="id">C5</span><span><b>Empurrador com eixos trocados.</b> No 03H, os furos das hastes correm ao longo dos 90 mm de altura, paralelos à face que empurra. No 03I, o pivô da biela é paralelo às hastes. No pórtico 03E, as hastes correm na direção do empurrão. Os três não montam juntos e a biela não consegue empurrar.</span>
+      <span class="fix"><b>Correção:</b> no 03H, furos das hastes perpendiculares à face côncava. No 03I, pivô vertical, paralelo ao eixo do servo.</span></article>
+    <article class="crit"><span class="id">C6</span><span><b>Haste de 170 mm só dá ~48 mm de curso.</b> O bloco do pórtico tem 92 mm, mais 14 mm presos na sapata e 12 mm presos na trave. Para 120 mm de curso, a haste precisa de ≥ 240 mm.</span>
+      <span class="fix"><b>Correção:</b> comprar 2 hastes Ø6 × 250 mm (ou uma de 500 mm) no lugar da M09 de 300 mm.</span></article>
+    <article class="crit"><span class="id">C7</span><span><b>Sapata de 100 mm passa num recorte de 100 mm (guia 01J).</b> Folga zero vira interferência de ~0,4 mm depois de impresso. Se o pórtico for parafusado direto no topo da longarina, como indicam os furos M4, as hastes ficam a 15 mm de altura. Aí metade da sapata fica abaixo da superfície da correia.</span>
+      <span class="fix"><b>Correção:</b> recorte da 01J ≥ 106 mm e elevar o pórtico ~45 mm, para a borda de baixo da sapata ficar ≥ 3 mm acima da guia (peça nova: calço ou torre).</span></article>
+    <article class="crit"><span class="id">C8</span><span><b>Alavanca 03F não segura no horn.</b> O rebaixo é redondo (Ø15) e não há furos para os parafusos do horn metálico, então o horn gira solto. O horn 25T metálico costuma ter Ø20–25 mm.</span>
+      <span class="fix"><b>Correção:</b> medir o horn real e copiar a furação dele (normalmente 4 a 8 furos M3 ou M2,5).</span></article>
+    <article class="crit"><span class="id">C9</span><span><b>Suporte do GA37 (03A) com furação embaralhada.</b> No gerador, os rasgos são girados em torno da origem depois de posicionados. Por isso caem fora do círculo de Ø31 mm do motor.</span>
+      <span class="fix"><b>Correção:</b> girar cada rasgo antes de transladar (é uma linha no gerador).</span></article>
+    <article class="crit"><span class="id">C10</span><span><b>Contagem de elos errada.</b> O passo real é 16,51 mm e o tambor tem 12 dentes. Pela fórmula de corrente, N = 2C/p + 12 = <b>90,7 elos</b> para 650 mm entre centros. Com 86 elos (manual), o entre-centros cairia para 611 mm, fora do curso do tensor. Os 90 impressos fecham em 643,9 mm, sem nenhuma reserva.</span>
+      <span class="fix"><b>Correção:</b> montar 91 elos (entre-centros de 652,1 mm, cabe no rasgo) e imprimir um 6º lote: 108 elos, sobram 17.</span></article>
+    <article class="crit"><span class="id">C11</span><span><b>Parafusos M4×16 não fecham as flanges.</b> A espessura que o parafuso atravessa (flange + parede até o bolso, nas duas peças) é de 21 mm (01A–01E), 17 mm (01E–01F) e 22 mm (01E–01C). Somando 2 arruelas, a Nyloc (5 mm) e 2 fios de rosca, dá 26 a 31 mm.</span>
+      <span class="fix"><b>Correção:</b> 8× <b>M4×30</b> (juntas com as cabeceiras) e 8× <b>M4×25</b> (juntas 01E–01F) no lugar das 16 primeiras M4×16.</span></article>
+  </div>
+
+  <h3>Ressalvas (funcionam com retrabalho ou ajuste)</h3>
+  <div class="tw"><table>
+    <thead><tr><th>ID</th><th>Achado</th><th>Ação</th></tr></thead>
+    <tbody>
+      <tr class="sev-maj"><td class="mono">M1</td><td>A parede entre a sede da bucha e os furos de respiro tem 0,46 mm no 02A/02B e ≈ 0,2 mm no 02C. É menos que uma linha de extrusão.</td><td>No gerador: respiros em r ≥ 17 mm ou tampados.</td></tr>
+      <tr class="sev-maj"><td class="mono">M2</td><td>O furo do tambor (Ø8,12, com 160 mm de comprimento) vai apertar no eixo antes das buchas.</td><td>Broca 8,5 mm passante, para só as buchas tocarem o eixo.</td></tr>
+      <tr class="sev-maj"><td class="mono">M3</td><td>Pórtico 03E: o furo da haste entre as buchas tem o mesmo Ø6,2 da bucha. São três apoios na mesma haste (sistema hiperestático).</td><td>Broca 7 mm entrando pela cavidade de 12 mm.</td></tr>
+      <tr class="sev-maj"><td class="mono">M4</td><td>Faltam buchas 608. A Mesa 14 tem 4, mas há 12 sedes: 01A, 01B, 2× 02D, 4 nos tambores, 2× 01F e 2 no rolete 02C.</td><td>Arquitetura recomendada: eixo parado e tambor girando. Imprimir mais 8 de <code>Bucha_608_…stl</code> (~25 g, 100%).</td></tr>
+      <tr class="sev-maj"><td class="mono">M5</td><td>O rolete 02C não tem eixo na BOM.</td><td>Cortar ~130 mm da barra M08: 185 + 160 + 130 = 475 mm de 500.</td></tr>
+      <tr class="sev-maj"><td class="mono">M6</td><td>Mesa 12: o texto das plaquetas vai de Z = 2,5 a 3,5 mm, não de 3,0. Pausar em 3,2 deixa só ~0,3 mm preto. O aro do difusor (5 mm) também ficaria preto acima de 2,5.</td><td>Pausar na camada que começa em Z = 2,5 e imprimir as plaquetas num prato separado do difusor.</td></tr>
+      <tr class="sev-maj"><td class="mono">M7</td><td>Cúpula 05A: teto de 115 × 141 mm sem apoio. O rebaixo do acrílico atravessa a parede: a abertura de 96 × 86 é maior que o acrílico de 90 × 80.</td><td>Imprimir com o teto na mesa (portais viram entalhes a 45°). Colar o acrílico por dentro com fita VHB.</td></tr>
+      <tr class="sev-maj"><td class="mono">M8</td><td>O pé 01K tem 2 furos verticais a 34 mm. O 01E tem 1 furo cego e sem porca. Os pés em X = ±250 caem nas cabeceiras, que não têm furo.</td><td>Furar na montagem, gabaritando pelo pé (broca 4,3).</td></tr>
+      <tr class="sev-maj"><td class="mono">M9</td><td>01G sem chanfro de entrada da correia (mesmo bug de rotação do C9).</td><td>Chanfrar a borda com lixa ou estilete.</td></tr>
+      <tr class="sev-maj"><td class="mono">M10</td><td>Sensores: S2 em X = +100 (suporte 04A de X = 73 a 127) bate no pórtico (X = 101 a 219), que fica do mesmo lado. S1 em X = −150 fica embaixo da flange da cúpula. O manual põe o feixe em “Y = 90 mm”, que é abaixo da superfície da correia (≈ 112 mm).</td><td>S2 em X ≈ +55 e S1 em X ≈ −250, com o tempo ajustado no firmware. Feixe a 35–45 mm acima da correia (Y ≈ 150).</td></tr>
+      <tr class="sev-maj"><td class="mono">M11</td><td>A biela fica no plano do horn (~40 mm acima da base) e o pivô da trave a ~15 mm.</td><td>Espaçador vertical no pivô (M3 longo com espaçadores). Conferir no ensaio a seco.</td></tr>
+      <tr class="sev-maj"><td class="mono">M12</td><td>BOM: porcas M5 = 2 (o manual diz 4); Nyloc M3 = 16 (o manual diz 20). Faltam lubrificante e PETG verde/amarelo. O PETG laranja tem 1 kg para um consumo declarado de 1,165 kg.</td><td>Ajustar a BOM antes da compra.</td></tr>
+      <tr class="sev-maj"><td class="mono">M13</td><td>A auditoria automática só testa a malha (fechada, Z = 0, tamanho). Os dados de montagem estão fixos no código como <code>True</code>. O arquivo mestre tem 122 corpos e não inclui a Mesa 14 (o total real é 132).</td><td>Não usar o “100% PASS” como prova de encaixe.</td></tr>
+      <tr class="sev-maj"><td class="mono">M14</td><td>O perfil da Mesa 07 pede “suporte nos furos”. Tirar suporte de dentro de um furo Ø12 com 22 mm de fundo é difícil.</td><td>Sem suporte (a ponte de 12 mm em PETG fecha bem). Alargar depois.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- cinemática -->
+<section>
+  <h2><span class="n">2.2</span>Cinemática e curso do empurrador</h2>
+  <div class="cols">
+    <div class="box">
+      <span class="label">Biela-manivela R = 60 · L = 110 (em linha)</span>
+      <p>Posição do cursor: x(θ) = R·cosθ + √(L² − R²·sen²θ). O curso de 120 mm só existe com os 180° completos do servo. Perto dos pontos mortos, perder alguns graus custa pouco.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Giro útil do servo</th><th>Curso</th></tr></thead>
+        <tbody>
+          <tr><td class="num">180° (0–180)</td><td class="num">120,0 mm</td></tr>
+          <tr><td class="num">160° (10–170)</td><td class="num">118,2 mm</td></tr>
+          <tr><td class="num">150° (15–165)</td><td class="num">115,9 mm</td></tr>
+          <tr><td class="num">120° (30–150)</td><td class="num">103,9 mm</td></tr>
+        </tbody></table></div>
+      <p class="note">Ângulo máximo da biela: 33,1° (aceitável, abaixo de 45°). Torque estimado: ~5 N × 0,06 m ≈ 3 kgf·cm, contra 11 kgf·cm do MG996R.</p>
+    </div>
+    <div class="box">
+      <span class="label">Folgas com a maçã Ø80 · 220 g</span>
+      <div class="tw"><table>
+        <thead><tr><th>Verificação</th><th>Valor</th><th></th></tr></thead>
+        <tbody>
+          <tr class="sev-ok"><td>Recolhido (face em −62) × maçã centrada</td><td class="num">22 mm livres</td><td><span class="pill ok">OK</span></td></tr>
+          <tr class="sev-ok"><td>Estendido (face em +58): centro da maçã além da borda da correia (±61)</td><td class="num">+34 mm</td><td><span class="pill ok">Cai na rampa</span></td></tr>
+          <tr class="sev-ok"><td>Sapata × cúpula 05A (X = −150 × X = +160)</td><td class="num">≈ 200 mm</td><td><span class="pill ok">OK</span></td></tr>
+          <tr class="sev-crit"><td>Sapata 100 mm × recorte 01J 100 mm</td><td class="num">0 mm</td><td><span class="pill crit">Colide</span></td></tr>
+          <tr class="sev-crit"><td>Altura da sapata × correia e guia</td><td class="num">−32 mm</td><td><span class="pill crit">Colide</span></td></tr>
+          <tr class="sev-crit"><td>Curso possível com haste de 170 mm</td><td class="num">≈ 48 mm</td><td><span class="pill crit">Insuficiente</span></td></tr>
+        </tbody></table></div>
+      <p class="note">Veredito: a geometria biela-manivela (R60/L110) está certa e empurra a maçã inteira para a rampa de 18°. O que reprova é a montagem física: C5, C6 e C7.</p>
+    </div>
+  </div>
+</section>
+
+<!-- tribologia -->
+<section>
+  <h2><span class="n">2.3</span>Contingência tribológica: operação sem rolamentos</h2>
+  <p>O fator P·v (pressão × velocidade de deslizamento) mede quanto calor de atrito o plástico precisa dissipar. O PETG não tem P·v publicado como material de mancal. Este laudo adota, por segurança, <b>0,05 MPa·m/s</b>, faixa de termoplástico amorfo sem carga. O manual usa 0,20, que é otimista. Mesmo com o limite conservador, as buchas passam.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Bucha</th><th>Área projetada</th><th>Carga</th><th>P</th><th>v</th><th>P·v</th><th>% de 0,05</th><th></th></tr></thead>
+    <tbody>
+      <tr class="sev-ok"><td>608 no tambor (nominal do manual)</td><td class="num">8 × 7 = 56 mm²</td><td class="num">10 N</td><td class="num">0,18 MPa</td><td class="num">12,6 mm/s</td><td class="num">0,0023</td><td class="num">4,5%</td><td><span class="pill ok">OK</span></td></tr>
+      <tr class="sev-ok"><td>608, correia pré-tensionada</td><td class="num">56 mm²</td><td class="num">20 N</td><td class="num">0,36 MPa</td><td class="num">12,6 mm/s</td><td class="num">0,0045</td><td class="num">9%</td><td><span class="pill ok">OK</span></td></tr>
+      <tr class="sev-ok"><td>608, motor travado (55 N de puxão na correia)</td><td class="num">56 mm²</td><td class="num">50 N</td><td class="num">0,89 MPa</td><td class="num">12,6 mm/s</td><td class="num">0,011</td><td class="num">22%</td><td><span class="pill ok">OK</span></td></tr>
+      <tr class="sev-ok"><td>LM6UU (pico, ciclo intermitente)</td><td class="num">6 × 19 = 114 mm²</td><td class="num">5 N</td><td class="num">0,044 MPa</td><td class="num">0,42 m/s</td><td class="num">0,018</td><td class="num">37%</td><td><span class="pill ok">OK</span></td></tr>
+      <tr class="sev-ok"><td>623 na biela (oscilação)</td><td class="num">3 × 4 = 12 mm²</td><td class="num">5 N</td><td class="num">0,42 MPa</td><td class="num">≈ 10 mm/s</td><td class="num">0,004</td><td class="num">8%</td><td><span class="pill ok">OK</span></td></tr>
+    </tbody></table></div>
+  <p class="note">A conta do manual confere: v = π·d·n = π × 0,008 × 0,5 = 0,0126 m/s, e P·v = 0,00225. Com bucha de PETG, o risco real não é aquecer. É a folga final depois de impressa (seção 2), o escoamento lento do plástico sob aperto e o pó de desgaste. A esteira nunca deve girar com a bucha seca.</p>
+  <div class="box">
+    <span class="label">Procedimento obrigatório de lubrificação inicial</span>
+    <ol style="margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px">
+      <li>Limpar eixos, hastes e buchas com álcool isopropílico. <b>Nunca</b> acetona, thinner ou WD-40: atacam o PETG e deixam microtrincas.</li>
+      <li>Buchas 608 e 623: 1 a 2 gotas de óleo de máquina (Singer) no furo, ou vaselina sólida / graxa branca de lítio no canal anelar.</li>
+      <li>LM6UU: película fina de vaselina ou graxa de silicone nos 2 canais. Correr o pórtico à mão 20 vezes.</li>
+      <li>Amaciamento: 10 min sem carga a 30 RPM. Limpar o pó que sair e lubrificar de novo.</li>
+      <li>Na feira: 1 gota por bucha no início de cada dia ou a cada 4 h de operação. Se a bucha esquentar ao toque, parar e verificar a folga.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- 3 -->
+<section>
+  <h2><span class="n">3</span>Balanço de carga: Ricley × Diego</h2>
+  <p>As cópias nas pastas <code>ricley/</code> e <code>diego/</code> foram comparadas por hash (MD5) com as originais. Todas as 14 mesas estão presentes, cada uma em uma única pasta, e as repetições são só as intencionais: Mesa 06 ×5 e Mesa 11 ×2. Nada falta e nada sobra. As massas e tempos abaixo são estimativas do script, não do fatiador.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Item</th><th>Ricley</th><th>Diego</th><th>Total</th><th>Veredito</th></tr></thead>
+    <tbody>
+      <tr class="sev-ok"><td>Arquivos / pratos</td><td class="num">8</td><td class="num">11</td><td class="num">19 execuções · 14 mesas distintas</td><td><span class="pill ok">Confere</span></td></tr>
+      <tr class="sev-ok"><td>Massa declarada</td><td class="num">1.108,8 g</td><td class="num">1.204,8 g</td><td class="num">2.313,6 g</td><td><span class="pill ok">Soma confere</span></td></tr>
+      <tr class="sev-ok"><td>Tempo declarado: Ricley</td><td class="num">22 h 35 min</td><td>—</td><td>—</td><td><span class="pill ok">Soma confere</span></td></tr>
+      <tr class="sev-crit"><td>Tempo declarado: Diego</td><td>—</td><td class="num">23 h 05 min</td><td>—</td><td><span class="pill crit">Errado</span><br><span class="note">A soma das linhas do próprio guia dá 26 h 05 min.</span></td></tr>
+      <tr class="sev-ok"><td>Elos impressos</td><td class="num">54 (3 lotes)</td><td class="num">36 (2 lotes)</td><td class="num">90</td><td><span class="pill ok">54 + 36 = 90</span></td></tr>
+      <tr class="sev-crit"><td>Elos necessários (passo 16,51, tambor de 12 dentes)</td><td colspan="2">91 elos para entre-centros de 652 mm</td><td class="num">−1 de reserva</td><td><span class="pill crit">Não fecha com reserva</span><br><span class="note">Os “86 + 4” do manual estão errados.</span></td></tr>
+      <tr class="sev-maj"><td>Massa realista</td><td colspan="3">O estimador conta casca de 2 paredes com fator 0,5, mas os perfis pedem 3 a 4 paredes e 4 camadas de topo/base. A auditoria anterior estimou ≈ 3,6 kg no total. A Mesa 14 a 100% pesa ~20 g, não 8,9 g.</td><td><span class="pill maj">Subestimada</span><br><span class="note">Comprar com folga: 3 kg PETG + 0,5 kg extra.</span></td></tr>
+    </tbody></table></div>
+  <div class="box">
+    <span class="label">Rebalanceamento proposto</span>
+    <p><b>Ricley</b> recebe o 6º lote de elos (+18 elos, +2 h 15 min) e fica com ≈ 24 h 50 min. <b>Diego</b> recebe +8 buchas 608 (+15 min) e fica com ≈ 26 h 20 min. Diferença de ~1,5 h, aceitável. Elos: 108 impressos, 91 montados, 17 de reserva.</p>
+    <p><b>Ordem sugerida para começar hoje:</b> cada um imprime primeiro o lote liberado. Ricley: elos 1–4, sapatas TPU, caixa de aprovados, Mesa 04. Diego: bucha de teste, Mesa 14, elos, Mesas 03, 08, 10, 11, 12 e a 09 invertida. As Mesas 01 e 05 (Ricley) e 02 e 07 (Diego) entram por último, já regeradas.</p>
+  </div>
+</section>
+
+<!-- 4 -->
+<section>
+  <h2><span class="n">4</span>Checklist final de pré-fatiamento</h2>
+  <p>Conferência dos perfis pedidos para a Bambu Studio / P2S. Itens em vermelho são correções a este laudo ou aos guias.</p>
+  <div class="cols">
+    <div class="box">
+      <span class="label">Máquina e material</span>
+      <ul class="check">
+        <li>Bico 0,4 mm de aço endurecido (o de fábrica da P2S). Confirmado nos dois perfis.</li>
+        <li>Placa PEI texturizada, lavada com água e detergente. PETG não precisa de cola nessa placa.</li>
+        <li class="warn"><b>Secar o filamento antes</b> (umidade de Manaus ~80%). PETG a 65 °C por 6–8 h, TPU a 55 °C por 6 h. Manter no AMS com dessecante.</li>
+        <li>PETG a 245 °C (250 °C na 1ª camada) e mesa a 75 °C: dentro da faixa Bambu de 230–260 / 70–80. Aprovado.</li>
+        <li>Ventoinha de 20–50%, com ventoinha de ponte/balanço ≥ 80% (tetos a 45° e furos deitados).</li>
+        <li class="warn">Compensação de furo X-Y: <b>+0,05 mm nos dois guias</b> (hoje só o do Ricley tem) e compensação de pé de elefante de 0,15 mm.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <span class="label">Por mesa</span>
+      <ul class="check">
+        <li>Geral: 3 paredes, gyroid 22%, 4 topo/base. Aprovado. Peças com furo carregado (01A–01D, 02D, 03E, 03F, 03G, 03I) usam <b>5 paredes</b>.</li>
+        <li class="warn">Mesa 14: 100% sólido, camada de 0,16, ironing no topo (estético, não mexe no furo). <b>Imprimir 1 bucha 608 de teste</b>, medir com o eixo e ajustar a compensação de furo entre +0,05 e +0,15 antes do lote.</li>
+        <li>Mesa 05: brim externo de 5 mm. Correto, mas a mesa está bloqueada até regerar (C1–C3).</li>
+        <li>Mesa 13 TPU 95A: 30 mm/s, retração ≤ 1 mm, carretel externo (TPU não passa no AMS), 230 / 40 °C. Aprovado.</li>
+        <li class="warn">Mesa 12 PLA: 220 / 55 °C. Aprovado. <b>Pausa em Z = 2,5 mm</b>, não 3,2, e plaquetas num prato separado do difusor.</li>
+        <li class="warn">Mesa 07: <b>desligar o suporte</b> nos furos Ø12. Mesa 09: <b>teto para baixo</b>.</li>
+        <li>Mesa 06: 6 lotes. Testar cada lote com um pedaço de filamento 1,75 antes de destacar os elos.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="box">
+    <span class="label">Antes de ligar a máquina: responsável de cada impressora</span>
+    <ul class="check">
+      <li>Fatiar e anotar a massa e o tempo reais que o Bambu Studio mostra. Substituir as estimativas do guia.</li>
+      <li>Conferir que o prato carregado é o arquivo da sua pasta, não o mestre <code>TODAS_AS_MESAS…</code> (que não tem a Mesa 14).</li>
+      <li class="warn">Não imprimir as Mesas 01, 02, 05 e 07 até receber a versão regerada.</li>
+      <li class="warn">Comprar antes da montagem: M4×30 e M4×25 (C11), hastes Ø6 × 250 (C6), polia 20T com furo 6 (C3), óleo de máquina ou vaselina, PETG extra.</li>
+      <li>Ensaio a seco (montar sem parafusar) do conjunto tambor + bucha + eixo + cabeceira antes da correia.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <p>Medições feitas nas malhas STL com cortes de seção (trimesh) e simulação de articulação por booleana (manifold3d). As estimativas pós-FDM seguem o comportamento típico do bico de 0,4 mm em PETG e devem ser confirmadas com a bucha de teste. Correções geométricas vão no gerador <code>gerar_kit_3d_amazonvision.py</code>, nunca editando a STL à mão.</p>
+</footer>
+</main>

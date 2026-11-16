@@ -1,0 +1,1028 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Infográfico A Jornada da Inspeção Inteligente — AmazonVision 4.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #070d09;
+      --bg-card: #0e1711;
+      --fg: #f1ede4;
+      --fg-muted: #95a396;
+      --accent: #e5b33d;
+      --accent-glow: rgba(229, 179, 61, 0.35);
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.3);
+      --border: #1f3325;
+      --border-highlight: #2e4d38;
+      --display: 'Space Grotesk', 'Outfit', sans-serif;
+      --body: 'DM Sans', sans-serif;
+    }
+
+    [data-theme="light"] {
+      --bg: #f2f5f1;
+      --bg-card: #ffffff;
+      --fg: #132219;
+      --fg-muted: #526356;
+      --accent: #b3821a;
+      --accent-glow: rgba(179, 130, 26, 0.2);
+      --emerald: #059669;
+      --emerald-glow: rgba(5, 150, 105, 0.2);
+      --border: #d2ddd4;
+      --border-highlight: #b0c4b5;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--body);
+      min-height: 100vh;
+      padding: 1.5rem 1rem 3rem;
+      transition: background 0.3s ease, color 0.3s ease;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.8rem 1.4rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .nav-link {
+      color: var(--fg-muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 0.4rem 0.85rem;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--fg);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--border);
+    }
+
+    .nav-link.active {
+      color: var(--accent);
+      background: rgba(229, 179, 61, 0.12);
+      border-color: rgba(229, 179, 61, 0.3);
+    }
+
+    /* Top Header */
+    .top-header {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.8rem 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .brand-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+      font-family: var(--display);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(229, 179, 61, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(229, 179, 61, 0.3);
+    }
+
+    .badge.emerald {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--emerald);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .top-header h1 {
+      font-family: var(--display);
+      font-size: clamp(1.6rem, 3vw, 2.3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+
+    .top-header h1 span {
+      background: linear-gradient(135deg, #ffd768 0%, #f59e0b 50%, #10b981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .top-header p {
+      color: var(--fg-muted);
+      font-size: 0.92rem;
+      max-width: 720px;
+    }
+
+    /* Toolbar */
+    .toolbar {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1rem 1.4rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .tool-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .tool-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--fg-muted);
+      margin-right: 0.3rem;
+    }
+
+    .btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--fg);
+      padding: 0.45rem 0.9rem;
+      border-radius: 10px;
+      font-family: var(--body);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--border-highlight);
+      transform: translateY(-1px);
+    }
+
+    .btn.active {
+      background: var(--accent);
+      color: #070d09;
+      border-color: var(--accent);
+      box-shadow: 0 4px 14px var(--accent-glow);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, #e5b33d, #c2881b);
+      color: #080f0a;
+      border: none;
+      font-weight: 700;
+      box-shadow: 0 4px 18px var(--accent-glow);
+    }
+
+    .btn.primary:hover {
+      filter: brightness(1.1);
+      transform: translateY(-2px);
+    }
+
+    .btn svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    /* Layout */
+    .stage-wrapper {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 1060px) {
+      .stage-wrapper {
+        grid-template-columns: 1.25fr 1fr;
+      }
+    }
+
+    .banner-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+    }
+
+    .card-topbar {
+      padding: 0.9rem 1.4rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .card-title {
+      font-family: var(--display);
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .canvas-viewport {
+      position: relative;
+      width: 100%;
+      background: #020704;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 0.5rem;
+    }
+
+    #journeyCanvas {
+      width: min(100%, 540px);
+      height: auto;
+      aspect-ratio: 800 / 2000;
+      display: block;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      border-radius: 12px;
+    }
+
+    /* Specs Sidebar */
+    .specs-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      height: fit-content;
+    }
+
+    .section-title {
+      font-family: var(--display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: var(--fg);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.65rem;
+    }
+
+    .journey-timeline-item {
+      display: flex;
+      gap: 0.9rem;
+      align-items: flex-start;
+      padding: 0.75rem;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+    }
+
+    .journey-timeline-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: rgba(229, 179, 61, 0.15);
+      color: var(--accent);
+      display: grid;
+      place-items: center;
+      font-size: 0.85rem;
+      font-weight: 800;
+      font-family: var(--display);
+      flex-shrink: 0;
+    }
+
+    .journey-timeline-content h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      font-family: var(--display);
+      color: #ffffff;
+      margin-bottom: 0.2rem;
+    }
+
+    .journey-timeline-content p {
+      font-size: 0.8rem;
+      color: var(--fg-muted);
+      line-height: 1.4;
+    }
+
+    .tech-specs-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+
+    .tech-specs-table td {
+      padding: 0.45rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .tech-specs-table td:first-child {
+      color: var(--fg-muted);
+    }
+
+    .tech-specs-table td:last-child {
+      text-align: right;
+      font-weight: 600;
+      color: var(--fg);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--fg-muted);
+      font-size: 0.82rem;
+      padding: 1.5rem 0 0.5rem;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #0f2416;
+      border: 1px solid var(--emerald);
+      color: #d1fae5;
+      padding: 0.7rem 1.4rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- Navigation between pieces -->
+    <nav class="nav-bar">
+      <div style="font-family: var(--display); font-weight: 700; font-size: 0.95rem; color: var(--accent);">
+        AmazonVision 4.0 · Material Visual
+      </div>
+      <div class="nav-links">
+        <a href="banner-ideias.html" class="nav-link">Backdrop 2,5×2,5m (Estande)</a>
+        <a href="infografico-blueprint.html" class="nav-link">Infográfico 01: Blueprint FUCAPI</a>
+        <a href="infografico-jornada.html" class="nav-link active">Infográfico 02: A Jornada Inteligente</a>
+      </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="top-header">
+      <div class="brand-group">
+        <div class="tag-row">
+          <span class="badge">Infográfico 800 × 2000 px</span>
+          <span class="badge emerald">Automação Industrial · NCA1</span>
+          <span class="badge">XXI Feira Tecnológica FUCAPI</span>
+        </div>
+        <h1>A Jornada da <span>Inspeção Inteligente</span> — 5 Etapas</h1>
+        <p>Do fruto na esteira à separação mecatrônica autônoma: entenda o ciclo completo de controle, visão artificial e impacto na bioeconomia amazônica.</p>
+      </div>
+
+      <div class="tool-group">
+        <button class="btn primary" id="btnExportHighRes" title="Gera imagem PNG nítida em 1600 × 4000 px para gráfica/impressão">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exportar 1600×4000 (Gráfica)
+        </button>
+      </div>
+    </header>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="tool-group">
+        <span class="tool-label">Tema Visual:</span>
+        <button class="btn active" data-theme-val="dourado" id="themeGold">🌟 Horizonte Ouro</button>
+        <button class="btn" data-theme-val="esmeralda" id="themeEmerald">🍃 Cyber Esmeralda</button>
+        <button class="btn" data-theme-val="sunset" id="themeSunset">🌅 Sunset Amazônia</button>
+      </div>
+
+      <div class="tool-group">
+        <span class="tool-label">Efeitos:</span>
+        <button class="btn active" id="btnToggleAnim">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Animação da Trilha
+        </button>
+      </div>
+    </div>
+
+    <!-- Workspace -->
+    <div class="stage-wrapper">
+
+      <div class="banner-card">
+        <div class="card-topbar">
+          <div class="card-title">
+            <span style="color: var(--accent);">●</span>
+            <span>Infográfico A Jornada da Inspeção — Proporção Vertical 800 × 2000 px</span>
+          </div>
+        </div>
+
+        <div class="canvas-viewport">
+          <canvas id="journeyCanvas" width="800" height="2000"></canvas>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="specs-card">
+        <div class="section-title">
+          <span>🚀</span> As 5 Etapas do Ciclo Inteligente
+        </div>
+
+        <div class="journey-timeline-item">
+          <div class="journey-timeline-badge">01</div>
+          <div class="journey-timeline-content">
+            <h4>Conceito: Indústria 4.0</h4>
+            <p>Triagem autônoma de tucumã, castanha, açaí, cupuaçu e frutos da sociobiodiversidade com Edge Computing.</p>
+          </div>
+        </div>
+
+        <div class="journey-timeline-item">
+          <div class="journey-timeline-badge">02</div>
+          <div class="journey-timeline-content">
+            <h4>Ação: Transporte & Detecção</h4>
+            <p>Sensor óptico S1 interrompe a peça sob iluminação difusa uniforme, garantindo captura nítida.</p>
+          </div>
+        </div>
+
+        <div class="journey-timeline-item">
+          <div class="journey-timeline-badge">03</div>
+          <div class="journey-timeline-content">
+            <h4>Inteligência: Visão & Edge AI</h4>
+            <p>Câmera fotografa o fruto e o modelo MobileNetV3 infere a classe de qualidade em apenas 4 ms.</p>
+          </div>
+        </div>
+
+        <div class="journey-timeline-item">
+          <div class="journey-timeline-badge">04</div>
+          <div class="journey-timeline-content">
+            <h4>Controle: Separação Mecânica</h4>
+            <p>ESP32 comanda o servomotor defletor, direcionando peças aprovadas e rejeitadas para saídas distintas.</p>
+          </div>
+        </div>
+
+        <div class="journey-timeline-item">
+          <div class="journey-timeline-badge">05</div>
+          <div class="journey-timeline-content">
+            <h4>Impacto: Rastreabilidade Total</h4>
+            <p>Painel registra fotos e lotes em SQLite para auditoria completa e valorização da safra amazônica.</p>
+          </div>
+        </div>
+
+        <table class="tech-specs-table">
+          <tr><td>Evento</td><td>XXI Feira Tecnológica FUCAPI - 2026</td></tr>
+          <tr><td>Curso / Turma</td><td>Automação Industrial · NCA1</td></tr>
+          <tr><td>Resolução Original</td><td>800 × 2000 px (1:2.5)</td></tr>
+          <tr><td>Exportação Gráfica</td><td>1600 × 4000 px PNG Ultra-HD</td></tr>
+          <tr><td>Ciclo Operacional</td><td>Uma peça por vez · &lt; 2s total</td></tr>
+        </table>
+      </div>
+
+    </div>
+
+    <footer>
+      AmazonVision 4.0 · Automação Industrial NCA1 · XXI Feira Tecnológica FUCAPI 2026
+    </footer>
+  </div>
+
+  <div class="toast" id="toastMessage">Infográfico exportado em alta resolução!</div>
+
+  <script>
+  (function(){
+    const canvas = document.getElementById('journeyCanvas');
+    const ctx = canvas.getContext('2d');
+    const W = 800, H = 2000;
+    canvas.width = W;
+    canvas.height = H;
+
+    let currentTheme = 'dourado';
+    let isAnimated = true;
+    let animTime = 0;
+    let animFrame = null;
+
+    const palettes = {
+      dourado: {
+        bgTop: '#020904',
+        bgMid1: '#06170d',
+        bgMid2: '#0b2315',
+        bgBot: '#030a05',
+        gold: '#e5b33d',
+        goldBright: '#ffd768',
+        goldDim: '#a6822c',
+        emerald: '#10b981',
+        cardBg: 'rgba(9, 24, 15, 0.75)',
+        cardBorder: '#23462f',
+        pathGlow: '#e5b33d'
+      },
+      esmeralda: {
+        bgTop: '#010e08',
+        bgMid1: '#041c12',
+        bgMid2: '#082d1e',
+        bgBot: '#021009',
+        gold: '#10b981',
+        goldBright: '#34d399',
+        goldDim: '#059669',
+        emerald: '#00f0a8',
+        cardBg: 'rgba(5, 28, 19, 0.8)',
+        cardBorder: '#0e5539',
+        pathGlow: '#00f0a8'
+      },
+      sunset: {
+        bgTop: '#100508',
+        bgMid1: '#1e0c12',
+        bgMid2: '#2c130f',
+        bgBot: '#0a0305',
+        gold: '#fb923c',
+        goldBright: '#fed7aa',
+        goldDim: '#c2410c',
+        emerald: '#fbbf24',
+        cardBg: 'rgba(32, 12, 11, 0.8)',
+        cardBorder: '#522018',
+        pathGlow: '#f97316'
+      }
+    };
+
+    function renderJourney(c, t) {
+      const p = palettes[currentTheme];
+
+      // 1. Background
+      const bg = c.createLinearGradient(0, 0, 0, H);
+      bg.addColorStop(0, p.bgTop);
+      bg.addColorStop(0.25, p.bgMid1);
+      bg.addColorStop(0.65, p.bgMid2);
+      bg.addColorStop(1, p.bgBot);
+      c.fillStyle = bg;
+      c.fillRect(0, 0, W, H);
+
+      // Subtle Stars
+      for (let i = 0; i < 45; i++) {
+        const sx = (Math.sin(i * 97 + t * 0.4) * 0.5 + 0.5) * W;
+        const sy = (Math.cos(i * 241 + t * 0.25) * 0.5 + 0.5) * H;
+        const sr = 1 + (Math.sin(t * 2 + i) + 1) * 1.5;
+        c.beginPath();
+        c.arc(sx, sy, sr, 0, Math.PI * 2);
+        c.fillStyle = p.goldBright;
+        c.globalAlpha = 0.35;
+        c.fill();
+      }
+      c.globalAlpha = 1;
+
+      // 2. HEADER
+      c.textAlign = 'center';
+      c.font = '700 13px "Space Grotesk", sans-serif';
+      c.fillStyle = p.gold;
+      c.letterSpacing = '0.12em';
+      c.fillText('XXI FEIRA TECNOLÓGICA FUCAPI - 2026', W / 2, 55);
+
+      c.font = '600 12px "DM Sans", sans-serif';
+      c.fillStyle = '#9cb8a7';
+      c.fillText('CURSO: AUTOMAÇÃO INDUSTRIAL · TURMA: NCA1', W / 2, 78);
+
+      c.font = '800 34px "Space Grotesk", sans-serif';
+      c.fillStyle = '#ffffff';
+      c.fillText('A JORNADA DA', W / 2, 130);
+
+      const gradTitle = c.createLinearGradient(150, 0, 650, 0);
+      gradTitle.addColorStop(0, p.goldBright);
+      gradTitle.addColorStop(1, p.emerald);
+      c.fillStyle = gradTitle;
+      c.fillText('INSPEÇÃO INTELIGENTE', W / 2, 172);
+
+      c.font = '500 15px "DM Sans", sans-serif';
+      c.fillStyle = '#c7d7cc';
+      c.fillText('Do fruto na esteira à separação mecatrônica autônoma em 5 etapas', W / 2, 210);
+
+      // 3. CENTRAL CONNECTING PIPELINE (Glowing vertical trail connecting cards)
+      const pipelineX = 100;
+      const startY = 280, endY = 1820;
+
+      // Outer glow line
+      c.beginPath();
+      c.moveTo(pipelineX, startY);
+      c.lineTo(pipelineX, endY);
+      c.strokeStyle = p.pathGlow;
+      c.lineWidth = 4;
+      c.globalAlpha = 0.25;
+      c.stroke();
+
+      // Main core circuit line
+      c.strokeStyle = p.emerald;
+      c.lineWidth = 2;
+      c.globalAlpha = 0.8;
+      c.stroke();
+      c.globalAlpha = 1;
+
+      // Traveling Energy Pulse
+      const pulseCycle = (t * 0.4) % 1; // 0 to 1
+      const pulseY = startY + pulseCycle * (endY - startY);
+      c.beginPath();
+      c.arc(pipelineX, pulseY, 8, 0, Math.PI * 2);
+      c.fillStyle = '#ffffff';
+      c.shadowColor = p.pathGlow;
+      c.shadowBlur = 15;
+      c.fill();
+      c.shadowBlur = 0;
+
+      // 4. THE 5 STAGES OF THE JOURNEY
+      const stages = [
+        {
+          num: '01',
+          tag: 'CONCEITO',
+          title: 'Indústria 4.0 & Bioeconomia',
+          desc: 'O AmazonVision 4.0 une automação e IA para a sociobiodiversidade amazônica, realizando a triagem visual autônoma de tucumã, açaí, castanha-do-pará e cupuaçu com Edge Computing.',
+          icon: '🌴',
+          accent: p.gold,
+          y: 280
+        },
+        {
+          num: '02',
+          tag: 'AÇÃO',
+          title: 'Transporte e Detecção Óptica',
+          desc: 'A esteira conduz o fruto até o sensor óptico S1, que interrompe o avanço da peça sob iluminação difusa controlada para garantir captura nítida e sem sombras.',
+          icon: '🔄',
+          accent: '#38bdf8',
+          y: 590
+        },
+        {
+          num: '03',
+          tag: 'INTELIGÊNCIA',
+          title: 'Visão Computacional & Edge AI',
+          desc: 'A câmera industrial fotografa o fruto e o modelo MobileNetV3 (ONNX) infere a classe de qualidade (A, B ou C) em apenas 4 ms, operando de forma 100% local e offline.',
+          icon: '👁️',
+          accent: p.emerald,
+          y: 900
+        },
+        {
+          num: '04',
+          tag: 'CONTROLE',
+          title: 'Separação Mecânica Ativa',
+          desc: 'O ESP32 recebe a classificação por protocolo serial seguro e comanda o servomotor defletor, direcionando peças aprovadas e rejeitadas para saídas físicas distintas.',
+          icon: '⚙️',
+          accent: '#f59e0b',
+          y: 1210
+        },
+        {
+          num: '05',
+          tag: 'IMPACTO',
+          title: 'Rastreabilidade Total & Valorização',
+          desc: 'O painel web registra fotos, lotes e decisões em banco SQLite, permitindo auditoria completa, redução de perdas na safra e valorização dos produtos da Amazônia.',
+          icon: '📊',
+          accent: '#a855f7',
+          y: 1520
+        }
+      ];
+
+      stages.forEach((st) => {
+        drawStageCard(c, p, pipelineX, st, t);
+      });
+
+      // 5. FOOTER
+      drawJourneyFooter(c, p);
+    }
+
+    function drawStageCard(c, p, lineX, st, t) {
+      c.save();
+      const cardX = lineX + 45;
+      const cardY = st.y;
+      const cardW = 600;
+      const cardH = 265;
+
+      // Connecting Node on the central pipeline
+      c.beginPath();
+      c.arc(lineX, cardY + 50, 18, 0, Math.PI * 2);
+      c.fillStyle = 'rgba(10, 25, 16, 0.95)';
+      c.fill();
+      c.strokeStyle = st.accent;
+      c.lineWidth = 2.5;
+      c.stroke();
+
+      c.font = '800 14px "Space Grotesk", sans-serif';
+      c.fillStyle = st.accent;
+      c.textAlign = 'center';
+      c.fillText(st.num, lineX, cardY + 55);
+
+      // Horizontal connector arm
+      c.beginPath();
+      c.moveTo(lineX + 18, cardY + 50);
+      c.lineTo(cardX, cardY + 50);
+      c.strokeStyle = st.accent;
+      c.lineWidth = 2;
+      c.stroke();
+
+      // Card Body
+      c.beginPath();
+      c.roundRect(cardX, cardY, cardW, cardH, 16);
+      c.fillStyle = p.cardBg;
+      c.fill();
+      c.strokeStyle = p.cardBorder;
+      c.lineWidth = 1.5;
+      c.stroke();
+
+      // Category Tag Pill
+      c.beginPath();
+      c.roundRect(cardX + 24, cardY + 22, 100, 24, 12);
+      c.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      c.fill();
+      c.strokeStyle = st.accent;
+      c.lineWidth = 1;
+      c.stroke();
+
+      c.font = '700 10px "Space Grotesk", sans-serif';
+      c.fillStyle = st.accent;
+      c.textAlign = 'center';
+      c.fillText(st.tag, cardX + 74, cardY + 38);
+
+      // Stage Icon
+      c.font = '24px sans-serif';
+      c.textAlign = 'right';
+      c.fillText(st.icon, cardX + cardW - 24, cardY + 45);
+
+      // Stage Title
+      c.font = '800 20px "Space Grotesk", sans-serif';
+      c.fillStyle = '#ffffff';
+      c.textAlign = 'left';
+      c.fillText(`${st.num}. ${st.title}`, cardX + 24, cardY + 75);
+
+      // Stage Description
+      c.font = '400 14px "DM Sans", sans-serif';
+      c.fillStyle = '#c0d2c5';
+      drawTextWrap(c, st.desc, cardX + 24, cardY + 104, cardW - 48, 22, 'left');
+
+      // Visual Widget Box inside each card
+      drawStageWidget(c, p, cardX + 24, cardY + 180, cardW - 48, 65, st.num, t);
+
+      c.restore();
+    }
+
+    function drawStageWidget(c, p, x, y, w, h, stageNum, t) {
+      c.save();
+      c.beginPath();
+      c.roundRect(x, y, w, h, 10);
+      c.fillStyle = 'rgba(4, 14, 8, 0.6)';
+      c.fill();
+      c.strokeStyle = 'rgba(255, 255, 255, 0.07)';
+      c.stroke();
+
+      if (stageNum === '01') {
+        // Fruit Multi-Bio Display
+        const items = ['Tucumã', 'Açaí', 'Castanha', 'Cupuaçu'];
+        const sp = w / 4;
+        items.forEach((item, i) => {
+          c.font = '600 12px "Space Grotesk", sans-serif';
+          c.fillStyle = p.gold;
+          c.textAlign = 'center';
+          c.fillText(item, x + sp * i + sp/2, y + 28);
+          c.fillStyle = '#8ea794';
+          c.font = '500 11px "DM Sans", sans-serif';
+          c.fillText('Autonomia IA', x + sp * i + sp/2, y + 48);
+        });
+      } else if (stageNum === '02') {
+        // Sensor & Light Status
+        c.font = '600 12px "Space Grotesk", sans-serif';
+        c.fillStyle = p.emerald;
+        c.textAlign = 'left';
+        c.fillText('● SENSOR ÓPTICO S1: PEÇA IDENTIFICADA', x + 20, y + 28);
+        c.fillStyle = '#ffffff';
+        c.fillText('ILUMINAÇÃO DIFUSA ATIVA · CAPTURA PARADA', x + 20, y + 48);
+      } else if (stageNum === '03') {
+        // Neural Inference 4ms
+        c.font = '800 13px "Space Grotesk", sans-serif';
+        c.fillStyle = p.goldBright;
+        c.textAlign = 'left';
+        c.fillText('MOBILENETV3 (ONNX): 4 ms', x + 20, y + 28);
+
+        // Confidence Bar
+        c.fillStyle = '#1e3828';
+        c.roundRect(x + 20, y + 38, w - 160, 12, 6);
+        c.fill();
+
+        c.fillStyle = p.emerald;
+        c.roundRect(x + 20, y + 38, (w - 160) * 0.985, 12, 6);
+        c.fill();
+
+        c.font = '700 12px "Space Grotesk", sans-serif';
+        c.fillStyle = p.emerald;
+        c.textAlign = 'right';
+        c.fillText('CLASSE A (98.5%)', x + w - 20, y + 48);
+      } else if (stageNum === '04') {
+        // Servo State
+        c.font = '600 12px "Space Grotesk", sans-serif';
+        c.fillStyle = '#f59e0b';
+        c.textAlign = 'left';
+        c.fillText('ESP32: ESTADO S4_ACTUATING', x + 20, y + 28);
+        c.fillStyle = '#ffffff';
+        c.fillText('SERVOMOTOR ATIVADO: CANAL DE APROVAÇÃO', x + 20, y + 48);
+      } else if (stageNum === '05') {
+        // SQLite Stats
+        c.font = '600 12px "Space Grotesk", sans-serif';
+        c.fillStyle = '#a855f7';
+        c.textAlign = 'left';
+        c.fillText('BANCO LOCAL: SQLITE REGISTRADO', x + 20, y + 28);
+        c.fillStyle = '#ffffff';
+        c.fillText('RASTREABILIDADE COMPLETA · BIOECONOMIA 4.0', x + 20, y + 48);
+      }
+
+      c.restore();
+    }
+
+    function drawJourneyFooter(c, p) {
+      c.save();
+      const fy = 1860;
+
+      // Divider
+      const divGrad = c.createLinearGradient(100, 0, 700, 0);
+      divGrad.addColorStop(0, 'transparent');
+      divGrad.addColorStop(0.5, p.gold);
+      divGrad.addColorStop(1, 'transparent');
+      c.fillStyle = divGrad;
+      c.fillRect(100, fy, 600, 2);
+
+      // Text block
+      c.textAlign = 'center';
+      c.font = '700 20px "Space Grotesk", sans-serif';
+      c.fillStyle = '#ffffff';
+      c.fillText('AMAZONVISION 4.0', W / 2, fy + 38);
+
+      c.font = '600 14px "Space Grotesk", sans-serif';
+      c.fillStyle = p.gold;
+      c.fillText('XXI FEIRA TECNOLÓGICA FUCAPI - 2026', W / 2, fy + 62);
+
+      c.font = '500 13px "DM Sans", sans-serif';
+      c.fillStyle = '#8fa394';
+      c.fillText('Curso: Automação Industrial · Turma: NCA1 · Manaus - AM', W / 2, fy + 84);
+
+      c.restore();
+    }
+
+    function drawTextWrap(c, text, x, y, maxWidth, lineHeight, align = 'left') {
+      c.textAlign = align;
+      const words = text.split(' ');
+      let line = '';
+      let curY = y;
+
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = c.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+          c.fillText(line.trim(), x, curY);
+          line = words[n] + ' ';
+          curY += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      if (line.trim().length > 0) {
+        c.fillText(line.trim(), x, curY);
+        curY += lineHeight;
+      }
+      return curY;
+    }
+
+    function tick(timestamp) {
+      animTime = timestamp * 0.001;
+      renderJourney(ctx, animTime);
+      if (isAnimated) {
+        animFrame = requestAnimationFrame(tick);
+      }
+    }
+    animFrame = requestAnimationFrame(tick);
+
+    // Controls
+    const themeButtons = [
+      { btn: document.getElementById('themeGold'), val: 'dourado' },
+      { btn: document.getElementById('themeEmerald'), val: 'esmeralda' },
+      { btn: document.getElementById('themeSunset'), val: 'sunset' }
+    ];
+
+    themeButtons.forEach(({ btn, val }) => {
+      btn.addEventListener('click', () => {
+        themeButtons.forEach(b => b.btn.classList.remove('active'));
+        btn.classList.add('active');
+        currentTheme = val;
+        renderJourney(ctx, animTime);
+      });
+    });
+
+    const btnToggleAnim = document.getElementById('btnToggleAnim');
+    btnToggleAnim.addEventListener('click', () => {
+      isAnimated = !isAnimated;
+      btnToggleAnim.classList.toggle('active', isAnimated);
+      if (isAnimated) {
+        animFrame = requestAnimationFrame(tick);
+      } else if (animFrame) {
+        cancelAnimationFrame(animFrame);
+        animFrame = null;
+        renderJourney(ctx, animTime);
+      }
+    });
+
+    // High-Res Export (1600 x 4000 px)
+    const toast = document.getElementById('toastMessage');
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+
+    document.getElementById('btnExportHighRes').addEventListener('click', () => {
+      showToast('Renderizando Infográfico em 1600 × 4000 px para gráfica...');
+
+      setTimeout(() => {
+        const offCanvas = document.createElement('canvas');
+        const exportW = 1600;
+        const exportH = 4000;
+        offCanvas.width = exportW;
+        offCanvas.height = exportH;
+        const offCtx = offCanvas.getContext('2d');
+
+        offCtx.save();
+        offCtx.scale(2, 2);
+        renderJourney(offCtx, animTime);
+        offCtx.restore();
+
+        const link = document.createElement('a');
+        const dateStr = new Date().toISOString().slice(0, 10);
+        link.download = `Infografico-Jornada-Inspecao-AmazonVision-4.0-FUCAPI-${currentTheme}-${dateStr}.png`;
+        link.href = offCanvas.toDataURL('image/png', 1.0);
+        link.click();
+
+        showToast('Download concluído! PNG de alta definição pronto para impressão.');
+      }, 100);
+    });
+
+  })();
+  </script>
+</body>
+</html>

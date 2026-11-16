@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>10 Conceitos de Layout e Design System — IoT & Industrial CAD Simulator</title>
+  <style>
+    :root {
+      --bg-main: #0c0e14;
+      --card-bg: #141721;
+      --border-color: #232838;
+      --accent-color: #00e5ff;
+      --accent-hover: #00b8cc;
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      padding: 24px;
+    }
+
+    header.main-header {
+      max-width: 1440px;
+      margin: 0 auto 32px auto;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .header-title h1 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge-iot {
+      background: rgba(0, 229, 255, 0.12);
+      color: var(--accent-color);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      font-size: 11px;
+      font-family: var(--font-mono);
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .header-title p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .filter-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+      background: rgba(0, 229, 255, 0.05);
+    }
+
+    /* BARRA DE NAVEGAÇÃO RÁPIDA POR ABAS */
+    .nav-ideas-bar {
+      max-width: 1440px;
+      margin: 0 auto 24px auto;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .nav-ideas-bar::-webkit-scrollbar {
+      height: 6px;
+    }
+    .nav-ideas-bar::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 3px;
+    }
+
+    .tab-nav-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .tab-nav-item:hover {
+      color: #fff;
+      border-color: #3b4258;
+    }
+
+    .tab-nav-item.active {
+      background: #1b2030;
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
+    }
+
+    .tab-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      opacity: 0.7;
+    }
+
+    /* CONTAINER PRINCIPAL */
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    /* GRID DE CARDS */
+    .ideas-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    .idea-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      transition: border-color 0.2s;
+    }
+
+    .idea-card:hover {
+      border-color: #38415c;
+    }
+
+    .idea-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .idea-header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .idea-index {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--accent-color);
+      background: rgba(0, 229, 255, 0.1);
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 229, 255, 0.2);
+    }
+
+    .idea-title-block h2 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .idea-title-block span {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .idea-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tag-badge {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: #1e2433;
+      color: #cbd5e1;
+      border: 1px solid #2d3748;
+    }
+
+    .idea-body {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 0;
+    }
+
+    @media (max-width: 1024px) {
+      .idea-body {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* MOCKUP VISUAL INTERATIVO */
+    .mockup-viewport {
+      padding: 24px;
+      background: #090a0f;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border-color);
+    }
+
+    .mockup-window {
+      width: 100%;
+      height: 440px;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* SIDEBAR DE ESPECIFICAÇÃO TÉCNICA */
+    .idea-specs {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      background: var(--card-bg);
+    }
+
+    .spec-group h3 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      font-family: var(--font-mono);
+    }
+
+    .palette-swatches {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .swatch {
+      flex: 1;
+      min-width: 50px;
+      height: 52px;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 4px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: bold;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .swatch span {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 2px 3px;
+      border-radius: 3px;
+      text-align: center;
+      color: #fff;
+    }
+
+    .spec-details-list {
+      list-style: none;
+      font-size: 13px;
+      color: #cbd5e1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .spec-details-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .spec-details-list li strong {
+      color: #fff;
+    }
+
+    .spec-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-color);
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+
+    .btn-select-idea {
+      margin-top: auto;
+      background: #1e2435;
+      color: #fff;
+      border: 1px solid #333d56;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-select-idea:hover {
+      background: var(--accent-color);
+      color: #000;
+      border-color: var(--accent-color);
+      font-weight: bold;
+    }
+
+    .btn-select-idea.selected {
+      background: #00e5ff;
+      color: #000;
+      border-color: #00e5ff;
+      font-weight: bold;
+    }
+
+    /* MOCKUP INTERNAL STYLING POR TEMA */
+    /* Exemplo genérico de janela de app */
+    .app-topbar {
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      user-select: none;
+    }
+
+    .app-main {
+      flex: 1;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .app-sidebar-left {
+      width: 140px;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 8px;
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .app-canvas {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .app-sidebar-right {
+      width: 130px;
+      border-left: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 8px;
+      font-size: 11px;
+    }
+
+    .app-footer {
+      height: 26px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      font-size: 10px;
+      font-family: var(--font-mono);
+    }
+
+    /* SUMMARY COMPARISON TABLE */
+    .summary-section {
+      margin-top: 60px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 32px;
+    }
+
+    .summary-section h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .summary-section p {
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    table.comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    table.comparison-table th, table.comparison-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    table.comparison-table th {
+      background: #11141d;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    table.comparison-table tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* FOOTER */
+    footer.page-footer {
+      max-width: 1440px;
+      margin: 40px auto 0 auto;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER GERAL -->
+  <header class="main-header">
+    <div class="header-title">
+      <h1>
+        PROJETO EDA / IoT SIMULATOR
+        <span class="badge-iot">10 Conceitos de Design</span>
+      </h1>
+      <p>Catálogo interativo de layouts, paletas cromáticas e arquiteturas de interface para a criação da plataforma web de automação e simulação IoT.</p>
+    </div>
+    <div class="header-actions">
+      <button class="filter-btn active" onclick="filterCategory('all')">Todos (10)</button>
+      <button class="filter-btn" onclick="filterCategory('industrial')">Industrial / CAD</button>
+      <button class="filter-btn" onclick="filterCategory('modern')">SaaS Moderno</button>
+      <button class="filter-btn" onclick="filterCategory('simulation')">Simulação & Gêmeo Digital</button>
+    </div>
+  </header>
+
+  <!-- NAVEGAÇÃO RÁPIDA -->
+  <nav class="nav-ideas-bar">
+    <button class="tab-nav-item active" onclick="scrollToIdea('idea-1')"><span class="tab-num">01</span> Industrial Dark Cyber</button>
+    <button class="tab-nav-item" onclick="scrollToIdea('idea-2')"><span class="tab-num">02</span> Technical Blueprint ABNT</button>
+    <button class="tab-nav-item" onclick="scrollToIdea('idea-3')"><span class="tab-num">03</span> Nordic Minimalist EDA</button>
+    <button class="tab-nav-item" onclick="scrollToIdea('idea-4')"><span class="tab-num">04</span> Digital Twin 2.5D</button>
+    <button class="tab-nav-item" onclick="scrollToIdea('idea-5')"><span class="tab-num">05</span> Hacker Terminal CLI</button>
+    <button class="tab-nav-item" onclick="scrollToIdea('idea-6')"><span class="tab-num">06</span> Modular Node-Graph</button>
+    <button class="tab-nav-item" onclick="scrollToIdea('idea-7')"><span class="tab-num">07</span> DIN Rail Industrial Cabinet</button>
+    <button class="tab-nav-item" onclick="scrollToIdea('idea-8')"><span class="tab-num">08</span> Precision Laboratory E-Ink</button>
+    <button class="tab-nav-item" onclick="scrollToIdea('idea-9')"><span class="tab-num">09</span> SCADA Cloud Operations</button>
+    <button class="tab-nav-item" onclick="scrollToIdea('idea-10')"><span class="tab-num">10</span> AI-Assisted Hardware Copilot</button>
+  </nav>
+
+  <!-- CONTAINER COM AS 10 IDEIAS -->
+  <main class="container">
+    <div class="ideas-grid">
+
+      <!-- ========================================================================= -->
+      <!-- IDEIA 01: INDUSTRIAL DARK CYBER (MODERN STUDIO)                           -->
+      <!-- ========================================================================= -->
+      <article class="idea-card" id="idea-1" data-cat="industrial modern">
+        <div class="idea-header">
+          <div class="idea-header-left">
+            <div class="idea-index">01</div>
+            <div class="idea-title-block">
+              <h2>Industrial Dark Cyber (Studio EDA)</h2>
+              <span>Visual estilo Altium 365 + VS Code Dark Studio</span>
+            </div>
+          </div>
+          <div class="idea-tags">
+            <span class="tag-badge">Obsidian Slate</span>
+            <span class="tag-badge">Electric Cyan</span>
+            <span class="tag-badge">3-Panel Studio</span>
+            <span class="tag-badge">Mais Popular</span>
+          </div>
+        </div>
+        <div class="idea-body">
+          <div class="mockup-viewport">
+            <div class="mockup-window" style="background: #0d1117; color: #c9d1d9;">
+              <!-- TOPBAR -->
+              <div class="app-topbar" style="background: #161b22; border-bottom: 1px solid #30363d;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="color:#00f2fe; font-weight:bold;">⚡ IOT-STUDIO</span>
+                  <span style="color:#8b949e;">amazonvision-4.0.cad</span>
+                </div>
+                <div style="display:flex; gap:6px;">
+                  <span style="background:#21262d; padding:2px 6px; border-radius:3px;">GRID: 10mm</span>
+                  <span style="background:#00f2fe; color:#000; padding:2px 6px; border-radius:3px; font-weight:bold;">▶ SIMULAR</span>
+                </div>
+              </div>
+              <!-- MAIN -->
+              <div class="app-main">
+                <!-- SIDEBAR LEFT -->
+                <div class="app-sidebar-left" style="background: #161b22;">
+                  <span style="color:#8b949e; font-size:10px; font-weight:bold;">BIBLIOTECA</span>
+                  <div style="background:#21262d; padding:4px; border-radius:4px; color:#58a6ff;">ESP32 DevKit</div>
+                  <div style="background:#21262d; padding:4px; border-radius:4px;">Buck XL4015</div>
+                  <div style="background:#21262d; padding:4px; border-radius:4px;">MOSFET D4184</div>
+                  <div style="background:#21262d; padding:4px; border-radius:4px;">Relé K1 12V</div>
+                </div>
+                <!-- CANVAS -->
+                <div class="app-canvas" style="background: #0d1117; background-image: radial-gradient(#30363d 1px, transparent 1px); background-size: 16px 16px;">
+                  <!-- Simulação gráfica de circuito -->
+                  <svg width="280" height="180" viewBox="0 0 280 180">
+                    <rect x="20" y="30" width="70" height="90" rx="4" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/>
+                    <text x="55" y="50" fill="#58a6ff" font-size="8" font-family="monospace" text-anchor="middle" font-weight="bold">ESP32</text>
+                    <rect x="160" y="30" width="80" height="60" rx="4" fill="#161b22" stroke="#ff7b72" stroke-width="1.5"/>
+                    <text x="200" y="50" fill="#ff7b72" font-size="8" font-family="monospace" text-anchor="middle" font-weight="bold">DRIVER D4184</text>
+                    <!-- Fios -->
+                    <path d="M 90 70 L 160 70" fill="none" stroke="#00f2fe" stroke-width="1.8"/>
+                    <circle cx="125" cy="70" r="3" fill="#00f2fe"/>
+                    <text x="125" y="64" fill="#00f2fe" font-size="7" font-family="monospace" text-anchor="middle">GPIO19 (PWM)</text>
+                    <path d="M 90 100 L 200 100 L 200 90" fill="none" stroke="#7ee787" stroke-width="1.2" stroke-dasharray="4,2"/>
+                    <text x="145" y="112" fill="#7ee787" font-size="7" font-family="monospace" text-anchor="middle">GND COMUM</text>
+                  </svg>
+                </div>
+                <!-- SIDEBAR RIGHT -->
+                <div class="app-sidebar-right" style="background: #161b22;">
+                  <span style="color:#8b949e; font-size:10px; font-weight:bold;">INSPETOR GPIO</span>
+                  <div style="font-size:10px; margin-top:6px;">D25: S1 (Input)</div>
+                  <div style="font-size:10px;">D26: S2 (Input)</div>
+                  <div style="font-size:10px; color:#00f2fe;">D19: PWM Motor</div>
+                  <div style="font-size:10px; color:#ff7b72;">D27: E-STOP NF</div>
+                </div>
+              </div>
+              <!-- FOOTER -->
+              <div class="app-footer" style="background: #161b22; color: #8b949e;">
+                <span>DRC: 0 erros | 83 condutores</span>
+                <span style="color:#7ee787;">● ONLINE (ESP32 COM3)</span>
+              </div>
+            </div>
+          </div>
+          <!-- SPECS -->
+          <div class="idea-specs">
+            <div class="spec-group">
+              <h3>Paleta Cromática</h3>
+              <div class="palette-swatches">
+                <div class="swatch" style="background: #0d1117;"><span>#0D1117</span></div>
+                <div class="swatch" style="background: #161b22;"><span>#161B22</span></div>
+                <div class="swatch" style="background: #00f2fe; color:#000;"><span>#00F2FE</span></div>
+                <div class="swatch" style="background: #7ee787; color:#000;"><span>#7EE787</span></div>
+                <div class="swatch" style="background: #ff7b72; color:#000;"><span>#FF7B72</span></div>
+              </div>
+            </div>
+            <div class="spec-group">
+              <h3>Destaques de Engenharia</h3>
+              <ul class="spec-details-list">
+                <li><span class="spec-dot"></span> <strong>Estrutura:</strong> Layout em 3 painéis (Árvore de Peças + Canvas + Inspetor).</li>
+                <li><span class="spec-dot"></span> <strong>Ergonomia:</strong> Baixa fadiga visual para longas horas de bancada.</li>
+                <li><span class="spec-dot"></span> <strong>Ideal para:</strong> Engenheiros de firmware e desenvolvedores de sistemas embarcados.</li>
+              </ul>
+            </div>
+            <button class="btn-select-idea" onclick="selectIdea('Industrial Dark Cyber')">Selecionar Conceito 01</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- ========================================================================= -->
+      <!-- IDEIA 02: TECHNICAL BLUEPRINT ABNT/IEC                                   -->
+      <!-- ========================================================================= -->
+      <article class="idea-card" id="idea-2" data-cat="industrial">
+        <div class="idea-header">
+          <div class="idea-header-left">
+            <div class="idea-index">02</div>
+            <div class="idea-title-block">
+              <h2>Technical Blueprint (Padrão ABNT / IEC)</h2>
+              <span>Estilo clássico de engenharia eletrotécnica em Azul Prussiano</span>
+            </div>
+          </div>
+          <div class="idea-tags">
+            <span class="tag-badge">Prussian Blue</span>
+            <span class="tag-badge">Chalk White</span>
+            <span class="tag-badge">Moldura A1/A3</span>
+            <span class="tag-badge">Auditoria NR-12</span>
+          </div>
+        </div>
+        <div class="idea-body">
+          <div class="mockup-viewport">
+            <div class="mockup-window" style="background: #0a192f; color: #e6f1ff;">
+              <!-- TOPBAR -->
+              <div class="app-topbar" style="background: #0f2744; border-bottom: 1px solid #1e3a5f;">
+                <div><span style="font-weight:bold; letter-spacing:1px;">📐 BLUEPRINT-CAD</span> | FOLHA 03/15 [A1]</div>
+                <div style="font-size:10px;">ESCALA: 1:1 ISO 5457</div>
+              </div>
+              <!-- MAIN -->
+              <div class="app-main">
+                <div class="app-canvas" style="background: #0a192f; border: 2px solid #1e3a5f; margin: 10px;">
+                  <svg width="300" height="180" viewBox="0 0 300 180">
+                    <!-- Moldura interna de prancha -->
+                    <rect x="10" y="10" width="280" height="160" fill="none" stroke="#233554" stroke-width="1"/>
+                    <rect x="14" y="14" width="272" height="152" fill="none" stroke="#64ffda" stroke-width="0.7"/>
+                    <!-- Linhas esquemáticas técnicas -->
+                    <text x="25" y="32" fill="#64ffda" font-size="8" font-family="monospace">BARRAMENTO +12V (FORÇA)</text>
+                    <line x1="25" y1="36" x2="270" y2="36" stroke="#64ffda" stroke-width="1.5"/>
+                    <text x="25" y="150" fill="#8892b0" font-size="8" font-family="monospace">GND 0V (RETORNO UNIFICADO)</text>
+                    <line x1="25" y1="140" x2="270" y2="140" stroke="#8892b0" stroke-width="1" stroke-dasharray="4,2"/>
+                    <!-- Bloco K1 e Carimbo -->
+                    <rect x="70" y="55" width="60" height="60" fill="#0f2744" stroke="#e6f1ff" stroke-width="1"/>
+                    <text x="100" y="75" fill="#fff" font-size="7" font-family="monospace" text-anchor="middle">RELÉ K1</text>
+                    <text x="100" y="90" fill="#64ffda" font-size="6" font-family="monospace" text-anchor="middle">NR-12 DUPLO</text>
+                    <!-- Carimbo -->
+                    <rect x="180" y="115" width="100" height="45" fill="#0f2744" stroke="#64ffda" stroke-width="0.8"/>
+                    <text x="185" y="128" fill="#fff" font-size="6" font-family="monospace">FUCAPI ENGENHARIA</text>
+                    <text x="185" y="140" fill="#8892b0" font-size="5" font-family="monospace">AMAZONVISION 4.0</text>
+                  </svg>
+                </div>
+              </div>
+              <div class="app-footer" style="background: #0f2744; color: #8892b0;">
+                <span>FORMATO: A1 PAISAGEM (841 x 594 mm)</span>
+                <span style="color:#64ffda;">ABNT NBR 5410 / IEC 60617</span>
+              </div>
+            </div>
+          </div>
+          <!-- SPECS -->
+          <div class="idea-specs">
+            <div class="spec-group">
+              <h3>Paleta Cromática</h3>
+              <div class="palette-swatches">
+                <div class="swatch" style="background: #0a192f;"><span>#0A192F</span></div>
+                <div class="swatch" style="background: #0f2744;"><span>#0F2744</span></div>
+                <div class="swatch" style="background: #64ffda; color:#000;"><span>#64FFDA</span></div>
+                <div class="swatch" style="background: #e6f1ff; color:#000;"><span>#E6F1FF</span></div>
+                <div class="swatch" style="background: #8892b0;"><span>#8892B0</span></div>
+              </div>
+            </div>
+            <div class="spec-group">
+              <h3>Destaques de Engenharia</h3>
+              <ul class="spec-details-list">
+                <li><span class="spec-dot"></span> <strong>Estrutura:</strong> Foco em prancha técnica de desenho industrial com coordenadas de borda (A-H, 1-6).</li>
+                <li><span class="spec-dot"></span> <strong>Auditoria:</strong> Geração direta de cadernos para inspeção pelo Ministério do Trabalho (NR-12).</li>
+                <li><span class="spec-dot"></span> <strong>Ideal para:</strong> Empresas integradoras de painéis e indústrias pesadas.</li>
+              </ul>
+            </div>
+            <button class="btn-select-idea" onclick="selectIdea('Technical Blueprint ABNT')">Selecionar Conceito 02</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- ========================================================================= -->
+      <!-- IDEIA 03: NORDIC MINIMALIST (LINEAR STYLE)                                -->
+      <!-- ========================================================================= -->
+      <article class="idea-card" id="idea-3" data-cat="modern">
+        <div class="idea-header">
+          <div class="idea-header-left">
+            <div class="idea-index">03</div>
+            <div class="idea-title-block">
+              <h2>Nordic Minimalist (SaaS Moderno)</h2>
+              <span>Inspirado em Linear.app, Raycast e Vercel — Ultra Clean e Fluido</span>
+            </div>
+          </div>
+          <div class="idea-tags">
+            <span class="tag-badge">Zinc Dark</span>
+            <span class="tag-badge">Indigo Violet</span>
+            <span class="tag-badge">Paletas Flutuantes</span>
+            <span class="tag-badge">Design Sofisticado</span>
+          </div>
+        </div>
+        <div class="idea-body">
+          <div class="mockup-viewport">
+            <div class="mockup-window" style="background: #18181b; color: #f4f4f5;">
+              <div class="app-topbar" style="background: rgba(24, 24, 27, 0.8); backdrop-filter: blur(8px); border-bottom: 1px solid #27272a;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div style="width:10px; height:10px; border-radius:50%; background:#6366f1;"></div>
+                  <span style="font-weight:600; letter-spacing:-0.3px;">CircuitFlow IoT</span>
+                </div>
+                <div style="background:#27272a; padding:4px 12px; border-radius:6px; color:#a1a1aa; font-size:10px;">
+                  Comando: <kbd style="color:#fff;">Ctrl + K</kbd>
+                </div>
+              </div>
+              <div class="app-main" style="background:#09090b; display:flex; align-items:center; justify-content:center;">
+                <!-- Card flutuante central -->
+                <div style="background:#18181b; border:1px solid #27272a; border-radius:10px; padding:16px; width:260px; box-shadow:0 20px 40px rgba(0,0,0,0.5);">
+                  <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+                    <span style="font-size:11px; font-weight:bold; color:#6366f1;">ESP32 Node</span>
+                    <span style="font-size:9px; background:#27272a; padding:2px 6px; border-radius:4px;">3.3V Logic</span>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px; font-size:10px; color:#a1a1aa;">
+                    <div style="display:flex; justify-content:space-between;"><span>GPIO 25 (S1 IN)</span> <span style="color:#34d399;">● Clamped</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span>GPIO 19 (PWM)</span> <span style="color:#60a5fa;">● 20 kHz</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span>GPIO 04 (RELAY)</span> <span style="color:#f87171;">● Armed</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="app-footer" style="background: #18181b; border-color: #27272a; color:#71717a;">
+                <span>Prototipagem Ágil</span>
+                <span>Zoom: 100%</span>
+              </div>
+            </div>
+          </div>
+          <div class="idea-specs">
+            <div class="spec-group">
+              <h3>Paleta Cromática</h3>
+              <div class="palette-swatches">
+                <div class="swatch" style="background: #09090b;"><span>#09090B</span></div>
+                <div class="swatch" style="background: #18181b;"><span>#18181B</span></div>
+                <div class="swatch" style="background: #6366f1;"><span>#6366F1</span></div>
+                <div class="swatch" style="background: #34d399; color:#000;"><span>#34D399</span></div>
+                <div class="swatch" style="background: #f4f4f5; color:#000;"><span>#F4F4F5</span></div>
+              </div>
+            </div>
+            <div class="spec-group">
+              <h3>Destaques de Engenharia</h3>
+              <ul class="spec-details-list">
+                <li><span class="spec-dot"></span> <strong>Estrutura:</strong> Paletas flutuantes que somem para dar foco total ao desenho.</li>
+                <li><span class="spec-dot"></span> <strong>Usabilidade:</strong> Busca rápida estilo Raycast/Spotlight (<kbd>Ctrl+K</kbd>).</li>
+                <li><span class="spec-dot"></span> <strong>Ideal para:</strong> Startups modernas de IoT e desenvolvedores que buscam alta produtividade.</li>
+              </ul>
+            </div>
+            <button class="btn-select-idea" onclick="selectIdea('Nordic Minimalist EDA')">Selecionar Conceito 03</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- ========================================================================= -->
+      <!-- IDEIA 04: DIGITAL TWIN 2.5D (SIMULAÇÃO FÍSICA)                            -->
+      <!-- ========================================================================= -->
+      <article class="idea-card" id="idea-4" data-cat="simulation">
+        <div class="idea-header">
+          <div class="idea-header-left">
+            <div class="idea-index">04</div>
+            <div class="idea-title-block">
+              <h2>Digital Twin 2.5D (Gêmeo Digital + Esquemático)</h2>
+              <span>Metade Esquemático Elétrico + Metade Maquete Física Animada</span>
+            </div>
+          </div>
+          <div class="idea-tags">
+            <span class="tag-badge">Split View</span>
+            <span class="tag-badge">Gêmeo Digital</span>
+            <span class="tag-badge">Interativo</span>
+            <span class="tag-badge">Showcase Feiras</span>
+          </div>
+        </div>
+        <div class="idea-body">
+          <div class="mockup-viewport">
+            <div class="mockup-window" style="background: #12131a; color: #fff;">
+              <div class="app-topbar" style="background: #1a1c26; border-bottom: 1px solid #282b3d;">
+                <span style="font-weight:bold; color:#38bdf8;">🌐 AMAZONVISION 4.0 — DIGITAL TWIN RUNTIME</span>
+                <span style="background:#22c55e; color:#000; padding:2px 8px; border-radius:10px; font-weight:bold; font-size:10px;">ESTEIRA: EM MOVIMENTO</span>
+              </div>
+              <div class="app-main" style="display:flex;">
+                <!-- Lado Esquerdo: Esquemático -->
+                <div style="flex:1; border-right:1px solid #282b3d; padding:10px; background:#0c0d12;">
+                  <span style="font-size:9px; color:#94a3b8; font-weight:bold;">1. ESQUEMÁTICO ELÉTRICO</span>
+                  <div style="margin-top:15px; border:1px dashed #38bdf8; padding:8px; border-radius:4px;">
+                    <div style="font-size:10px; color:#38bdf8;">ESP32 GPIO19 ──▶ MOSFET D4184</div>
+                    <div style="font-size:9px; color:#22c55e;">Sinal: 1 (HIGH) | VOUT: 12.0V</div>
+                  </div>
+                </div>
+                <!-- Lado Direito: Esteira Mecânica Animada 2.5D -->
+                <div style="flex:1; padding:10px; background:#161822; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                  <span style="font-size:9px; color:#f59e0b; font-weight:bold; margin-bottom:10px;">2. GÊMEO MECÂNICO 2.5D</span>
+                  <!-- Desenho simplificado da esteira -->
+                  <div style="width:160px; height:45px; background:#2d3248; border-radius:20px; position:relative; border:2px solid #4a5270; display:flex; align-items:center; justify-content:space-around;">
+                    <div style="width:20px; height:20px; border-radius:50%; background:#ef4444;" title="Maçã Rejeitada"></div>
+                    <div style="width:20px; height:20px; border-radius:50%; background:#22c55e;" title="Maçã Aprovada"></div>
+                  </div>
+                  <span style="font-size:9px; color:#94a3b8; margin-top:8px;">Servo Braço: Ângulo 45°</span>
+                </div>
+              </div>
+              <div class="app-footer" style="background: #1a1c26; color: #94a3b8;">
+                <span>FPS: 60 | Latência Serial: 2ms</span>
+                <span>YOLOv8: CONECTADO</span>
+              </div>
+            </div>
+          </div>
+          <div class="idea-specs">
+            <div class="spec-group">
+              <h3>Paleta Cromática</h3>
+              <div class="palette-swatches">
+                <div class="swatch" style="background: #0c0d12;"><span>#0C0D12</span></div>
+                <div class="swatch" style="background: #1a1c26;"><span>#1A1C26</span></div>
+                <div class="swatch" style="background: #38bdf8; color:#000;"><span>#38BDF8</span></div>
+                <div class="swatch" style="background: #22c55e; color:#000;"><span>#22C55E</span></div>
+                <div class="swatch" style="background: #f59e0b; color:#000;"><span>#F59E0B</span></div>
+              </div>
+            </div>
+            <div class="spec-group">
+              <h3>Destaques de Engenharia</h3>
+              <ul class="spec-details-list">
+                <li><span class="spec-dot"></span> <strong>Estrutura:</strong> Visão dividida (*Split Screen*) unindo circuito elétrico e animação física do mecanismo.</li>
+                <li><span class="spec-dot"></span> <strong>Interação:</strong> Você clica no sensor e vê a esteira reagir visualmente.</li>
+                <li><span class="spec-dot"></span> <strong>Ideal para:</strong> Apresentações para banca, clientes finais e cursos de robótica/mecatrônica.</li>
+              </ul>
+            </div>
+            <button class="btn-select-idea" onclick="selectIdea('Digital Twin 2.5D')">Selecionar Conceito 04</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- ========================================================================= -->
+      <!-- IDEIA 05: HACKER TERMINAL CLI (RETRO-FUTURISTIC)                          -->
+      <!-- ========================================================================= -->
+      <article class="idea-card" id="idea-5" data-cat="modern">
+        <div class="idea-header">
+          <div class="idea-header-left">
+            <div class="idea-index">05</div>
+            <div class="idea-title-block">
+              <h2>Hacker Terminal CLI (Cyberpunk Console)</h2>
+              <span>Foco em Fósforo Verde, Âmbar e Terminal Interativo de Depuração</span>
+            </div>
+          </div>
+          <div class="idea-tags">
+            <span class="tag-badge">Matrix Green</span>
+            <span class="tag-badge">Amber Glow</span>
+            <span class="tag-badge">REPL Integrado</span>
+            <span class="tag-badge">Low-Level Debug</span>
+          </div>
+        </div>
+        <div class="idea-body">
+          <div class="mockup-viewport">
+            <div class="mockup-window" style="background: #050505; color: #00ff66; font-family: monospace;">
+              <div class="app-topbar" style="background: #000; border-bottom: 1px solid #00ff66;">
+                <span>root@amazonvision-node:~# ./eda_inspect.sh</span>
+                <span style="color:#ffb000;">[SYS: ARMED]</span>
+              </div>
+              <div class="app-main" style="display:flex; flex-direction:column; padding:12px;">
+                <div style="font-size:11px; line-height:1.6;">
+                  <div>[OK] ESP32-WROOM-32 INITIALIZED AT 240MHz</div>
+                  <div>[OK] NETLIST CHECK: 83 CONDUCTORS OK (0 SHORTS)</div>
+                  <div style="color:#ffb000;">[WARN] GPIO5 SDIO STRAPPING PULSE DETECTED ON BOOT (100ms)</div>
+                  <div style="color:#00e5ff;">&gt; gpio.read(25) -&gt; 0 [APPLE DETECTED]</div>
+                  <div>&gt; pmic.voltage(RAIL_12V) -&gt; 12.03V | CURRENT: 1.84A</div>
+                </div>
+                <!-- Barra de comando interativo -->
+                <div style="margin-top:auto; background:#111; border:1px solid #00ff66; padding:6px; display:flex; gap:6px;">
+                  <span>$</span>
+                  <span style="color:#fff;">actuator.servo_set(45); motor.enable();</span>
+                  <span style="animation: blink 1s infinite;">_</span>
+                </div>
+              </div>
+              <div class="app-footer" style="background: #000; color: #00ff66; border-color: #00ff66;">
+                <span>MEM: 284KB FREE</span>
+                <span>BAUD: 115200 8N1</span>
+              </div>
+            </div>
+          </div>
+          <div class="idea-specs">
+            <div class="spec-group">
+              <h3>Paleta Cromática</h3>
+              <div class="palette-swatches">
+                <div class="swatch" style="background: #050505;"><span>#050505</span></div>
+                <div class="swatch" style="background: #00ff66; color:#000;"><span>#00FF66</span></div>
+                <div class="swatch" style="background: #ffb000; color:#000;"><span>#FFB000</span></div>
+                <div class="swatch" style="background: #00e5ff; color:#000;"><span>#00E5FF</span></div>
+                <div class="swatch" style="background: #ff3366; color:#fff;"><span>#FF3366</span></div>
+              </div>
+            </div>
+            <div class="spec-group">
+              <h3>Destaques de Engenharia</h3>
+              <ul class="spec-details-list">
+                <li><span class="spec-dot"></span> <strong>Estrutura:</strong> Console interativo de scripts em tempo real acoplado ao circuito.</li>
+                <li><span class="spec-dot"></span> <strong>Diagnóstico:</strong> Comandos diretos de injeção de falhas e leitura de registradores.</li>
+                <li><span class="spec-dot"></span> <strong>Ideal para:</strong> Engenheiros de teste, hackers de hardware e automação via Python.</li>
+              </ul>
+            </div>
+            <button class="btn-select-idea" onclick="selectIdea('Hacker Terminal CLI')">Selecionar Conceito 05</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- ========================================================================= -->
+      <!-- IDEIA 06: MODULAR NODE-GRAPH (NODE-RED STYLE)                             -->
+      <!-- ========================================================================= -->
+      <article class="idea-card" id="idea-6" data-cat="modern simulation">
+        <div class="idea-header">
+          <div class="idea-header-left">
+            <div class="idea-index">06</div>
+            <div class="idea-title-block">
+              <h2>Modular Node-Graph (Fluxo de Dados & Sinais)</h2>
+              <span>Inspirado em Node-RED, Unreal Engine Blueprints e LabVIEW Web</span>
+            </div>
+          </div>
+          <div class="idea-tags">
+            <span class="tag-badge">Nós Conectáveis</span>
+            <span class="tag-badge">Curvas Bézier</span>
+            <span class="tag-badge">Fiação Codificada</span>
+            <span class="tag-badge">Low-Code IoT</span>
+          </div>
+        </div>
+        <div class="idea-body">
+          <div class="mockup-viewport">
+            <div class="mockup-window" style="background: #1e1e24; color: #fff;">
+              <div class="app-topbar" style="background: #16161a; border-bottom: 1px solid #32323c;">
+                <span style="font-weight:bold; color:#a78bfa;">☍ NODE-GRAPH IoT DESIGNER</span>
+                <span style="font-size:10px; color:#9ca3af;">FLUXO DE SEGURANÇA E PARADA</span>
+              </div>
+              <div class="app-main" style="background: #18181c; background-image: radial-gradient(#32323c 1px, transparent 1px); background-size: 20px 20px; display:flex; align-items:center; justify-content:space-around; padding:10px;">
+                <!-- Nó 1 -->
+                <div style="background:#26262e; border:1px solid #ef4444; border-radius:6px; width:85px; font-size:9px; padding:6px;">
+                  <div style="font-weight:bold; color:#ef4444; border-bottom:1px solid #3b3b47; padding-bottom:3px;">E-STOP S0</div>
+                  <div style="margin-top:4px; text-align:right;">NF1 OUT ●</div>
+                  <div style="text-align:right;">NF2 OUT ●</div>
+                </div>
+                <!-- Curva -->
+                <div style="color:#ef4444; font-size:18px;">➔</div>
+                <!-- Nó 2 -->
+                <div style="background:#26262e; border:1px solid #a78bfa; border-radius:6px; width:95px; font-size:9px; padding:6px;">
+                  <div style="font-weight:bold; color:#a78bfa; border-bottom:1px solid #3b3b47; padding-bottom:3px;">K1 RELAY COIL</div>
+                  <div style="margin-top:4px;">● 85 (VCC)</div>
+                  <div>● 86 (LOW-SIDE)</div>
+                </div>
+              </div>
+              <div class="app-footer" style="background: #16161a; color: #9ca3af;">
+                <span>Fios Coloridos por Tipo de Sinal (Potência/Digital/PWM)</span>
+                <span>Lógica Visual Ativa</span>
+              </div>
+            </div>
+          </div>
+          <div class="idea-specs">
+            <div class="spec-group">
+              <h3>Paleta Cromática</h3>
+              <div class="palette-swatches">
+                <div class="swatch" style="background: #18181c;"><span>#18181C</span></div>
+                <div class="swatch" style="background: #26262e;"><span>#26262E</span></div>
+                <div class="swatch" style="background: #a78bfa;"><span>#A78BFA</span></div>
+                <div class="swatch" style="background: #ef4444;"><span>#EF4444</span></div>
+                <div class="swatch" style="background: #3b82f6;"><span>#3B82F6</span></div>
+              </div>
+            </div>
+            <div class="spec-group">
+              <h3>Destaques de Engenharia</h3>
+              <ul class="spec-details-list">
+                <li><span class="spec-dot"></span> <strong>Estrutura:</strong> Nós com portas de entrada e saída interligadas por fios elásticos inteligentes.</li>
+                <li><span class="spec-dot"></span> <strong>Clareza:</strong> Excelente para quem quer programar lógica sem escrever centenas de linhas de código.</li>
+                <li><span class="spec-dot"></span> <strong>Ideal para:</strong> Integradores de sistemas IoT, automação residencial e prototipagem rápida.</li>
+              </ul>
+            </div>
+            <button class="btn-select-idea" onclick="selectIdea('Modular Node-Graph')">Selecionar Conceito 06</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- ========================================================================= -->
+      <!-- IDEIA 07: INDUSTRIAL DIN RAIL CABINET                                     -->
+      <!-- ========================================================================= -->
+      <article class="idea-card" id="idea-7" data-cat="industrial">
+        <div class="idea-header">
+          <div class="idea-header-left">
+            <div class="idea-index">07</div>
+            <div class="idea-title-block">
+              <h2>DIN Rail Industrial Cabinet (Painel Realista)</h2>
+              <span>Simulador de Quadro Elétrico com Trilhos DIN, Canaletas e Bornes SAK</span>
+            </div>
+          </div>
+          <div class="idea-tags">
+            <span class="tag-badge">Quadro Elétrico</span>
+            <span class="tag-badge">Trilho TS-35</span>
+            <span class="tag-badge">Montagem 1:1</span>
+            <span class="tag-badge">Padrão Fabril</span>
+          </div>
+        </div>
+        <div class="idea-body">
+          <div class="mockup-viewport">
+            <div class="mockup-window" style="background: #c5cbd3; color: #1e293b;">
+              <div class="app-topbar" style="background: #94a3b8; border-bottom: 2px solid #64748b; color:#0f172a;">
+                <span style="font-weight:bold;">🗄️ PAINEL ELÉTRICO INDUSTRIAL — ARRANJO MECÂNICO</span>
+                <span style="font-size:10px;">TRILHO TS-35 SUPERIOR</span>
+              </div>
+              <div class="app-main" style="background: #e2e8f0; padding:15px; display:flex; flex-direction:column; justify-content:center; gap:10px;">
+                <!-- Canaleta superior -->
+                <div style="height:12px; background:#64748b; border:1px solid #475569; border-radius:2px;" title="Canaleta Perfurada"></div>
+                <!-- Trilho DIN com componentes montados -->
+                <div style="height:70px; background:#cbd5e1; border-top:3px solid #94a3b8; border-bottom:3px solid #94a3b8; display:flex; align-items:center; gap:6px; padding:0 10px;">
+                  <div style="width:35px; height:60px; background:#334155; color:#fff; font-size:7px; border-radius:3px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:monospace;">
+                    <span>E15</span><span>DISJ</span><span>10A</span>
+                  </div>
+                  <div style="width:45px; height:60px; background:#475569; color:#fff; font-size:7px; border-radius:3px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:monospace;">
+                    <span>E16</span><span>FUS</span><span>4 VIAS</span>
+                  </div>
+                  <div style="width:60px; height:60px; background:#1e293b; color:#38bdf8; font-size:7px; border-radius:3px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:monospace;">
+                    <span>FONTE E01</span><span>12V 10A</span>
+                  </div>
+                  <div style="width:30px; height:50px; background:#d97706; color:#fff; font-size:7px; border-radius:2px; display:flex; align-items:center; justify-content:center; font-family:monospace;">
+                    <span>SAK</span>
+                  </div>
+                </div>
+                <!-- Canaleta inferior -->
+                <div style="height:12px; background:#64748b; border:1px solid #475569; border-radius:2px;" title="Canaleta Perfurada"></div>
+              </div>
+              <div class="app-footer" style="background: #94a3b8; color: #0f172a; border-color: #64748b;">
+                <span>OCUPAÇÃO DE TRILHO: 64%</span>
+                <span>DISSIPAÇÃO TÉRMICA: 24W (VENTILAÇÃO OK)</span>
+              </div>
+            </div>
+          </div>
+          <div class="idea-specs">
+            <div class="spec-group">
+              <h3>Paleta Cromática</h3>
+              <div class="palette-swatches">
+                <div class="swatch" style="background: #e2e8f0; color:#000;"><span>#E2E8F0</span></div>
+                <div class="swatch" style="background: #64748b;"><span>#64748B</span></div>
+                <div class="swatch" style="background: #1e293b;"><span>#1E293B</span></div>
+                <div class="swatch" style="background: #d97706;"><span>#D97706</span></div>
+                <div class="swatch" style="background: #38bdf8; color:#000;"><span>#38BDF8</span></div>
+              </div>
+            </div>
+            <div class="spec-group">
+              <h3>Destaques de Engenharia</h3>
+              <ul class="spec-details-list">
+                <li><span class="spec-dot"></span> <strong>Estrutura:</strong> Disposição física exata de como os módulos ficam montados dentro da caixa do painel.</li>
+                <li><span class="spec-dot"></span> <strong>Espaço & Térmica:</strong> Calcula largura do trilho e aquecimento antes de comprar a caixa plástica.</li>
+                <li><span class="spec-dot"></span> <strong>Ideal para:</strong> Eletricistas industriais, montadores de quadros e integradores mecânicos.</li>
+              </ul>
+            </div>
+            <button class="btn-select-idea" onclick="selectIdea('DIN Rail Industrial Cabinet')">Selecionar Conceito 07</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- ========================================================================= -->
+      <!-- IDEIA 08: PRECISION LABORATORY E-INK                                      -->
+      <!-- ========================================================================= -->
+      <article class="idea-card" id="idea-8" data-cat="industrial">
+        <div class="idea-header">
+          <div class="idea-header-left">
+            <div class="idea-index">08</div>
+            <div class="idea-title-block">
+              <h2>Precision Laboratory (E-Paper High Contrast)</h2>
+              <span>Monocromático cirúrgico preto/branco com realce em Laranja Técnico</span>
+            </div>
+          </div>
+          <div class="idea-tags">
+            <span class="tag-badge">Paper White</span>
+            <span class="tag-badge">Pure Black</span>
+            <span class="tag-badge">Alta Precisão</span>
+            <span class="tag-badge">Metrologia</span>
+          </div>
+        </div>
+        <div class="idea-body">
+          <div class="mockup-viewport">
+            <div class="mockup-window" style="background: #ffffff; color: #000000; font-family: 'Courier New', monospace;">
+              <div class="app-topbar" style="background: #f1f5f9; border-bottom: 2px solid #000; color:#000;">
+                <span style="font-weight:bold;">LABORATÓRIO DE METROLOGIA ELÉTRICA</span>
+                <span style="background:#ff5500; color:#fff; padding:2px 6px; font-weight:bold;">CALIBRADO</span>
+              </div>
+              <div class="app-main" style="background: #fff; padding:15px; display:flex; flex-direction:column; gap:10px;">
+                <div style="border:1px solid #000; padding:8px;">
+                  <div style="font-weight:bold; font-size:11px;">MEDIDOR DE CORRENTE REAL (SHIELD ACS712)</div>
+                  <div style="font-size:18px; font-weight:bold; color:#ff5500;">1.912 A <span style="font-size:10px; color:#666;">(Nominal)</span></div>
+                  <div style="font-size:9px; color:#444;">POTÊNCIA ATIVA: 22.94 W | FATOR DE POTÊNCIA: 0.98</div>
+                </div>
+                <div style="border:1px solid #000; padding:8px; font-size:10px;">
+                  <div>BAT54S CLAMP S1 VOLTAGE: <strong>3.548 V</strong> (MAX SAFE: 3.600 V)</div>
+                  <div>STATUS: <span style="background:#000; color:#fff; padding:1px 4px;">EM CONFORMIDADE</span></div>
+                </div>
+              </div>
+              <div class="app-footer" style="background: #f1f5f9; color: #000; border-color: #000;">
+                <span>ERRO ABSOLUTO: &lt; 0.1%</span>
+                <span>RELATÓRIO PRONTO PARA LAUDO</span>
+              </div>
+            </div>
+          </div>
+          <div class="idea-specs">
+            <div class="spec-group">
+              <h3>Paleta Cromática</h3>
+              <div class="palette-swatches">
+                <div class="swatch" style="background: #ffffff; color:#000;"><span>#FFFFFF</span></div>
+                <div class="swatch" style="background: #f1f5f9; color:#000;"><span>#F1F5F9</span></div>
+                <div class="swatch" style="background: #000000;"><span>#000000</span></div>
+                <div class="swatch" style="background: #ff5500;"><span>#FF5500</span></div>
+                <div class="swatch" style="background: #64748b;"><span>#64748B</span></div>
+              </div>
+            </div>
+            <div class="spec-group">
+              <h3>Destaques de Engenharia</h3>
+              <ul class="spec-details-list">
+                <li><span class="spec-dot"></span> <strong>Estrutura:</strong> Inspirada em instrumentos de bancada Keysight e Tektronix.</li>
+                <li><span class="spec-dot"></span> <strong>Contraste:</strong> Perfeito para tablets sob luz solar direta ou ambientes de oficina.</li>
+                <li><span class="spec-dot"></span> <strong>Ideal para:</strong> Laudos de auditoria pericial, testes de homologação e certificação.</li>
+              </ul>
+            </div>
+            <button class="btn-select-idea" onclick="selectIdea('Precision Laboratory E-Ink')">Selecionar Conceito 08</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- ========================================================================= -->
+      <!-- IDEIA 09: SCADA CLOUD OPERATIONS                                         -->
+      <!-- ========================================================================= -->
+      <article class="idea-card" id="idea-9" data-cat="simulation modern">
+        <div class="idea-header">
+          <div class="idea-header-left">
+            <div class="idea-index">09</div>
+            <div class="idea-title-block">
+              <h2>SCADA Cloud Operations (Painel de Telemetria)</h2>
+              <span>Fusão de Software CAD com Dashboard de Monitoramento IoT (Estilo Grafana)</span>
+            </div>
+          </div>
+          <div class="idea-tags">
+            <span class="tag-badge">MQTT Broker</span>
+            <span class="tag-badge">Tempo Real</span>
+            <span class="tag-badge">Gauges & Gráficos</span>
+            <span class="tag-badge">Indústria 4.0</span>
+          </div>
+        </div>
+        <div class="idea-body">
+          <div class="mockup-viewport">
+            <div class="mockup-window" style="background: #0f172a; color: #f8fafc;">
+              <div class="app-topbar" style="background: #1e293b; border-bottom: 1px solid #334155;">
+                <span style="font-weight:bold; color:#38bdf8;">📊 CLOUD SCADA · AMAZONVISION 4.0</span>
+                <span style="color:#22c55e; font-size:10px;">MQTT: CONECTADO (broker.hivemq.com)</span>
+              </div>
+              <div class="app-main" style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; padding:8px;">
+                <!-- Widget 1: Gauge -->
+                <div style="background:#1e293b; padding:8px; border-radius:6px; border:1px solid #334155;">
+                  <span style="font-size:9px; color:#94a3b8;">VELOCIDADE DA ESTEIRA</span>
+                  <div style="font-size:18px; font-weight:bold; color:#38bdf8; margin:4px 0;">60.0 RPM</div>
+                  <div style="font-size:8px; color:#22c55e;">Motor GA37 (12V PWM 85%)</div>
+                </div>
+                <!-- Widget 2: Contadores -->
+                <div style="background:#1e293b; padding:8px; border-radius:6px; border:1px solid #334155;">
+                  <span style="font-size:9px; color:#94a3b8;">CLASSIFICAÇÃO DE MAÇÃS</span>
+                  <div style="display:flex; justify-content:space-between; margin-top:4px;">
+                    <span style="color:#22c55e; font-weight:bold;">142 Aprovadas</span>
+                    <span style="color:#ef4444; font-weight:bold;">18 Descarte</span>
+                  </div>
+                </div>
+                <!-- Widget 3: Gráfico Sparkline -->
+                <div style="grid-column: span 2; background:#1e293b; padding:8px; border-radius:6px; border:1px solid #334155;">
+                  <span style="font-size:9px; color:#94a3b8;">CORRENTE TOTAL DA FONTE E01 (TEMPO REAL)</span>
+                  <div style="height:35px; display:flex; align-items:flex-end; gap:3px; margin-top:6px;">
+                    <div style="flex:1; height:40%; background:#38bdf8;"></div>
+                    <div style="flex:1; height:45%; background:#38bdf8;"></div>
+                    <div style="flex:1; height:50%; background:#38bdf8;"></div>
+                    <div style="flex:1; height:90%; background:#f59e0b;" title="Pico Servo 4.9A"></div>
+                    <div style="flex:1; height:45%; background:#38bdf8;"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="app-footer" style="background: #1e293b; color: #94a3b8;">
+                <span>UPTIME: 04h 22m 11s</span>
+                <span>SEGURANÇA: NORMAL (K1 ATIVO)</span>
+              </div>
+            </div>
+          </div>
+          <div class="idea-specs">
+            <div class="spec-group">
+              <h3>Paleta Cromática</h3>
+              <div class="palette-swatches">
+                <div class="swatch" style="background: #0f172a;"><span>#0F172A</span></div>
+                <div class="swatch" style="background: #1e293b;"><span>#1E293B</span></div>
+                <div class="swatch" style="background: #38bdf8; color:#000;"><span>#38BDF8</span></div>
+                <div class="swatch" style="background: #22c55e; color:#000;"><span>#22C55E</span></div>
+                <div class="swatch" style="background: #f59e0b; color:#000;"><span>#F59E0B</span></div>
+              </div>
+            </div>
+            <div class="spec-group">
+              <h3>Destaques de Engenharia</h3>
+              <ul class="spec-details-list">
+                <li><span class="spec-dot"></span> <strong>Estrutura:</strong> Conexão nativa do circuito esquemático com telemetria via MQTT/WebSockets.</li>
+                <li><span class="spec-dot"></span> <strong>Operação:</strong> Permite ver o esquema elétrico reagir às grandezas medidas em tempo real.</li>
+                <li><span class="spec-dot"></span> <strong>Ideal para:</strong> Chão de fábrica, monitoramento remoto e Indústria 4.0.</li>
+              </ul>
+            </div>
+            <button class="btn-select-idea" onclick="selectIdea('SCADA Cloud Operations')">Selecionar Conceito 09</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- ========================================================================= -->
+      <!-- IDEIA 10: AI-ASSISTED HARDWARE COPILOT                                    -->
+      <!-- ========================================================================= -->
+      <article class="idea-card" id="idea-10" data-cat="modern simulation">
+        <div class="idea-header">
+          <div class="idea-header-left">
+            <div class="idea-index">10</div>
+            <div class="idea-title-block">
+              <h2>AI-Assisted Hardware Copilot (Engenheiro Virtual)</h2>
+              <span>CAD Inteligente com IA Generativa que audita e sugere correções no circuito</span>
+            </div>
+          </div>
+          <div class="idea-tags">
+            <span class="tag-badge">AI Assistant</span>
+            <span class="tag-badge">Deep Space Dark</span>
+            <span class="tag-badge">Auto-Fix Circuitos</span>
+            <span class="tag-badge">O Mais Avançado</span>
+          </div>
+        </div>
+        <div class="idea-body">
+          <div class="mockup-viewport">
+            <div class="mockup-window" style="background: #090a10; color: #e2e8f0;">
+              <div class="app-topbar" style="background: #12141f; border-bottom: 1px solid #23273c;">
+                <span style="font-weight:bold; background:linear-gradient(90deg, #a855f7, #3b82f6); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">🤖 HARDWARE COPILOT AI</span>
+                <span style="background:rgba(168, 85, 247, 0.2); color:#c084fc; padding:2px 8px; border-radius:4px; font-size:10px;">AUDITORIA ATIVA</span>
+              </div>
+              <div class="app-main" style="display:flex;">
+                <!-- Área do circuito -->
+                <div style="flex:1; padding:10px; background:#0c0e17; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+                  <div style="border:2px solid #a855f7; border-radius:6px; padding:10px; width:140px; text-align:center;">
+                    <span style="font-size:10px; font-weight:bold;">SERVO MG996R</span>
+                    <div style="color:#ef4444; font-size:8px; margin-top:4px;">Pico: 2.5A Detectado!</div>
+                  </div>
+                </div>
+                <!-- Chat da IA / Painel de Sugestões -->
+                <div style="width:160px; background:#12141f; border-left:1px solid #23273c; padding:10px; font-size:10px; display:flex; flex-direction:column; gap:8px;">
+                  <div style="color:#c084fc; font-weight:bold;">💡 Sugestão da IA:</div>
+                  <div style="background:#1a1d2e; padding:6px; border-radius:4px; font-size:9px; line-height:1.4;">
+                    "O servo MG996R pode causar quedas de tensão no Buck XL4015. Deseja inserir um capacitor E06 de 1000µF?"
+                  </div>
+                  <button style="background:#a855f7; color:#fff; border:none; padding:4px; border-radius:4px; font-weight:bold; cursor:pointer;">✓ Inserir E06</button>
+                </div>
+              </div>
+              <div class="app-footer" style="background: #12141f; color: #94a3b8;">
+                <span>Análise Contínua de Regras Elétricas</span>
+                <span style="color:#a855f7;">Pronto para Auto-Roteamento</span>
+              </div>
+            </div>
+          </div>
+          <div class="idea-specs">
+            <div class="spec-group">
+              <h3>Paleta Cromática</h3>
+              <div class="palette-swatches">
+                <div class="swatch" style="background: #090a10;"><span>#090A10</span></div>
+                <div class="swatch" style="background: #12141f;"><span>#12141F</span></div>
+                <div class="swatch" style="background: #a855f7;"><span>#A855F7</span></div>
+                <div class="swatch" style="background: #3b82f6;"><span>#3B82F6</span></div>
+                <div class="swatch" style="background: #ef4444;"><span>#EF4444</span></div>
+              </div>
+            </div>
+            <div class="spec-group">
+              <h3>Destaques de Engenharia</h3>
+              <ul class="spec-details-list">
+                <li><span class="spec-dot"></span> <strong>Estrutura:</strong> Assistente de inteligência artificial embutido que atua como co-piloto de projeto.</li>
+                <li><span class="spec-dot"></span> <strong>Auditoria em Tempo Real:</strong> Identifica erros de pinagem, fusíveis errados e sobrecorrente no ato.</li>
+                <li><span class="spec-dot"></span> <strong>Ideal para:</strong> O futuro da engenharia de hardware — aprendizado rápido e zero retrabalho de montagem.</li>
+              </ul>
+            </div>
+            <button class="btn-select-idea" onclick="selectIdea('AI-Assisted Hardware Copilot')">Selecionar Conceito 10</button>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- TABELA COMPARATIVA RESUMIDA -->
+    <section class="summary-section">
+      <h2>Matriz de Comparação e Escolha Estratégica</h2>
+      <p>Visão executiva das 10 abordagens para orientar a tomada de decisão da equipe de desenvolvimento do software.</p>
+      
+      <div class="table-responsive">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Conceito</th>
+              <th>Público-Alvo Principal</th>
+              <th>Complexidade Técnica</th>
+              <th>Maior Vantagem Competitiva</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>01</strong></td>
+              <td>Industrial Dark Cyber</td>
+              <td>Engenheiros de Firmware / Embarcados</td>
+              <td>Média</td>
+              <td>Ergonomia profissional e familiaridade com VS Code / Altium.</td>
+            </tr>
+            <tr>
+              <td><strong>02</strong></td>
+              <td>Technical Blueprint ABNT</td>
+              <td>Projetistas Industriais / Painelistas</td>
+              <td>Média-Baixa</td>
+              <td>Conformidade normativa imediata (NR-10, NR-12, IEC 60617).</td>
+            </tr>
+            <tr>
+              <td><strong>03</strong></td>
+              <td>Nordic Minimalist</td>
+              <td>Startups de Hardware / Devs Web</td>
+              <td>Baixa</td>
+              <td>Interface limpa, moderna e sem poluição visual.</td>
+            </tr>
+            <tr>
+              <td><strong>04</strong></td>
+              <td>Digital Twin 2.5D</td>
+              <td>Bancas Avaliadoras, Feiras, Clientes</td>
+              <td>Alta</td>
+              <td>Impacto visual avassalador (mostra a máquina funcionando de verdade).</td>
+            </tr>
+            <tr>
+              <td><strong>05</strong></td>
+              <td>Hacker Terminal CLI</td>
+              <td>Engenheiros de Teste e Validação</td>
+              <td>Média</td>
+              <td>Depuração em baixo nível com injeção direta de comandos via terminal.</td>
+            </tr>
+            <tr>
+              <td><strong>06</strong></td>
+              <td>Modular Node-Graph</td>
+              <td>Makers, Integradores, Cursos</td>
+              <td>Alta</td>
+              <td>Programação visual de circuitos e nós sem atrito de código.</td>
+            </tr>
+            <tr>
+              <td><strong>07</strong></td>
+              <td>DIN Rail Industrial Cabinet</td>
+              <td>Montadores de Quadros e Eletrotécnicos</td>
+              <td>Média</td>
+              <td>Planejamento mecânico 1:1 de trilhos, canaletas e espaço físico.</td>
+            </tr>
+            <tr>
+              <td><strong>08</strong></td>
+              <td>Precision Laboratory E-Ink</td>
+              <td>Laboratórios de Metrologia e Laudos</td>
+              <td>Baixa</td>
+              <td>Máximo contraste, foco em precisão de dados e consumo elétrico.</td>
+            </tr>
+            <tr>
+              <td><strong>09</strong></td>
+              <td>SCADA Cloud Operations</td>
+              <td>Gestores de Fábrica / Indústria 4.0</td>
+              <td>Alta</td>
+              <td>Conexão do esquemático com telemetria e broker MQTT real na nuvem.</td>
+            </tr>
+            <tr>
+              <td><strong>10</strong></td>
+              <td>AI-Assisted Hardware Copilot</td>
+              <td>Estudantes e Engenheiros de Produto</td>
+              <td>Muito Alta</td>
+              <td>Auditoria automática e sugestão inteligente de componentes via IA.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="page-footer">
+    <p>Projeto AmazonVision 4.0 · Arquitetura e Engenharia de Software EDA/IoT · FUCAPI 2026</p>
+  </footer>
+
+  <script>
+    function scrollToIdea(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Atualiza aba ativa
+        document.querySelectorAll('.tab-nav-item').forEach(b => b.classList.remove('active'));
+        const activeBtn = Array.from(document.querySelectorAll('.tab-nav-item')).find(b => b.getAttribute('onclick').includes(id));
+        if (activeBtn) activeBtn.classList.add('active');
+      }
+    }
+
+    function selectIdea(name) {
+      alert('Conceito escolhido: "' + name + '"!\n\nEsta opção foi salva como a sua preferida para orientar o desenvolvimento do sistema.');
+    }
+
+    function filterCategory(cat) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const cards = document.querySelectorAll('.idea-card');
+      cards.forEach(card => {
+        const itemCats = card.getAttribute('data-cat') || '';
+        if (cat === 'all' || itemCats.includes(cat)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chaveiros NCA1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F4F1EA; --surface: #FFFFFF; --ink: #1B2A22; --muted: #5E6B63;
+    --line: #E2DDD2; --stage: #ECE7DC; --accent: #2F6B47;
+    --pb: #2E5A3E; --cut: #1F3F2B;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #111613; --surface: #19201C; --ink: #E7ECE8; --muted: #98A59D;
+      --line: #29322D; --stage: #212924; --accent: #7CC29A;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #111613; --surface: #19201C; --ink: #E7ECE8; --muted: #98A59D;
+    --line: #29322D; --stage: #212924; --accent: #7CC29A;
+  }
+  body[data-pal="floresta"] { --pb: #2E5A3E; --cut: #1F3F2B; }
+  body[data-pal="castanha"] { --pb: #7A4E2D; --cut: #57361F; }
+  body[data-pal="tucuma"]   { --pb: #E07A26; --cut: #B05A16; }
+  body[data-pal="rio"]      { --pb: #1C4F63; --cut: #123747; }
+  body[data-pal="grafite"]  { --pb: #3A3D40; --cut: #232527; }
+  body[data-pal="creme"]    { --pb: #EFE6D2; --cut: #CDBF9F; }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Archivo", system-ui, sans-serif; line-height: 1.45;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 40px 16px 64px; }
+  header { display: grid; gap: 20px; margin-bottom: 28px; }
+  .kicker { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+  h1 { font-stretch: 125%; font-weight: 800; font-size: clamp(30px, 5vw, 48px); line-height: 1.02; margin: 4px 0 8px; letter-spacing: -.01em; }
+  .lead { color: var(--muted); max-width: 640px; margin: 0; }
+  .specs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .chip { font-size: 12.5px; border: 1px solid var(--line); background: var(--surface); padding: 4px 10px; border-radius: 99px; color: var(--muted); }
+  .chip b { color: var(--ink); font-weight: 700; }
+
+  .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+  @media (min-width: 760px) { .toolbar { position: sticky; top: 10px; z-index: 5; } }
+  .toolbar span.lbl { font-size: 13px; color: var(--muted); font-weight: 600; }
+  .pals { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pal { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line); background: transparent; color: var(--ink); border-radius: 99px; padding: 5px 11px 5px 6px; font: 600 13px "Archivo", sans-serif; cursor: pointer; }
+  .pal[aria-pressed="true"] { border-color: var(--ink); }
+  .sw { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(0,0,0,.15); }
+  .favcount { margin-left: auto; font-size: 13px; color: var(--muted); }
+  .favcount b { color: var(--ink); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 16px; margin-top: 18px; }
+  .sec { grid-column: 1 / -1; margin: 18px 0 0; font-size: 20px; font-weight: 800; font-stretch: 112%; }
+  .sec:first-child { margin-top: 0; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; }
+  .stage { background: var(--stage); position: relative; display: grid; place-items: center; padding: 26px 16px 22px; }
+  .stage .big { width: 150px; height: 175px; filter: drop-shadow(0 6px 10px rgba(0,0,0,.18)); }
+  .stage .num { position: absolute; top: 12px; left: 14px; font-stretch: 125%; font-weight: 800; font-size: 13px; color: var(--muted); }
+  .stage { min-height: 227px; }
+  body.real .stage .big { width: 30mm; height: 35mm; }
+  .toggle { display: inline-flex; align-items: center; gap: 8px; font: 600 13px "Archivo", sans-serif; color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 99px; padding: 5px 12px; cursor: pointer; }
+  .toggle[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .star { position: absolute; top: 8px; right: 8px; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; display: grid; place-items: center; }
+  .star svg { width: 17px; height: 17px; }
+  .star[aria-pressed="true"] { color: #D9A21E; border-color: #D9A21E; }
+  .star[aria-pressed="true"] path { fill: currentColor; }
+
+  .body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .body h2 { font-size: 18px; font-weight: 800; margin: 0; font-stretch: 112%; }
+  .body p { margin: 0; color: var(--muted); font-size: 14px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+  .tag { font-size: 11.5px; padding: 2px 8px; border-radius: 6px; background: var(--stage); color: var(--ink); }
+  .dl { display: flex; gap: 8px; margin-top: auto; padding-top: 8px; }
+  .dl button { flex: 1; font: 600 12.5px "Archivo", sans-serif; padding: 8px 8px; border-radius: 9px; border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; }
+  .dl button:hover { border-color: var(--ink); }
+
+  /* camadas do chaveiro */
+  .plate { fill: var(--pb); fill-rule: evenodd; }
+  .cut { filter: url(#rebaixo); }
+  .f { fill: var(--cut); }
+  .s { fill: none; stroke: var(--cut); stroke-linecap: round; stroke-linejoin: round; }
+  .ns { fill: none; stroke-linecap: round; }
+  .t, .tn { font-family: "Archivo", sans-serif; font-weight: 800; text-anchor: middle; letter-spacing: .25px; }
+  .t { fill: var(--cut); }
+  /* ilhas: partes que ficam na altura da chapa dentro de um rebaixo */
+  mask .n, mask .tn { fill: #000; }
+  mask .ns { stroke: #000; }
+
+  section.tips { margin-top: 36px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .tip { border-top: 2px solid var(--ink); padding-top: 10px; }
+  .tip h3 { margin: 0 0 6px; font-size: 15px; font-weight: 800; }
+  .tip p, .tip li { margin: 0; color: var(--muted); font-size: 14px; }
+  .tip ul { margin: 0; padding-left: 18px; }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+</head>
+<body data-pal="floresta">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="rebaixo" x="-10%" y="-10%" width="120%" height="120%">
+    <feFlood flood-color="#000" flood-opacity=".55" result="c"/>
+    <feComposite in="c" in2="SourceAlpha" operator="out" result="fora"/>
+    <feOffset in="fora" dy=".5" result="desloc"/>
+    <feGaussianBlur in="desloc" stdDeviation=".22" result="borrado"/>
+    <feComposite in="borrado" in2="SourceAlpha" operator="in" result="sombra"/>
+    <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="sombra"/></feMerge>
+  </filter>
+</svg>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="kicker">Feira FUCAPI 2026 · AmazonVision 4.0</div>
+      <h1>20 chaveiros para a turma NCA1</h1>
+      <p class="lead">Visão computacional + Amazônia, em formas simples que imprimem bem. Uma cor só: o desenho é a <b>falta de filamento</b>, rebaixado na chapa. Imprime sem troca de material e todos estão na escala real.</p>
+      <div class="specs">
+        <span class="chip"><b>30 × 35 mm</b> (largura × altura)</span>
+        <span class="chip">Chapa <b>4 mm</b>, desenho rebaixado <b>1,2 mm</b></span>
+        <span class="chip">Furo <b>Ø 3,6–4 mm</b></span>
+        <span class="chip">Sulco mínimo <b>0,8 mm</b></span>
+      </div>
+    </div>
+    <div class="toolbar" role="group" aria-label="Cor do filamento">
+      <span class="lbl">Filamento</span>
+      <div class="pals" id="pals"></div>
+      <button class="toggle" id="real" aria-pressed="false">Tamanho real (aprox.)</button>
+      <span class="favcount" id="favcount"></span>
+    </div>
+  </header>
+
+  <main class="grid" id="grid"></main>
+
+  <section class="tips">
+    <div class="tip">
+      <h3>Como imprimir</h3>
+      <p>Chapa de 4 mm com o desenho rebaixado 1,2 mm na face de cima. Imprima com o desenho <b>virado para cima</b>: não precisa de suporte nem de ponte, e as bordas do sulco saem nítidas.</p>
+    </div>
+    <div class="tip">
+      <h3>Levar para o Tinkercad / Fusion</h3>
+      <ul>
+        <li>Baixe <b>chapa</b>, <b>gravação</b> e, quando houver, <b>ilhas</b> (SVG em mm).</li>
+        <li>Chapa com 4 mm de altura. Gravação com 1,2 mm, marcada como <i>Furo</i>, encostada no topo (z = 2,8 mm). Agrupe as duas.</li>
+        <li>Ilhas: sólido de 1,2 mm no mesmo lugar, agrupado <i>depois</i>; elas devolvem o material que a gravação tirou.</li>
+        <li>Textos e traços: no Inkscape use <i>Caminho → Objeto para caminho</i> e <i>Contorno em caminho</i> antes de importar.</li>
+      </ul>
+    </div>
+    <div class="tip">
+      <h3>Para sair bonito</h3>
+      <ul>
+        <li>Bico 0,4 mm e camada de 0,12–0,16 mm: o sulco fica mais definido.</li>
+        <li>Cores escuras ou fortes destacam melhor a sombra do rebaixo; o creme fica mais sutil.</li>
+        <li>Quer mais contraste? Passe tinta acrílica no sulco e limpe a superfície.</li>
+        <li>Imprima 2 versões teste antes de fazer o lote da turma.</li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<script>
+// Formas da chapa (unidades = mm). Furo vazado com fill-rule evenodd.
+const PLATES = {
+  rect: 'M4 0 H26 A4 4 0 0 1 30 4 V31 A4 4 0 0 1 26 35 H4 A4 4 0 0 1 0 31 V4 A4 4 0 0 1 4 0 Z M13 4.6 a2 2 0 1 0 4 0 a2 2 0 1 0 -4 0 Z',
+  round: 'M10.5 5.69 V4.5 A4.5 4.5 0 0 1 19.5 4.5 V5.69 A15 15 0 1 1 10.5 5.69 Z M13.2 3.6 a1.8 1.8 0 1 0 3.6 0 a1.8 1.8 0 1 0 -3.6 0 Z'
+};
+const RIM = '<circle class="s" cx="15" cy="20" r="12.8" stroke-width=".9"/>';
+const f = n => +n.toFixed(2);
+const pt = (cx, cy, r, deg) => { const a = deg * Math.PI / 180; return [f(cx + r * Math.cos(a)), f(cy + r * Math.sin(a))]; };
+
+function pixelLeaf() {
+  const rows = ['.....###', '...###.#', '..###.##', '.###.###', '.##.###.', '.#.###..', '.###....', '#.......'];
+  let out = '';
+  rows.forEach((row, r) => [...row].forEach((c, k) => {
+    if (c === '#') out += `<rect class="f" x="${f(5.8 + k * 2.3)}" y="${f(8 + r * 2.3)}" width="1.5" height="1.5" rx=".2"/>`;
+  }));
+  return out;
+}
+
+function aperture() {
+  const cx = 15, cy = 18.3, R = 8.6, h = 3.8;
+  const H = [...Array(6)].map((_, i) => pt(cx, cy, h, i * 60 - 90));
+  let d = '';
+  for (let i = 0; i < 6; i++) {
+    const [x0, y0] = H[i], [x1, y1] = H[(i + 1) % 6];
+    let dx = x1 - x0, dy = y1 - y0; const L = Math.hypot(dx, dy); dx /= L; dy /= L;
+    const px = x0 - cx, py = y0 - cy, b = px * dx + py * dy;
+    const t = -b + Math.sqrt(b * b - (px * px + py * py) + R * R);
+    d += `M${f(x0)} ${f(y0)} L${f(x0 + t * dx)} ${f(y0 + t * dy)} `;
+  }
+  return `<circle class="s" cx="${cx}" cy="${cy}" r="${R}" stroke-width="1"/>
+    <path class="s" d="${d}" stroke-width=".9"/>
+    <path class="f" d="M15 16.3 C16.3 17.1 16.3 19.3 15 20.3 C13.7 19.3 13.7 17.1 15 16.3 Z"/>`;
+}
+
+function lily() {
+  const cx = 15, cy = 18.2, R = 8.6;
+  const [ax, ay] = pt(cx, cy, R, -45), [bx, by] = pt(cx, cy, R, -70);
+  let rays = '';
+  for (let k = 1; k <= 7; k++) {
+    const a = -57.5 + 45 * k;
+    const [x0, y0] = pt(cx, cy, 3.9, a), [x1, y1] = pt(cx, cy, 6.5, a);
+    rays += `M${x0} ${y0} L${x1} ${y1} `;
+  }
+  return `<path class="s" d="M${ax} ${ay} A${R} ${R} 0 1 1 ${bx} ${by}" stroke-width="1.3"/>
+    <path class="s" d="${rays}" stroke-width=".8"/>
+    <circle class="f" cx="${cx}" cy="${cy}" r="2.4"/><circle class="n" cx="${cx}" cy="${cy}" r=".9"/>`;
+}
+
+function river() {
+  const lines = [[14.5, 3], [19, 4], [23.5, 2]];
+  return lines.map(([y, n]) => {
+    let s = `<path class="s" d="M5 ${y} q2.5 -1.8 5 0 t5 0" stroke-width="1.1"/>`;
+    for (let i = 0; i < n; i++) s += `<rect class="f" x="${f(16.6 + i * 2.5)}" y="${f(y - .6)}" width="1.2" height="1.2"/>`;
+    return s;
+  }).join('');
+}
+
+const DESIGNS = [
+  { nome: 'Folha-circuito', forma: 'rect', nivel: 'Fácil',
+    conceito: 'As nervuras da folha viram trilhas de placa eletrônica: natureza e hardware no mesmo traço.',
+    svg: `<path class="s" d="M15 9 C21 12.5 22 20 15 25 C8 20 9 12.5 15 9 Z" stroke-width="1"/>
+      <path class="s" d="M15 11 V27.5" stroke-width=".9"/>
+      <path class="s" d="M15 13.8 H16.2 L16.9 14.5 M15 18 H16.4 L17.2 18.8 M15 15.8 H13.8 L13.1 16.5 M15 20.3 H14 L13.3 21" stroke-width=".8"/>
+      <circle class="f" cx="16.9" cy="14.5" r=".65"/><circle class="f" cx="17.2" cy="18.8" r=".65"/>
+      <circle class="f" cx="13.1" cy="16.5" r=".65"/><circle class="f" cx="13.3" cy="21" r=".65"/>
+      <text class="t" x="15" y="32" font-size="4">NCA1</text>` },
+  { nome: 'Olho amazônico', forma: 'round', nivel: 'Fácil',
+    conceito: 'Um olho cuja íris guarda uma folha vazada. Leitura imediata de “visão” + “Amazônia”.',
+    svg: `${RIM}<path class="s" d="M5.5 19 Q15 10.5 24.5 19 Q15 27.5 5.5 19 Z" stroke-width="1.1"/>
+      <circle class="f" cx="15" cy="19" r="4.25"/>
+      <path class="n" d="M15 16 C17.2 17.3 17.2 20.6 15 22 C12.8 20.6 12.8 17.3 15 16 Z"/>
+      <text class="t" x="15" y="30.2" font-size="3.4">NCA1</text>` },
+  { nome: 'Mira de detecção', forma: 'rect', nivel: 'Fácil',
+    conceito: 'A castanha dentro da caixa de detecção da IA, com a etiqueta “NCA1 98%” como no software.',
+    svg: `<path class="s" d="M5 13 V9.5 H8.5 M21.5 9.5 H25 V13 M25 23.5 V27 H21.5 M8.5 27 H5 V23.5" stroke-width="1.1"/>
+      <path class="f" d="M15 12 C18.6 13 20.8 19.2 19.9 23.2 C19.4 25.2 10.6 25.2 10.1 23.2 C9.2 19.2 11.4 13 15 12 Z"/>
+      <path class="ns" d="M15 14.4 Q16.7 18.6 15.6 23.4" stroke-width=".9"/>
+      <rect class="f" x="5" y="28.3" width="13.5" height="4.6" rx=".8"/>
+      <text class="tn" x="11.75" y="32" font-size="3.6">NCA1</text>
+      <text class="t" x="22.3" y="31.9" font-size="3">98%</text>` },
+  { nome: 'Folha em pixels', forma: 'rect', nivel: 'Fácil',
+    conceito: 'A folha como a câmera enxerga: uma grade de pixels. Quadradinhos imprimem perfeitos.',
+    svg: `${pixelLeaf()}<text class="t" x="15" y="32" font-size="4">NCA1</text>` },
+  { nome: 'Monograma AV', forma: 'rect', nivel: 'Médio',
+    conceito: 'As iniciais de AmazonVision: o “A” tem uma lente no lugar da barra e o “V” brota numa folha.',
+    svg: `<path class="s" d="M5 26 L10 10.5 L15 26" stroke-width="2.2"/>
+      <circle class="f" cx="10" cy="21.5" r="1.3"/>
+      <path class="s" d="M16.5 10.5 L20.5 26 L23.6 14.4" stroke-width="2.2"/>
+      <path class="f" d="M23.6 14.2 C23.2 11 25 8.6 27.6 8.2 C28 11.2 26.4 13.6 23.6 14.2 Z"/>
+      <text class="t" x="15" y="32" font-size="3.6">NCA1</text>` },
+  { nome: 'Rio de dados', forma: 'round', nivel: 'Fácil',
+    conceito: 'As ondas do rio se transformam em pixels no meio do caminho: o natural virando dado.',
+    svg: `${RIM}${river()}<text class="t" x="15" y="30.2" font-size="3.4">NCA1</text>` },
+  { nome: 'Diafragma', forma: 'round', nivel: 'Médio',
+    conceito: 'As lâminas do diafragma de uma câmera abrindo para revelar uma folha no centro.',
+    svg: `${RIM}${aperture()}<text class="t" x="15" y="30.6" font-size="3.2">NCA1</text>` },
+  { nome: 'Tucumã nota A', forma: 'rect', nivel: 'Fácil',
+    conceito: 'O tucumã classificado com nota A, a melhor classe da esteira. Bom em laranja sobre creme.',
+    svg: `<circle class="f" cx="15" cy="19.3" r="8"/>
+      <path class="f" d="M15 11.4 C15.6 8.9 17.6 7.6 20.3 7.8 C19.8 10.2 17.8 11.4 15 11.4 Z"/>
+      <text class="tn" x="15" y="23.3" font-size="11" style="font-weight:900">A</text>
+      <text class="t" x="15" y="32.2" font-size="3.6">NCA1</text>` },
+  { nome: 'Esteira', forma: 'rect', nivel: 'Médio',
+    conceito: 'O próprio projeto em miniatura: câmera escaneando a castanha sobre a esteira.',
+    svg: `<rect class="f" x="12" y="8.6" width="6" height="4" rx=".8"/><circle class="n" cx="15" cy="10.6" r="1.1"/>
+      <path class="s" d="M13.4 13.4 L11 18.6 M16.6 13.4 L19 18.6" stroke-width=".8"/>
+      <path class="f" d="M15 15.8 C17 16.2 18 18.6 17.6 20 C17.3 20.8 12.7 20.8 12.4 20 C12 18.6 13 16.2 15 15.8 Z"/>
+      <rect class="s" x="5" y="21" width="20" height="5" rx="2.5" stroke-width="1"/>
+      <circle class="f" cx="7.5" cy="23.5" r="1.1"/><circle class="f" cx="22.5" cy="23.5" r="1.1"/>
+      <text class="t" x="15" y="32" font-size="3.6">NCA1</text>` },
+  { nome: 'Vitória-régia', forma: 'round', nivel: 'Médio',
+    conceito: 'A vitória-régia vista de cima, com o centro virando uma lente. Ícone amazônico, leitura de visão.',
+    svg: `${RIM}${lily()}<text class="t" x="15" y="30.8" font-size="3.2">NCA1</text>` },
+];
+
+// --- Família "Mira de detecção" (ideias 11–20) ---
+const NUT = [['M', 0, -6.5], ['C', 3.6, -5.5, 5.8, .7, 4.9, 4.7], ['C', 4.4, 6.7, -4.4, 6.7, -4.9, 4.7], ['C', -5.8, .7, -3.6, -5.5, 0, -6.5]];
+function nut(cx, cy, k, ridge = true) {
+  const d = NUT.map(([c, ...v]) => c + v.map((n, j) => f(j % 2 ? cy + n * k : cx + n * k)).join(' ')).join(' ') + ' Z';
+  const r = ridge ? `<path class="ns" d="M${f(cx)} ${f(cy - 4.1 * k)} Q${f(cx + 1.7 * k)} ${f(cy + .1 * k)} ${f(cx + .6 * k)} ${f(cy + 4.9 * k)}" stroke-width="${f(Math.max(.8, .9 * k))}"/>` : '';
+  return `<path class="f" d="${d}"/>${r}`;
+}
+const brackets = (x0, y0, x1, y1, L = 3.5, sw = 1.1) =>
+  `<path class="s" d="M${x0} ${y0 + L} V${y0} H${x0 + L} M${x1 - L} ${y0} H${x1} V${y0 + L} M${x1} ${y1 - L} V${y1} H${x1 - L} M${x0 + L} ${y1} H${x0} V${y1 - L}" stroke-width="${sw}"/>`;
+const tag = right => `<rect class="f" x="5" y="28.3" width="13.5" height="4.6" rx=".8"/>
+  <text class="tn" x="11.75" y="32" font-size="3.6">NCA1</text>${right}`;
+
+function pixelNut() {
+  const rows = ['..##..', '.####.', '.####.', '######', '######', '######', '.####.'];
+  let out = '';
+  rows.forEach((row, r) => [...row].forEach((c, k) => {
+    if (c === '#') out += `<rect class="f" x="${f(8.5 + k * 2.3)}" y="${f(10.8 + r * 2.3)}" width="1.5" height="1.5" rx=".2"/>`;
+  }));
+  return out;
+}
+
+DESIGNS.push(
+  { nome: 'Rótulo no topo', forma: 'rect', nivel: 'Fácil',
+    conceito: 'Caixa inteira com a etiqueta encaixada no canto de cima, igual às detecções do YOLO.',
+    svg: `<rect class="f" x="5" y="8" width="13" height="4.8" rx=".6"/>
+      <text class="tn" x="11.5" y="11.7" font-size="3.4">NCA1</text>
+      <text class="t" x="22.6" y="11.7" font-size="2.9">98%</text>
+      <rect class="s" x="5.45" y="12.4" width="19.1" height="18.2" rx=".4" stroke-width=".9"/>
+      ${nut(15, 21.5, .95)}` },
+  { nome: 'Tucumã detectado', forma: 'rect', nivel: 'Fácil',
+    conceito: 'A mesma mira, agora com o tucumã e a nota A na etiqueta: os dois produtos da esteira.',
+    svg: `${brackets(5, 9.5, 25, 27)}
+      <circle class="f" cx="15" cy="19.4" r="5.6"/>
+      <path class="f" d="M15 14.2 C15.4 12.2 17 11.1 19.1 11.2 C18.7 13.1 17.1 14.2 15 14.2 Z"/>
+      <circle class="n" cx="12.9" cy="17.4" r="1"/>
+      ${tag('<text class="t" x="22.3" y="32" font-size="3.6">A</text>')}` },
+  { nome: 'Folha detectada', forma: 'rect', nivel: 'Fácil',
+    conceito: 'Uma folha reconhecida pela IA, com as nervuras ficando na altura da chapa.',
+    svg: `${brackets(5, 9.5, 25, 27)}
+      <path class="f" d="M15 11 C21 14 21.5 21 15 25.8 C8.5 21 9 14 15 11 Z"/>
+      <path class="ns" d="M15 13.6 V23.6 M15 17.4 L17.5 15.6 M15 20.8 L12.5 19" stroke-width=".8"/>
+      ${tag('<text class="t" x="22.3" y="31.9" font-size="3">99%</text>')}` },
+  { nome: 'Duas detecções', forma: 'rect', nivel: 'Médio',
+    conceito: 'Duas castanhas na cena, cada uma com sua caixa e sua classe: A para a grande, B para a pequena.',
+    svg: `<text class="t" x="6.6" y="10.2" font-size="3.2">A</text>
+      <rect class="s" x="4.9" y="11.1" width="12.6" height="13.4" rx=".4" stroke-width=".8"/>
+      ${nut(11.2, 18, .66)}
+      <text class="t" x="20.2" y="16.3" font-size="3.2">B</text>
+      <rect class="s" x="18.6" y="17.2" width="7.3" height="8.4" rx=".4" stroke-width=".8"/>
+      ${nut(22.25, 21.5, .42, false)}
+      <text class="t" x="15" y="31.6" font-size="4">NCA1</text>` },
+  { nome: 'Retícula', forma: 'round', nivel: 'Fácil',
+    conceito: 'A versão redonda: uma retícula de mira com marcações em cruz cercando a castanha.',
+    svg: `${RIM}<circle class="s" cx="15" cy="18.3" r="8.4" stroke-width=".9"/>
+      <path class="s" d="M15 9.9 V11.9 M15 24.7 V26.7 M6.6 18.3 H8.6 M21.4 18.3 H23.4" stroke-width=".9"/>
+      ${nut(15, 18.6, .55, false)}
+      <text class="t" x="15" y="30.6" font-size="3.2">NCA1</text>` },
+  { nome: 'Castanha em pixels', forma: 'rect', nivel: 'Médio',
+    conceito: 'A castanha como a câmera recebe, em blocos de pixels, antes da IA reconhecer.',
+    svg: `${brackets(5, 9.5, 25, 27)}${pixelNut()}
+      ${tag('<text class="t" x="22.3" y="31.9" font-size="3">98%</text>')}` },
+  { nome: 'Foco da câmera', forma: 'rect', nivel: 'Fácil',
+    conceito: 'Cantos arredondados de foco, como no celular, com a cruz de foco marcada sobre a castanha.',
+    svg: `<path class="s" d="M5 13.5 V11.7 Q5 9.5 7.2 9.5 H9 M21 9.5 H22.8 Q25 9.5 25 11.7 V13.5 M25 23 V24.8 Q25 27 22.8 27 H21 M9 27 H7.2 Q5 27 5 24.8 V23" stroke-width="1.1"/>
+      ${nut(15, 18.5, .9, false)}
+      <path class="ns" d="M15 16.2 V20.8 M12.7 18.5 H17.3" stroke-width=".8"/>
+      <text class="t" x="15" y="32" font-size="4">NCA1</text>` },
+  { nome: 'Linha de varredura', forma: 'rect', nivel: 'Médio',
+    conceito: 'Um feixe de leitura atravessa a mira; sobre a castanha ele se inverte. Etiqueta com o “ok”.',
+    svg: `${brackets(5, 9.5, 25, 27)}
+      <path class="s" d="M6.6 18.3 H23.4" stroke-width=".8"/>
+      ${nut(15, 18.3, .85, false)}
+      <path class="ns" d="M10.6 18.3 H19.4" stroke-width=".8"/>
+      ${tag('<path class="s" d="M20.6 30.5 L22.1 32 L24.8 29" stroke-width="1"/>')}` },
+  { nome: 'Polígono de anotação', forma: 'rect', nivel: 'Médio',
+    conceito: 'A castanha contornada ponto a ponto, como na ferramenta de rotulagem do dataset.',
+    svg: `<path class="s" d="M15 11.4 L18.8 13.9 L20.6 19 L20 23.7 L15 25.3 L10 23.7 L9.4 19 L11.2 13.9 Z" stroke-width=".8"/>
+      ${[[15, 11.4], [18.8, 13.9], [20.6, 19], [20, 23.7], [15, 25.3], [10, 23.7], [9.4, 19], [11.2, 13.9]]
+        .map(([x, y]) => `<rect class="f" x="${f(x - .9)}" y="${f(y - .9)}" width="1.8" height="1.8" rx=".2"/>`).join('')}
+      ${nut(15, 18.6, .7, false)}
+      <text class="t" x="15" y="31.8" font-size="4">NCA1</text>` },
+  { nome: 'Barra de confiança', forma: 'rect', nivel: 'Fácil',
+    conceito: 'Castanha grande e, embaixo, a barra de confiança do modelo quase cheia.',
+    svg: `${nut(15, 16.6, .9)}
+      <rect class="s" x="5" y="24.6" width="20" height="3.4" rx="1.7" stroke-width=".8"/>
+      <rect class="f" x="6.2" y="25.8" width="16.9" height="1" rx=".5"/>
+      <text class="t" x="10.3" y="32.6" font-size="3.2">NCA1</text>
+      <text class="t" x="21.6" y="32.6" font-size="3.2">98%</text>` },
+);
+
+const PALS = [
+  ['floresta', 'Verde', '#2E5A3E'],
+  ['castanha', 'Castanha', '#7A4E2D'],
+  ['tucuma', 'Tucumã', '#E07A26'],
+  ['rio', 'Rio Negro', '#1C4F63'],
+  ['grafite', 'Grafite', '#3A3D40'],
+  ['creme', 'Creme', '#EFE6D2'],
+];
+
+// Separa o que é rebaixado (gravação) do que fica na altura da chapa dentro dele (ilhas).
+const ILHA = /<(?:path|circle|rect) class="(?:n|ns)"[^>]*\/>|<text class="tn"[^>]*>[^<]*<\/text>/g;
+DESIGNS.forEach(d => {
+  d.ilhas = (d.svg.match(ILHA) || []).join('');
+  d.gravacao = d.svg.replace(ILHA, '');
+});
+
+const keychain = (d, i, cls) =>
+  `<svg class="${cls}" viewBox="0 0 30 35" role="img" aria-label="Chaveiro ${d.nome}">
+     <mask id="ilhas-${i}" maskUnits="userSpaceOnUse" x="0" y="0" width="30" height="35">
+       <rect width="30" height="35" fill="#fff"/>${d.ilhas}</mask>
+     <path class="plate" d="${PLATES[d.forma]}"/>
+     <g class="cut"><g mask="url(#ilhas-${i})">${d.gravacao}</g></g></svg>`;
+
+const store = {
+  get(k, def) { try { const v = localStorage.getItem(k); return v === null ? def : JSON.parse(v); } catch { return def; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
+let favs = new Set(store.get('nca1-favs', []));
+
+const grid = document.getElementById('grid');
+const SECOES = { 0: 'Ideias 1–10', 10: 'Mais 10 · família Mira de detecção' };
+grid.innerHTML = DESIGNS.map((d, i) => `${SECOES[i] ? `<h2 class="sec">${SECOES[i]}</h2>` : ''}
+  <article class="card">
+    <div class="stage">
+      <span class="num">${String(i + 1).padStart(2, '0')}</span>
+      <button class="star" data-i="${i}" aria-label="Marcar ${d.nome} como favorito" aria-pressed="false">
+        <svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      </button>
+      ${keychain(d, i, 'big')}
+    </div>
+    <div class="body">
+      <h2>${d.nome}</h2>
+      <p>${d.conceito}</p>
+      <div class="tags">
+        <span class="tag">${d.forma === 'round' ? 'Redondo Ø30' : 'Retangular 30×35'}</span>
+        <span class="tag">1 cor · rebaixo</span><span class="tag">${d.nivel}</span>
+      </div>
+      <div class="dl">
+        <button data-i="${i}" data-layer="chapa">Chapa</button>
+        <button data-i="${i}" data-layer="gravacao">Gravação</button>
+        ${d.ilhas ? `<button data-i="${i}" data-layer="ilhas">Ilhas</button>` : ''}
+      </div>
+    </div>
+  </article>`).join('');
+
+// Tamanho "real" aproximado: 30 mm na resolução nominal do CSS (varia com a tela).
+const real = document.getElementById('real');
+real.addEventListener('click', () => real.setAttribute('aria-pressed', document.body.classList.toggle('real')));
+
+function renderFavs() {
+  document.querySelectorAll('.star').forEach(b => b.setAttribute('aria-pressed', favs.has(+b.dataset.i)));
+  const names = [...favs].sort((a, b) => a - b).map(i => DESIGNS[i].nome);
+  document.getElementById('favcount').innerHTML = names.length
+    ? `Favoritos: <b>${names.join(', ')}</b>` : 'Toque na ★ para marcar favoritos';
+}
+renderFavs();
+
+const pals = document.getElementById('pals');
+pals.innerHTML = PALS.map(([id, nome, b, r]) =>
+  `<button class="pal" data-pal="${id}" aria-pressed="false"><span class="sw" style="background:${b}"></span>${nome}</button>`).join('');
+function setPal(id) {
+  document.body.dataset.pal = id;
+  pals.querySelectorAll('.pal').forEach(b => b.setAttribute('aria-pressed', b.dataset.pal === id));
+  store.set('nca1-pal', id);
+}
+setPal(store.get('nca1-pal', 'floresta'));
+pals.addEventListener('click', e => { const b = e.target.closest('.pal'); if (b) setPal(b.dataset.pal); });
+
+function exportSVG(d, layer) {
+  let body;
+  if (layer === 'chapa') {
+    body = `<path d="${PLATES[d.forma]}" fill="#000" fill-rule="evenodd"/>`;
+  } else {
+    // Cada arquivo sai todo em preto: no Tinkercad cada um vira uma peça separada.
+    body = d[layer]
+      .replace(/class="(?:s|ns)"/g, 'fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"')
+      .replace(/class="(?:f|n)"/g, 'fill="#000"')
+      .replace(/class="tn?"/g, 'fill="#000" font-family="Archivo, Arial, sans-serif" font-weight="800" text-anchor="middle"');
+  }
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="30mm" height="35mm" viewBox="0 0 30 35">\n${body}\n</svg>\n`;
+}
+
+grid.addEventListener('click', e => {
+  const star = e.target.closest('.star');
+  if (star) {
+    const i = +star.dataset.i;
+    favs.has(i) ? favs.delete(i) : favs.add(i);
+    store.set('nca1-favs', [...favs]); renderFavs(); return;
+  }
+  const b = e.target.closest('.dl button');
+  if (!b) return;
+  const d = DESIGNS[+b.dataset.i];
+  const slug = d.nome.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const url = URL.createObjectURL(new Blob([exportSVG(d, b.dataset.layer)], { type: 'image/svg+xml' }));
+  const a = Object.assign(document.createElement('a'), { href: url, download: `nca1-${slug}-${b.dataset.layer}.svg` });
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+</script>
+</body>
+</html>

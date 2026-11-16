@@ -1,0 +1,175 @@
+net;componente;terminal;fio;folha
+AC_L;E19;L (Fase AC);W001;W1
+AC_L;E15;1 (IN_L);W001;W1
+AC_N;E19;N (Neutro AC);W002;W1
+AC_N;E15;3 (IN_N);W002;W1
+PE;E19;PE (Terra Proteção);W003;W1
+PE;E01;PE ⏚ (Carcaça Metálica Fonte);W003;W1
+PE;E27;CHASSI (Barramento PE Estrutura);W003;W1
+AC_L_PROT;E15;2 (OUT_L);W004;W1
+AC_L_PROT;E01;AC_L;W004;W1
+AC_N_PROT;E15;4 (OUT_N);W005;W1
+AC_N_PROT;E01;AC_N;W005;W1
++12V_FONTE;E01;+V (+12V);W006;W1
++12V_FONTE;E16;IN (Porta-Fusível 10A);W006;W1
++12V;E16;OUT (Pós-Fusível);W007;W1
++12V;X1;1 (+12V_G Geral);W007;W1
++12V;X1;1 (+12V_G Geral);W009;W1
++12V;X1;2 (+12V_L Lógica/Ilum);W009;W1
++12V;X1;2 (+12V_L Lógica/Ilum);W015;W1
++12V;E16;F4 IN (Fusível 1A Lógica);W015;W1
++12V_F4;E16;F4 OUT;W015;W1
++12V_F4;E03;IN+ (Entrada Buck 5V);W015;W1
++12V;X1;2 (+12V_L Lógica/Ilum);W069;W4
++12V;E12-B (E31);21 (Entrada NF2 Emergência);W069;W4
++12V;X1;1 (+12V_G Geral);W075;W4
++12V;E08;30 (COM Contato Potência K1);W075;W4
++12V;X1;2 (+12V_L Lógica/Ilum);W077;W4
++12V;E13;+12V (Anodo Ring Light);W077;W4
++12V_AT;E08;87 (NA Saída Potência K1);W076;W4
++12V_AT;X1;3 (+12V_AT Atuadores Pós-K1);W076;W4
++12V_AT;X1;3 (+12V_AT Atuadores Pós-K1);W011;W1
++12V_AT;E16;F3 IN (Fusível 3A Servo);W011;W1
++12V_AT_F3;E16;F3 OUT;W011;W1
++12V_AT_F3;E02;IN+ (Entrada Buck 6V Pós-K1 NR-12);W011;W1
++12V_AT;X1;3 (+12V_AT Atuadores Pós-K1);W050;W3
++12V_AT;E16;F2 IN (Fusível 5A Motor);W050;W3
++12V_AT_F2;E16;F2 OUT;W050;W3
++12V_AT_F2;E04;VIN+ (Entrada Potência MOSFET);W050;W3
++6V_SV;E02;OUT+ (Saída +6V Buck);W013;W1
++6V_SV;E06;+ (Anodo Capacitor 1000µF);W013;W1
++6V_SV;E02;OUT+ (Saída +6V Buck);W043;W3
++6V_SV;Barramento +6V_SV;IN;W043;W3
++6V_SV;Barramento +6V_SV;TAP;W045;W3
++6V_SV;E06;+ (Anodo Capacitor 1000µF);W045;W3
++6V_SV;Barramento +6V_SV;OUT;W047;W3
++6V_SV;H02;2 (VCC +6V Vermelho Servo);W047;W3
++5V;E03;OUT+ (Saída +5V Buck);W017;W1
++5V;H01;VIN (Entrada 5V ESP32);W017;W1
++5V;E26;Trilho +5V Superior;W017;W2
++5V;E26;Trilho +5V Superior;W021;W2
++5V;H04;VCC (Marrom Sensor S1);W021;W2
++5V;E26;Trilho +5V Superior;W024;W2
++5V;E07;VCC (Marrom Sensor S2);W024;W2
++5V;E03;OUT+ (Barramento +5V);W065;W4
++5V;E25;+ (Positivo Buzzer 5V);W065;W4
++3V3;H01;3V3 (Saída LDO ESP32);W019;W1
++3V3;E26;Trilho +3.3V Inferior;W019;W2
++3V3;E10 (S1);Pino 2 (CAT — Catodo Clamp S1);W035;W2
++3V3;E26;Trilho +3.3V Inferior;W035;W2
++3V3;E10 (S2);Pino 2 (CAT — Catodo Clamp S2);W040;W2
++3V3;E26;Trilho +3.3V Inferior;W040;W2
++3V3;H01;3V3 (Barramento +3.3V);W052;W3
++3V3;E04;VCC (Alimentação Lógica Gate Driver);W052;W3
+GND;E01;-V (GND Fonte 12V);W008;W1
+GND;X1;5 (GND_F Fonte);W008;W1
+GND;X1;5 (GND_F Fonte);W010;W1
+GND;X1;6 (GND_D Distribuição);W010;W1
+GND;X1;6 (GND_D Distribuição);W012;W1
+GND;E02;IN- (Retorno Buck 6V);W012;W1
+GND;E02;OUT- (Retorno 6V);W014;W1
+GND;E06;- (Catodo Capacitor 1000µF);W014;W1
+GND;X1;6 (GND_D Distribuição);W016;W1
+GND;X1;6 (GND_D Distribuição);W083;W1
+GND;Barramento GND (X1:6…X1:8 em ponte);IN (Retorno direto 1,0 mm² PT — rev. C);W083;W1
+GND;E03;IN- (Retorno Buck 5V);W016;W1
+GND;E03;OUT- (Retorno 5V);W018;W1
+GND;H01;GND (Retorno Fonte ESP32);W018;W1
+GND;H01;GND (Comum Lógica ESP32);W020;W1
+GND;E26;Trilho GND Comum;W020;W2
+GND;H04;GND (Azul Sensor S1);W022;W2
+GND;X2;3 (GND_S1);W022;W2
+GND;E07;GND (Azul Sensor S2);W025;W2
+GND;X2;4 (GND_S2);W025;W2
+GND;E12;12 (NC Saída NF1 E-STOP);W028;W2
+GND;X2;6 (ESTOP_NC);W028;W2
+GND;E10 (S1);Pino 1 (ANO — Anodo Clamp S1);W034;W2
+GND;E26;Trilho GND Inferior;W034;W2
+GND;E10 (S2);Pino 1 (ANO — Anodo Clamp S2);W039;W2
+GND;E26;Trilho GND Inferior;W039;W2
+GND;X2;3 (GND_S1);W079;W2
+GND;E26;Trilho GND Superior;W079;W2
+GND;X2;4 (GND_S2);W080;W2
+GND;E26;Trilho GND Superior;W080;W2
+GND;X2;6 (ESTOP_NC);W081;W2
+GND;E26;Trilho GND Superior;W081;W2
+GND;E02;OUT- (Retorno Buck 6V);W044;W3
+GND;Barramento GND;IN;W044;W3
+GND;E06;- (Catodo Capacitor 1000µF);W046;W3
+GND;Barramento GND;IN;W046;W3
+GND;H02;3 (GND Marrom Servo);W048;W3
+GND;Barramento GND;IN;W048;W3
+GND;E04;VIN- (Source Potência MOSFET);W051;W3
+GND;Barramento GND;IN;W051;W3
+GND;E04;GND (Retorno Lógica MOSFET);W053;W3
+GND;Barramento GND;IN;W053;W3
+GND;H05-R;Catodo (-) LED Vermelho;W060;W4
+GND;Barramento GND;IN;W060;W4
+GND;H05-G;Catodo (-) LED Verde;W062;W4
+GND;Barramento GND;IN;W062;W4
+GND;H05-Y;Catodo (-) LED Amarelo;W064;W4
+GND;Barramento GND;IN;W064;W4
+GND;Q1 (E28);E (Pino 3 — Emissor Buzzer);W068;W4
+GND;Barramento GND;IN;W068;W4
+GND;Q2 (E28);E (Pino 3 — Emissor Relé K1);W072;W4
+GND;Barramento GND;IN;W072;W4
+GND;E13;GND (-) Ring Light;W078;W4
+GND;Barramento GND;IN;W078;W4
+S1_RAW;H04;OUT (Preto Sensor S1 5V);W023;W2
+S1_RAW;X2;1 (S1_OUT);W023;W2
+S1_RAW;X2;1 (S1_OUT);W029;W2
+S1_RAW;E26;J10 (Entrada Trilha S1);W029;W2
+S1_RAW;E26;F10 (Trilha S1);W032;W2
+S1_RAW;E11 (S1);T1 (Entrada Resistor 1kΩ);W032;W2
+S1;E11 (S1);T2 (Saída Resistor 1kΩ);W033;W2
+S1;E10 (S1);Pino 3 (COM — Nó Clamped 3,3V);W033;W2
+S1;E10 (S1);Pino 3 (COM — Nó Clamped 3,3V);W036;W2
+S1;H01;D25/GPIO25 (Entrada S1);W036;W2
+S2_RAW;E07;OUT (Preto Sensor S2 5V);W026;W2
+S2_RAW;X2;2 (S2_OUT);W026;W2
+S2_RAW;X2;2 (S2_OUT);W030;W2
+S2_RAW;E26;J25 (Entrada Trilha S2);W030;W2
+S2_RAW;E26;F25 (Trilha S2);W037;W2
+S2_RAW;E11 (S2);T1 (Entrada Resistor 1kΩ);W037;W2
+S2;E11 (S2);T2 (Saída Resistor 1kΩ);W038;W2
+S2;E10 (S2);Pino 3 (COM — Nó Clamped 3,3V);W038;W2
+S2;E10 (S2);Pino 3 (COM — Nó Clamped 3,3V);W041;W2
+S2;H01;D26/GPIO26 (Entrada S2);W041;W2
+ESTOP;E12;11 (COM Entrada NF1 E-STOP);W027;W2
+ESTOP;X2;5 (ESTOP_COM);W027;W2
+ESTOP;X2;5 (ESTOP_COM);W031;W2
+ESTOP;E26;J40 (Trilha E-STOP);W031;W2
+ESTOP;E26;F40 (Trilha E-STOP);W042;W2
+ESTOP;H01;D27/GPIO27 (Entrada E-STOP Fail-Safe);W042;W2
+PWM_SERVO;H01;D18/GPIO18 (Saída PWM 50Hz);W049;W3
+PWM_SERVO;H02;1 (PWM Laranja Servo);W049;W3
+PWM_MOTOR;H01;D19/GPIO19 (Saída PWM 20kHz);W054;W3
+PWM_MOTOR;E04;SIG (Entrada PWM Gate MOSFET);W054;W3
+MOTOR+;E04;VOUT+ (Saída Positiva Motor);W055;W3
+MOTOR+;M13;M+ (Terminal Positivo Motor GA37);W055;W3
+MOTOR+;M13;M+ (Terminal Positivo Motor GA37);W057;W3
+MOTOR+;E05;Catodo (K — Faixa Schottky 1N5822);W057;W3
+MOTOR-;E04;VOUT- (Dreno MOSFET);W056;W3
+MOTOR-;M13;M- (Terminal Negativo Motor GA37);W056;W3
+MOTOR-;E05;Anodo (A — Schottky 1N5822);W058;W3
+MOTOR-;M13;M- (Terminal Negativo Motor GA37);W058;W3
+LED_R;H01;TX2/GPIO17 (Saída LED Vermelho);W059;W4
+LED_R;H05-R;R_R 330Ω → Anodo (+) LED Vermelho;W059;W4
+LED_G;H01;RX2/GPIO16 (Saída LED Verde);W061;W4
+LED_G;H05-G;R_G 330Ω → Anodo (+) LED Verde;W061;W4
+LED_Y;H01;D5/GPIO5 (Saída LED Amarelo);W063;W4
+LED_Y;H05-Y;R_Y 330Ω → Anodo (+) LED Amarelo;W063;W4
+BUZ_CMD;H01;D13/GPIO13 (Saída Buzzer);W067;W4
+BUZ_CMD;Q1 (E28);B (Pino 2 — Base via E11 1kΩ + R_PD1 10kΩ);W067;W4
+BUZ_COL;E25;- (Negativo Buzzer 5V);W066;W4
+BUZ_COL;Q1 (E28);C (Pino 1 — Coletor BC337-40);W066;W4
+RELAY_CMD;H01;D4/GPIO4 (Saída Relé K1);W071;W4
+RELAY_CMD;Q2 (E28);B (Pino 2 — Base via R_B2 470Ω + R_PD2 10kΩ);W071;W4
+K1_COIL+;E12-B (E31);22 (Saída NF2 Emergência);W082;W4
+K1_COIL+;E08;85 (Bobina + Relé K1);W082;W4
+K1_COIL+;E08;85 (Bobina + Relé K1);W073;W4
+K1_COIL+;E09;Catodo (K — Faixa Flyback 1N4007);W073;W4
+K1_COIL-;E09;Anodo (A — Flyback 1N4007);W074;W4
+K1_COIL-;E08;86 (Bobina - Relé K1);W074;W4
+K1_COIL-;E08;86 (Bobina - Relé K1);W070;W4
+K1_COIL-;Q2 (E28);C (Pino 1 — Coletor BC337-40);W070;W4

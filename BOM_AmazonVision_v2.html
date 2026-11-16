@@ -1,0 +1,991 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123f2d">
+  <title>AmazonVision 4.0 · BOM Consolidada v2 (2026-11-06)</title>
+  <style>
+    :root {
+      --ink: #112b20;
+      --green: #16734e;
+      --green-dark: #0a2e1f;
+      --green-soft: #e8f4ed;
+      --lime: #bfe86d;
+      --bg: #edf1ea;
+      --line: #d5ded5;
+      --muted: #5e7063;
+      --soft: #f6f8f5;
+      --warn: #8a5a00;
+      --warn-bg: #fff8e6;
+      --warn-border: #f0d898;
+      --bad: #9b2c2c;
+      --bad-soft: #fde8e8;
+      --card-bg: #ffffff;
+      --gray-row: #eef2ed;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Hero / Header Institucional */
+    .hero {
+      background: linear-gradient(135deg, #072218 0%, #124832 100%);
+      color: #f5faef;
+      padding: 42px max(24px, calc((100vw - 1280px) / 2)) 36px;
+      border-bottom: 4px solid var(--lime);
+    }
+
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--lime);
+      margin-bottom: 8px;
+    }
+
+    .hero h1 {
+      font-size: clamp(26px, 3.8vw, 42px);
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 8px;
+      color: #ffffff;
+    }
+
+    .hero h1 span {
+      color: var(--lime);
+    }
+
+    .hero-sub {
+      font-size: 15px;
+      color: #d1e2d4;
+      max-width: 820px;
+    }
+
+    /* Container Principal */
+    .app-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px 20px 80px;
+    }
+
+    /* Callout de Resumo de Inventário */
+    .callout-summary {
+      background: #e8f4ed;
+      border: 1px solid #b7dcc4;
+      border-left: 6px solid var(--green);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 22px;
+      font-size: 14px;
+      color: #0b3824;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      box-shadow: 0 2px 6px rgba(17, 43, 32, 0.04);
+    }
+
+    .callout-summary strong {
+      color: #052617;
+      font-weight: 700;
+    }
+
+    /* Grid de Cards de Totais */
+    .totals-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 18px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .stat-card small {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .stat-card strong {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+
+    .stat-card.highlight {
+      background: var(--green-dark);
+      border-color: #051c13;
+      color: #ffffff;
+    }
+
+    .stat-card.highlight small {
+      color: var(--lime);
+    }
+
+    .stat-card.highlight strong {
+      color: #ffffff;
+    }
+
+    /* Barra de Controles e Filtros */
+    .controls-bar {
+      background: var(--card-bg);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 26px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      border: 1px solid var(--line);
+      background: var(--soft);
+      color: var(--ink);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn:hover {
+      background: #e2ece3;
+      border-color: #b5c7b8;
+    }
+
+    .filter-btn.active {
+      background: var(--green);
+      border-color: var(--green);
+      color: #ffffff;
+    }
+
+    .search-and-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .search-input {
+      width: 280px;
+      font: inherit;
+      font-size: 12px;
+      padding: 8px 14px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: #ffffff;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--green);
+    }
+
+    .btn-action {
+      border: 1px solid var(--line);
+      background: #ffffff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-action:hover {
+      background: var(--soft);
+      border-color: #999;
+    }
+
+    .btn-action.primary {
+      background: var(--green);
+      border-color: var(--green);
+      color: #ffffff;
+    }
+
+    .btn-action.primary:hover {
+      background: #12593c;
+    }
+
+    /* Seções e Tabelas */
+    .section-block {
+      margin-bottom: 34px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--line);
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      background: var(--card-bg);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+
+    table.bom-table {
+      width: 100%;
+      min-width: 960px;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    table.bom-table th {
+      background: #eef3ed;
+      color: #3b5042;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    table.bom-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #e7eee7;
+      vertical-align: middle;
+      font-size: 12.5px;
+    }
+
+    table.bom-table tr:hover td {
+      background: #fbfdfa;
+    }
+
+    table.bom-table tr.row-bought td {
+      background: #f2faf3;
+      color: #386047;
+    }
+
+    table.bom-table tr.row-bought td.col-item {
+      text-decoration: line-through;
+      color: #64826f;
+    }
+
+    /* Colunas Específicas */
+    .col-chk { width: 44px; text-align: center; }
+    .col-tag { width: 70px; font-family: Consolas, monospace; font-weight: 700; }
+    .col-item { width: 260px; font-weight: 600; color: var(--ink); }
+    .col-spec { color: #3d4f43; font-size: 12px; }
+    .col-qty { width: 60px; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .col-un { width: 50px; text-align: center; color: var(--muted); font-size: 12px; }
+    .col-price { width: 105px; text-align: right; font-variant-numeric: tabular-nums; }
+    .col-subtotal { width: 115px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
+    .col-priority { width: 105px; text-align: center; }
+
+    /* Badges e Tags */
+    .tag-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+      background: #e1ede4;
+      color: #1b5336;
+    }
+
+    .badge-priority {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .badge-priority.essencial {
+      background: #e3f1ea;
+      color: var(--green);
+    }
+
+    .badge-priority.recomendado {
+      background: var(--warn-bg);
+      color: var(--warn);
+    }
+
+    .badge-inhand {
+      display: inline-block;
+      background: #e2e7e3;
+      color: #3f5546;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 12px;
+      text-transform: uppercase;
+    }
+
+    /* Checkbox customizado */
+    input.chk-bought {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: var(--green);
+    }
+
+    /* Tabela de Em Mãos (Cinza) */
+    .section-inhand .table-wrap {
+      background: #f7f9f7;
+      border-color: #d1d8d1;
+    }
+
+    .section-inhand table.bom-table th {
+      background: #e5eae4;
+      color: #4a5c4f;
+    }
+
+    .section-inhand table.bom-table td {
+      background: #f3f6f3;
+      border-bottom-color: #e0e6e0;
+      color: #3b4d40;
+    }
+
+    /* Linha de Subtotal da Tabela */
+    tr.subtotal-row td {
+      background: #f1f6f1 !important;
+      font-weight: 700;
+      border-top: 2px solid var(--line);
+      color: var(--ink);
+    }
+
+    /* Disclaimers e Avisos */
+    .disclaimer-card {
+      background: var(--warn-bg);
+      border: 1px solid var(--warn-border);
+      border-left: 5px solid var(--warn);
+      border-radius: 8px;
+      padding: 18px 22px;
+      margin-top: 30px;
+      color: #593e06;
+    }
+
+    .disclaimer-card h3 {
+      font-size: 14px;
+      margin-bottom: 10px;
+      color: #452d00;
+      font-weight: 800;
+    }
+
+    .disclaimer-card ol {
+      padding-left: 20px;
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+
+    .disclaimer-card li {
+      margin-bottom: 6px;
+    }
+
+    /* Rodapé Técnico */
+    footer.doc-footer {
+      border-top: 1px solid var(--line);
+      margin-top: 34px;
+      padding-top: 18px;
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    /* Utilitário */
+    .hide-row {
+      display: none !important;
+    }
+
+    /* Responsividade */
+    @media (max-width: 980px) {
+      .totals-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .controls-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .search-input {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .totals-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Impressão / PDF */
+    @media print {
+      body {
+        background: #ffffff;
+        font-size: 10px;
+      }
+      .hero {
+        padding: 16px 0;
+        background: none;
+        color: #000000;
+        border-bottom: 2px solid #000000;
+      }
+      .hero h1 {
+        color: #000000;
+        font-size: 20px;
+      }
+      .hero-sub {
+        color: #444;
+        font-size: 11px;
+      }
+      .controls-bar, .col-chk, input.chk-bought {
+        display: none !important;
+      }
+      .app-container {
+        padding: 0;
+        max-width: none;
+      }
+      .table-wrap {
+        border: 1px solid #ccc;
+        box-shadow: none;
+        overflow: visible;
+      }
+      table.bom-table {
+        min-width: 0;
+      }
+      table.bom-table th, table.bom-table td {
+        padding: 4px 6px;
+        font-size: 9.5px;
+      }
+      .disclaimer-card {
+        border-color: #999;
+        background: #fafafa;
+        color: #222;
+      }
+      .section-block {
+        break-inside: auto;
+      }
+      tr {
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Institucional -->
+  <header class="hero">
+    <div class="hero-eyebrow">AMAZONVISION 4.0 · DOCUMENTO OFICIAL DE SUPRIMENTOS</div>
+    <h1>Amazon<span>Vision</span> 4.0 · BOM Consolidada v2 (2026-11-06)</h1>
+    <p class="hero-sub">Única fonte da verdade — substitui as 2 listas de 1-out-2026 arquivadas em docs/legado/.</p>
+  </header>
+
+  <main class="app-container">
+
+    <!-- Callout de Resumo de Inventário Real -->
+    <div class="callout-summary">
+      <div>
+        <strong>Inventário em mãos (não entra no total):</strong> ESP32, MG996R, 2× MG995 reserva, sensor retangular IR, LEDs 5mm, jumpers. 
+        <strong>Falta comprar:</strong> R$ 2 505 estimado (com Protoboard 830p), faixa R$ 2 200 a R$ 2 800 (rev. LT-3D-002 + correções da W4).
+      </div>
+    </div>
+
+    <!-- Cards de Totais -->
+    <div class="totals-grid">
+      <div class="stat-card">
+        <small>Itens a Comprar</small>
+        <strong id="cardCountBuy">65</strong>
+      </div>
+      <div class="stat-card">
+        <small>Itens Já em Mãos</small>
+        <strong id="cardCountInHand">6</strong>
+      </div>
+      <div class="stat-card">
+        <small>Subtotal Eletrônica</small>
+        <strong id="cardSubtotalElec">R$ 1.051,00</strong>
+      </div>
+      <div class="stat-card">
+        <small>Subtotal Mecânica</small>
+        <strong id="cardSubtotalMec">R$ 1.453,50</strong>
+      </div>
+      <div class="stat-card highlight">
+        <small>Total Geral Estimado</small>
+        <strong id="cardGrandTotal">R$ 2.504,50</strong>
+      </div>
+    </div>
+
+    <!-- Barra de Controles e Filtros -->
+    <div class="controls-bar">
+      <div class="filter-tabs" id="filterTabs">
+        <button class="filter-btn active" data-filter="all">Tudo</button>
+        <button class="filter-btn" data-filter="elec">Eletrônica</button>
+        <button class="filter-btn" data-filter="mec">Mecânica</button>
+        <button class="filter-btn" data-filter="inhand">Já em Mãos</button>
+      </div>
+
+      <div class="search-and-actions">
+        <input type="text" id="searchInput" class="search-input" placeholder="Buscar por tag, item ou especificação...">
+        <button class="btn-action primary" onclick="window.print()">Imprimir / PDF</button>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 1: BLOCO 1 - ELETRÔNICA E ELÉTRICA -->
+    <section class="section-block" id="secElec">
+      <div class="section-header">
+        <div class="section-title">
+          <span>Bloco 1: Eletrônica e Elétrica</span>
+          <span style="font-size:12px;font-weight:400;color:var(--muted);">(A Comprar)</span>
+        </div>
+        <div class="section-subtitle">31 itens · Painel elétrico 12V, fontes, drivers, controle e visão</div>
+      </div>
+      <div class="table-wrap">
+        <table class="bom-table">
+          <thead>
+            <tr>
+              <th class="col-chk">OK</th>
+              <th class="col-tag">Tag</th>
+              <th class="col-item">Item</th>
+              <th class="col-spec">Especificação Técnica</th>
+              <th class="col-qty">Qtd</th>
+              <th class="col-un">Un</th>
+              <th class="col-price">Preço Unit.</th>
+              <th class="col-subtotal">Subtotal</th>
+              <th class="col-priority">Prioridade</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyElec"></tbody>
+          <tfoot>
+            <tr class="subtotal-row">
+              <td colspan="7" style="text-align: right; padding-right: 14px;">Subtotal Eletrônica e Elétrica:</td>
+              <td class="col-subtotal" id="tblSubtotalElec">R$ 1.051,00</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 2: BLOCO 2 - MECÂNICA, FERRAGENS E FILAMENTOS -->
+    <section class="section-block" id="secMec">
+      <div class="section-header">
+        <div class="section-title">
+          <span>Bloco 2: Mecânica, Ferragens e Filamentos</span>
+          <span style="font-size:12px;font-weight:400;color:var(--muted);">(A Comprar)</span>
+        </div>
+        <div class="section-subtitle">34 itens · Chassi 700mm, transmissão GT2, rolamentos e insumos DfAM (rev. LT-3D-002)</div>
+      </div>
+      <div class="table-wrap">
+        <table class="bom-table">
+          <thead>
+            <tr>
+              <th class="col-chk">OK</th>
+              <th class="col-tag">Tag</th>
+              <th class="col-item">Item</th>
+              <th class="col-spec">Especificação Técnica</th>
+              <th class="col-qty">Qtd</th>
+              <th class="col-un">Un</th>
+              <th class="col-price">Preço Unit.</th>
+              <th class="col-subtotal">Subtotal</th>
+              <th class="col-priority">Prioridade</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyMec"></tbody>
+          <tfoot>
+            <tr class="subtotal-row">
+              <td colspan="7" style="text-align: right; padding-right: 14px;">Subtotal Mecânica e Ferragens:</td>
+              <td class="col-subtotal" id="tblSubtotalMec">R$ 1.453,50</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 3: JÁ EM MÃOS -->
+    <section class="section-block section-inhand" id="secInHand">
+      <div class="section-header">
+        <div class="section-title">
+          <span>Bloco 3: Já em Mãos</span>
+          <span style="font-size:12px;font-weight:400;color:var(--muted);">(Inventário Real Físico)</span>
+        </div>
+        <div class="section-subtitle">Não entra no total de compras · Componentes já disponíveis na bancada</div>
+      </div>
+      <div class="table-wrap">
+        <table class="bom-table">
+          <thead>
+            <tr>
+              <th class="col-tag">Tag</th>
+              <th class="col-item">Item</th>
+              <th class="col-spec">Aplicação no Projeto</th>
+              <th class="col-qty">Qtd</th>
+              <th class="col-un">Un</th>
+              <th class="col-priority">Status</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyInHand"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Card de Disclaimers / Pontos de Atenção -->
+    <div class="disclaimer-card">
+      <h3>ATENÇÃO — Pontos de confirmação antes de comprar:</h3>
+      <ol>
+        <li><strong>Sensores IR:</strong> o usuário tem 1 retangular. Para o par S1+S2 ser idêntico, comprar +1 do mesmo modelo (item E07). Se for trocar para E18-D80NK cilíndrico M18, comprar 2 unidades em vez de 1 e reimprimir a Mesa_08 com o suporte 04A original M18.</li>
+        <li><strong>BAT54S + 1 kΩ (E10 e E11):</strong> OBRIGATÓRIOS porque todos os módulos E18 e sensores IR retangulares comerciais trazem pull-up SMD interno de 10 kΩ a Vcc. Sem o clamp, a GPIO 3,3V do ESP32 queima.</li>
+        <li><strong>Motorredutor GA37 (M13):</strong> confirmar com o usuário se já comprou antes. Se sim, desmarcar M13 e subtrair R$ 110 do total.</li>
+        <li><strong>Filamentos (M01–M04):</strong> se o laboratório da FUCAPI fornecer, desmarcar e subtrair R$ 775 do total.</li>
+        <li><strong>Revisão LT-3D-002 (06/11/2026, noite):</strong> itens com sufixo <code>-r2</code> e M28–M32 mudaram por causa do laudo de auditoria mecânica (tambores 118 mm, tensor novo, empurrador). Se você já tinha marcado como comprado o item antigo (haste 300 mm, M4×16, M5×40, polia 20T furo 5, barra 500 mm), confira de novo.</li>
+        <li><strong>Correções da folha W4 (07/11/2026):</strong> E28–E31 entram porque o BC547 não aguenta a bobina do relé (150–200 mA), o relé precisa de pull-down para não disparar no boot e a NR-12 pede que o E-STOP corte a bobina do K1 por hardware (2º contato NF). Ver <code>desenho-eletrico/correcoes-W4.md</code>.</li>
+        <li><strong>Preços:</strong> médias de Mercado Livre / Shopee / lojas de automação em novembro de 2026; conferir no dia da compra.</li>
+        <li><strong>Montagem em Protoboard (E26):</strong> Definida como base central de montagem lógica e de sinal do ESP32. Lembrar da regra de ouro: correntes de potência do servo MG996R (Buck XL4015) e do motor GA37 (12V) devem correr por fora da protoboard, compartilhando apenas a linha de GND comum.</li>
+      </ol>
+    </div>
+
+    <!-- Rodapé Técnico com Declaração de Base -->
+    <footer class="doc-footer">
+      <p>Esta BOM é a única fonte da verdade do projeto AmazonVision 4.0.</p>
+      <p>Consolidada da FL04 de <code>Planta_Eletrica_Esteira_AmazonVision.html</code> e §3 de <code>MANUAL_IMPRESSAO_3D_BAMBU_P2S.md</code> em 2026-11-06. Revisada pelo laudo LT-3D-002 rev. B (06/11/2026, noite).</p>
+      <p>Listas antigas (Lista_de_Materiais, Lista_de_Compras_Eletronica) arquivadas em <code>docs/legado/</code> com banner de aviso.</p>
+    </footer>
+
+  </main>
+
+  <script>
+    /* DADOS DA BOM CONSOLIDADA v2 (Valores Oficiais) */
+    const ELETRONICA_ITEMS = [
+      { id: 'E01', tag: 'E01', item: 'Fonte Chaveada Colmeia 12V 10A 120W bivolt', spec: 'Entrada 110/220 VAC, saída 12V DC, ajuste trimpot de tensão', qty: 1, un: 'un', unitPrice: 85.00, priority: 'Essencial' },
+      { id: 'E02', tag: 'E02', item: 'Buck XL4015 5A', spec: 'Saída ajustável 6,0V para servo MG996R, corrente mínima 3A, trimpot (1 uso + 1 reserva)', qty: 2, un: 'un', unitPrice: 25.00, priority: 'Essencial' },
+      { id: 'E03', tag: 'E03', item: 'Buck MP1584EN 2A', spec: '12V → 5V estável para ESP32 + sensores IR', qty: 1, un: 'un', unitPrice: 12.00, priority: 'Essencial' },
+      { id: 'E04', tag: 'E04', item: 'Módulo MOSFET D4184 (AOD4184 duplo)', spec: '40V / 15A, gate 3,3V, controla motor GA37 via GPIO 19', qty: 1, un: 'un', unitPrice: 32.00, priority: 'Essencial' },
+      { id: 'E05', tag: 'E05', item: 'Diodo Schottky 1N5822', spec: '40V / 3A, flyback do motor GA37 (uso + reserva)', qty: 2, un: 'un', unitPrice: 2.00, priority: 'Essencial' },
+      { id: 'E06', tag: 'E06', item: 'Capacitor eletrolítico 1000 µF / 16V', spec: 'Pico de corrente do servo MG996R, saída do XL4015', qty: 2, un: 'un', unitPrice: 3.00, priority: 'Essencial' },
+      { id: 'E07', tag: 'E07', item: 'Sensor óptico IR retangular 5V NPN', spec: 'Mesmo modelo do que o usuário já tem (1 unidade adicional para formar o par S1+S2)', qty: 1, un: 'un', unitPrice: 30.00, priority: 'Essencial' },
+      { id: 'E08', tag: 'E08', item: 'Relé automotivo 12V 40A + soquete 5 terminais', spec: 'NR-12, corta +12V_AT dos atuadores', qty: 1, un: 'un', unitPrice: 32.00, priority: 'Essencial' },
+      { id: 'E09', tag: 'E09', item: 'Diodo 1N4007 (pacote c/10)', spec: 'Flyback da bobina do relé K1', qty: 1, un: 'pct', unitPrice: 4.00, priority: 'Essencial' },
+      { id: 'E10', tag: 'E10', item: 'Diodo Schottky duplo BAT54S (SOT-23)', spec: 'Clamp 3,3V antissobretensão nos canais S1 e S2 — OBRIGATÓRIO pelo pull-up interno 10kΩ do sensor IR', qty: 5, un: 'un', unitPrice: 2.00, priority: 'Essencial' },
+      { id: 'E11', tag: 'E11', item: 'Resistor 1 kΩ 1/4W', spec: 'Série antes do BAT54S na linha BK de cada sensor', qty: 10, un: 'un', unitPrice: 0.20, priority: 'Essencial' },
+      { id: 'E12', tag: 'E12', item: 'Botão cogumelo emergência 22 mm', spec: '1NF+1NA, c/ trava, S0 do sistema NR-12', qty: 1, un: 'un', unitPrice: 32.00, priority: 'Essencial' },
+      { id: 'E13', tag: 'E13', item: 'Ring Light LED 12V 6000K', spec: 'Anel Ø 80–90 mm, dentro da cúpula óptica', qty: 1, un: 'un', unitPrice: 45.00, priority: 'Essencial' },
+      { id: 'E14', tag: 'E14', item: 'Webcam USB 1080p UVC', spec: 'Logitech C270 ou similar com rosca 1/4"', qty: 1, un: 'un', unitPrice: 220.00, priority: 'Essencial' },
+      { id: 'E15', tag: 'E15', item: 'Disjuntor bipolar 10A Curva C DIN', spec: 'Proteção geral da rede AC', qty: 1, un: 'un', unitPrice: 42.00, priority: 'Essencial' },
+      { id: 'E16', tag: 'E16', item: 'Kit porta-fusíveis DIN + fusíveis vidro 5x20', spec: 'Valores 10A/5A/3A/1A com reservas', qty: 1, un: 'kit', unitPrice: 35.00, priority: 'Essencial' },
+      { id: 'E17', tag: 'E17', item: 'Régua de bornes SAK/Sindal DIN (12 vias)', spec: 'Réguas X1 (força 12V), X2 (sensores/S0), X3 (atuadores)', qty: 3, un: 'un', unitPrice: 18.00, priority: 'Essencial' },
+      { id: 'E18', tag: 'E18', item: 'Trilho DIN TS-35 1 m + 4 batentes finais', spec: 'Base do painel elétrico', qty: 1, un: 'un', unitPrice: 25.00, priority: 'Essencial' },
+      { id: 'E19', tag: 'E19', item: 'Cabo de força tripolar 1,5 m plugue 10A NBR 14136', spec: 'Entrada AC da fonte', qty: 1, un: 'un', unitPrice: 18.00, priority: 'Essencial' },
+      { id: 'E20', tag: 'E20', item: 'Cabo USB-A → micro-USB 1,5 m DATA-ONLY (VBUS seccionada)', spec: 'Entre ESP32 e notebook; se não achar pronto, comprar normal e seccionar', qty: 1, un: 'un', unitPrice: 18.00, priority: 'Essencial' },
+      { id: 'E21', tag: 'E21', item: 'Cabo flexível 1,0 mm² vermelho + preto (5 m cada)', spec: 'Potência 12V no painel', qty: 1, un: 'par', unitPrice: 25.00, priority: 'Essencial' },
+      { id: 'E22', tag: 'E22', item: 'Cabinho sinal 0,5 mm² colorido (BN/BU/BK/Vi, 5 m cada)', spec: 'Sinais sensores, ESP32, emergência', qty: 1, un: 'kit', unitPrice: 30.00, priority: 'Essencial' },
+      { id: 'E23', tag: 'E23', item: 'Terminais ilhós sortidos + alicate crimpador', spec: 'Pontas de cabo nos bornes', qty: 1, un: 'kit', unitPrice: 55.00, priority: 'Essencial' },
+      { id: 'E24', tag: 'E24', item: 'Prensa-cabos PG7 + PG9 c/ porca', spec: 'Entrada de cabos no painel', qty: 4, un: 'un', unitPrice: 4.00, priority: 'Essencial' },
+      { id: 'E25', tag: 'E25', item: 'Buzzer 5V ativo', spec: 'Alarme sonoro NR-12', qty: 1, un: 'un', unitPrice: 8.00, priority: 'Recomendado' },
+      { id: 'E26', tag: 'E26', item: 'Protoboard 830 pontos (MB-102)', spec: 'Base central de montagem da lógica do ESP32, LEDs e clamps de sinal', qty: 1, un: 'un', unitPrice: 25.00, priority: 'Essencial' },
+      { id: 'E27', tag: 'E27', item: 'Caixa plástica DIN/painel 200×300×150 mm c/ tampa transparente', spec: 'Armário do quadro elétrico', qty: 1, un: 'un', unitPrice: 120.00, priority: 'Essencial' },
+      { id: 'E28', tag: 'E28', item: 'Transistor NPN BC337-40 (TO-92)', spec: 'Q1 (buzzer) e Q2 (bobina do relé K1, até 800 mA) — substitui o BC547 (máx. 100 mA); 2 uso + 2 reserva', qty: 4, un: 'un', unitPrice: 0.50, priority: 'Essencial' },
+      { id: 'E29', tag: 'E29', item: 'Resistor 470 Ω 1/4W', spec: 'R_B2: base do Q2 (Ib ≈ 5,3 mA para saturar com a bobina de 200 mA)', qty: 5, un: 'un', unitPrice: 0.20, priority: 'Essencial' },
+      { id: 'E30', tag: 'E30', item: 'Resistor 10 kΩ 1/4W', spec: 'R_PD1/R_PD2: pull-down base-emissor de Q1 e Q2 (relé e buzzer desligados no boot do ESP32)', qty: 5, un: 'un', unitPrice: 0.20, priority: 'Essencial' },
+      { id: 'E31', tag: 'E31', item: 'Bloco de contato NF 22 mm (encaixe no botão E12)', spec: 'E12-B, contatos 21-22: 2º NF do E-STOP em série com a bobina do K1 (corte por hardware, NR-12). Conferir compatibilidade com a marca do botão', qty: 1, un: 'un', unitPrice: 12.00, priority: 'Essencial' }
+    ];
+
+    const MECANICA_ITEMS = [
+      { id: 'M01', tag: 'M01', item: 'Filamento PETG Preto Ø1,75 × 1 kg', spec: 'Mesas 01–04, 08, 09', qty: 2, un: 'un', unitPrice: 135.00, priority: 'Essencial' },
+      { id: 'M02-r2', tag: 'M02', item: 'Filamento PETG Laranja Ø1,75 × 1 kg', spec: 'Mesas 05, 06 (6 lotes de elos), 07, 10, 11 rejeitados — rev. LT-3D-002: 2 kg (consumo real estimado ≈1,9 kg)', qty: 2, un: 'un', unitPrice: 140.00, priority: 'Essencial' },
+      { id: 'M03', tag: 'M03', item: 'Filamento PLA Branco Leitoso Ø1,75 × 500 g', spec: 'Mesa 12 (difusor óptico + plaquetas)', qty: 1, un: 'un', unitPrice: 75.00, priority: 'Essencial' },
+      { id: 'M04', tag: 'M04', item: 'Filamento TPU 95A Ø1,75 × 500 g', spec: 'Mesa 13 (sapatas antivibração)', qty: 1, un: 'un', unitPrice: 150.00, priority: 'Essencial' },
+      { id: 'M05-r2', tag: 'M05', item: 'Rolamento 608ZZ (8×22×7 mm) blindado', spec: 'Rev. LT-3D-002: 6 sedes — 2 nas cabeceiras dianteiras 01A/01B (eixo motriz gira), 2 no tambor livre, 2 no rolete 02C. Sem rolamento: 6 buchas 608 (Mesa 14 + 2 avulsas)', qty: 6, un: 'un', unitPrice: 8.00, priority: 'Essencial' },
+      { id: 'M06', tag: 'M06', item: 'Rolamento 623ZZ (3×10×4 mm)', spec: 'Articulação da biela do empurrador (ou buchas 623 da Mesa 14 se não achar em Manaus)', qty: 2, un: 'un', unitPrice: 6.00, priority: 'Essencial' },
+      { id: 'M07', tag: 'M07', item: 'Bucha linear LM6UU Ø6', spec: 'Mancais do empurrador (ou buchas LM6UU da Mesa 14 se não achar em Manaus)', qty: 4, un: 'un', unitPrice: 7.00, priority: 'Essencial' },
+      { id: 'M08-r2', tag: 'M08', item: 'Barra aço inox retificado Ø8 × 1000 mm', spec: 'Rev. LT-3D-002: corte 185 (motriz) + 180 (livre, passa pelos 2 carros tensores) + 166 (rolete 02C) = 531 mm + serra', qty: 1, un: 'un', unitPrice: 60.00, priority: 'Essencial' },
+      { id: 'M09-r2', tag: 'M09', item: 'Haste inox retificada Ø6 × 250 mm', spec: 'Rev. LT-3D-002: guias do empurrador. Com 170 mm o curso máximo era ~48 mm; 250 mm dão os 120 mm', qty: 2, un: 'un', unitPrice: 15.00, priority: 'Essencial' },
+      { id: 'M10', tag: 'M10', item: 'Correia GT2 fechada 200 mm × 6 mm (2GT)', spec: 'Transmissão motor→tambor', qty: 1, un: 'un', unitPrice: 22.00, priority: 'Essencial' },
+      { id: 'M11-r2', tag: 'M11', item: 'Par polia GT2 20T furo 6 + GT2 40T furo 8 (com parafuso de fixação)', spec: 'Rev. LT-3D-002: 20T no eixo D Ø6 do GA37 (furo 5 NÃO serve); 40T no eixo motriz, por fora da cabeceira 01B. Polias impressas foram retiradas', qty: 1, un: 'par', unitPrice: 32.00, priority: 'Essencial' },
+      { id: 'M12', tag: 'M12', item: 'Horn metálico 25T compatível MG996R', spec: 'Alavanca R=60 mm. MEDIR o diâmetro e a furação do horn comprado para fechar a alavanca 03F', qty: 1, un: 'un', unitPrice: 15.00, priority: 'Essencial' },
+      { id: 'M13', tag: 'M13', item: 'Motorredutor GA37-520 12V 60 RPM eixo D Ø6', spec: 'CONFIRMAR se já tem; se sim, desmarcar', qty: 1, un: 'un', unitPrice: 110.00, priority: 'Essencial' },
+      { id: 'M14-r2', tag: 'M14', item: 'Parafusos Allen M4×30 inox', spec: 'Rev. LT-3D-002: flanges cabeceira↔extensão 01A/01B/01C/01D↔01E (aperto real 21–22 mm + arruelas + Nyloc)', qty: 10, un: 'un', unitPrice: 0.90, priority: 'Essencial' },
+      { id: 'M14b', tag: 'M14b', item: 'Parafusos Allen M4×25 inox', spec: 'Rev. LT-3D-002: flanges extensão↔central 01E↔01F (aperto real 17 mm + arruelas + Nyloc)', qty: 10, un: 'un', unitPrice: 0.85, priority: 'Essencial' },
+      { id: 'M14c', tag: 'M14c', item: 'Parafusos Allen M4×16 inox', spec: 'Travessas 01H e pórtico 03E — conferir comprimento no ensaio a seco', qty: 14, un: 'un', unitPrice: 0.70, priority: 'Essencial' },
+      { id: 'M15', tag: 'M15', item: 'Parafusos Allen M4×20 inox', spec: 'Pés estruturais', qty: 20, un: 'un', unitPrice: 0.80, priority: 'Essencial' },
+      { id: 'M16', tag: 'M16', item: 'Parafusos M4×12 cabeça abaulada', spec: 'Guias laterais + bedPlate', qty: 10, un: 'un', unitPrice: 0.60, priority: 'Essencial' },
+      { id: 'M17-r2', tag: 'M17', item: 'Parafuso M5×50 rosca total + 2 porcas M5', spec: 'Rev. LT-3D-002: tensor traseiro — porca cativa no carro 02D, cabeça na face externa da 01C/01D (curso 26 mm); 2ª porca de reserva/contra-porca', qty: 2, un: 'conj', unitPrice: 3.80, priority: 'Essencial' },
+      { id: 'M18', tag: 'M18', item: 'Parafusos Allen M3×8/10/12 inox', spec: 'Servo MG996R, suportes PCB, carenagem', qty: 30, un: 'un', unitPrice: 0.40, priority: 'Essencial' },
+      { id: 'M19', tag: 'M19', item: 'Porcas Nyloc M4', spec: 'Travamento antivibração', qty: 46, un: 'un', unitPrice: 0.30, priority: 'Essencial' },
+      { id: 'M20-r2', tag: 'M20', item: 'Porcas Nyloc M3', spec: 'Travamento antivibração (quantidade alinhada ao manual)', qty: 20, un: 'un', unitPrice: 0.25, priority: 'Essencial' },
+      { id: 'M21', tag: 'M21', item: 'Arruelas lisas M4 aba larga inox', spec: 'Distribuir carga nas longarinas', qty: 48, un: 'un', unitPrice: 0.15, priority: 'Essencial' },
+      { id: 'M22', tag: 'M22', item: 'Chapa acrílico cristal/fumê 90×80×3 mm', spec: 'Janela de inspeção da cúpula', qty: 1, un: 'un', unitPrice: 18.00, priority: 'Essencial' },
+      { id: 'M23', tag: 'M23', item: 'Folha EVA preta adesiva 2 mm (A4)', spec: 'Almofada da sapata do empurrador', qty: 1, un: 'un', unitPrice: 12.00, priority: 'Essencial' },
+      { id: 'M24', tag: 'M24', item: 'Abraçadeiras nylon 100 + 200 mm', spec: 'Chicotes', qty: 1, un: 'pct', unitPrice: 15.00, priority: 'Recomendado' },
+      { id: 'M25', tag: 'M25', item: 'Espiral organizadora Ø10 mm × 2 m', spec: 'Acabamento dos chicotes', qty: 1, un: 'un', unitPrice: 12.00, priority: 'Recomendado' },
+      { id: 'M26', tag: 'M26', item: 'Termorretrátil sortido Ø2–8 mm', spec: 'Isolar emendas', qty: 1, un: 'kit', unitPrice: 20.00, priority: 'Recomendado' },
+      { id: 'M27', tag: 'M27', item: 'Base MDF 600×400×15 mm + 4 pés borracha antiderrapantes', spec: 'Bancada da esteira', qty: 1, un: 'kit', unitPrice: 45.00, priority: 'Essencial' },
+      { id: 'M28', tag: 'M28', item: 'Parafuso sem cabeça M3×6 + porca M3 comum', spec: 'Rev. LT-3D-002: prende o tambor motriz 02A no eixo (2 + 2 reserva; porca cativa nas fendas das pontas, chave Allen 1,5)', qty: 4, un: 'conj', unitPrice: 0.65, priority: 'Essencial' },
+      { id: 'M29', tag: 'M29', item: 'Colar de travamento Ø8 mm com parafuso', spec: 'Rev. LT-3D-002: retenção axial dos 3 eixos Ø8 (2 por eixo)', qty: 6, un: 'un', unitPrice: 4.00, priority: 'Essencial' },
+      { id: 'M30', tag: 'M30', item: 'Óleo de máquina (tipo Singer) 100 ml + vaselina sólida', spec: 'Lubrificação das buchas e hastes. NÃO usar WD-40, acetona ou thinner (atacam o PETG)', qty: 1, un: 'kit', unitPrice: 18.00, priority: 'Essencial' },
+      { id: 'M31', tag: 'M31', item: 'Brocas HSS 3,2 / 7 / 8,2 / 8,5 / 12 mm', spec: 'Alargar furos impressos: bucha 623, pórtico 03E, bucha 608, tambores, cavidades LM6UU (dispensar se já houver na bancada)', qty: 1, un: 'kit', unitPrice: 45.00, priority: 'Recomendado' },
+      { id: 'M32', tag: 'M32', item: 'Fita dupla-face VHB 12 mm × 1 m', spec: 'Fixar o acrílico pelo lado de dentro da cúpula 05A (rebaixo é passante)', qty: 1, un: 'un', unitPrice: 15.00, priority: 'Recomendado' }
+    ];
+
+    const INHAND_ITEMS = [
+      { id: 'H01', tag: 'H01', item: 'ESP32 DevKit V1 (30 pinos)', spec: 'Microcontrolador central do sistema (Wi-Fi, Firmware, Serial)', qty: 1, un: 'un', status: 'em mãos' },
+      { id: 'H02', tag: 'H02', item: 'Servo MG996R (principal)', spec: 'Atuador mecânico do mecanismo empurrador linear de descarte', qty: 1, un: 'un', status: 'em mãos' },
+      { id: 'H03', tag: 'H03', item: 'Servo MG995 (reserva)', spec: 'Atuadores sobressalentes de substituição imediata', qty: 2, un: 'un', status: 'em mãos' },
+      { id: 'H04', tag: 'H04', item: 'Sensor óptico IR retangular 5V NPN', spec: 'Sensor de detecção de caixas (1 unidade disponível)', qty: 1, un: 'un', status: 'em mãos' },
+      { id: 'H05', tag: 'H05', item: 'Kit LEDs 5 mm (R/G/Y) + resistor 330 Ω', spec: 'Sinalização visual de painel e status operacional', qty: 1, un: 'kit', status: 'em mãos' },
+      { id: 'H06', tag: 'H06', item: 'Kit jumpers Dupont (M-M, M-F, F-F)', spec: 'Fiação para bancada, testes e validação em protoboard', qty: 1, un: 'kit', status: 'em mãos' }
+    ];
+
+    /* Formatação de Moeda Brasileira */
+    function formatBRL(val) {
+      return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    /* Renderização das Linhas da Tabela */
+    function renderBuyRows(items, tbodyId, blockClass) {
+      const tbody = document.getElementById(tbodyId);
+      tbody.innerHTML = '';
+
+      items.forEach(item => {
+        const subtotal = item.qty * item.unitPrice;
+        const storageKey = 'av-bom-v2-' + item.id;
+        const isBought = localStorage.getItem(storageKey) === 'true';
+
+        const tr = document.createElement('tr');
+        tr.className = isBought ? 'row-bought ' + blockClass : blockClass;
+        tr.dataset.id = item.id;
+        tr.dataset.tag = item.tag.toLowerCase();
+        tr.dataset.item = item.item.toLowerCase();
+        tr.dataset.spec = item.spec.toLowerCase();
+
+        const badgeClass = item.priority === 'Essencial' ? 'essencial' : 'recomendado';
+
+        tr.innerHTML = `
+          <td class="col-chk">
+            <input type="checkbox" class="chk-bought" data-id="${item.id}" ${isBought ? 'checked' : ''} aria-label="Marcar ${item.item}">
+          </td>
+          <td class="col-tag"><span class="tag-badge">${item.tag}</span></td>
+          <td class="col-item">${item.item}</td>
+          <td class="col-spec">${item.spec}</td>
+          <td class="col-qty">${item.qty}</td>
+          <td class="col-un">${item.un}</td>
+          <td class="col-price">${formatBRL(item.unitPrice)}</td>
+          <td class="col-subtotal">${formatBRL(subtotal)}</td>
+          <td class="col-priority"><span class="badge-priority ${badgeClass}">${item.priority}</span></td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderInHandRows(items, tbodyId) {
+      const tbody = document.getElementById(tbodyId);
+      tbody.innerHTML = '';
+
+      items.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = 'inhand-row';
+        tr.dataset.tag = item.tag.toLowerCase();
+        tr.dataset.item = item.item.toLowerCase();
+        tr.dataset.spec = item.spec.toLowerCase();
+
+        tr.innerHTML = `
+          <td class="col-tag"><span class="tag-badge">${item.tag}</span></td>
+          <td class="col-item">${item.item}</td>
+          <td class="col-spec">${item.spec}</td>
+          <td class="col-qty">${item.qty}</td>
+          <td class="col-un">${item.un}</td>
+          <td class="col-priority"><span class="badge-inhand">${item.status}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* Cálculo e Atualização Dinâmica dos Totais */
+    function updateTotals() {
+      let subtotalElec = 0;
+      let subtotalMec = 0;
+      let countElec = ELETRONICA_ITEMS.length;
+      let countMec = MECANICA_ITEMS.length;
+
+      ELETRONICA_ITEMS.forEach(i => subtotalElec += (i.qty * i.unitPrice));
+      MECANICA_ITEMS.forEach(i => subtotalMec += (i.qty * i.unitPrice));
+
+      const grandTotal = subtotalElec + subtotalMec;
+
+      document.getElementById('cardCountBuy').textContent = countElec + countMec;
+      document.getElementById('cardCountInHand').textContent = INHAND_ITEMS.length;
+      document.getElementById('cardSubtotalElec').textContent = formatBRL(subtotalElec);
+      document.getElementById('cardSubtotalMec').textContent = formatBRL(subtotalMec);
+      document.getElementById('cardGrandTotal').textContent = formatBRL(grandTotal);
+
+      document.getElementById('tblSubtotalElec').textContent = formatBRL(subtotalElec);
+      document.getElementById('tblSubtotalMec').textContent = formatBRL(subtotalMec);
+    }
+
+    /* Gerenciamento de Persistência em localStorage */
+    function setupCheckboxListeners() {
+      document.querySelectorAll('.chk-bought').forEach(chk => {
+        chk.addEventListener('change', (e) => {
+          const id = e.target.dataset.id;
+          const checked = e.target.checked;
+          const tr = e.target.closest('tr');
+
+          localStorage.setItem('av-bom-v2-' + id, checked ? 'true' : 'false');
+
+          if (checked) {
+            tr.classList.add('row-bought');
+          } else {
+            tr.classList.remove('row-bought');
+          }
+        });
+      });
+    }
+
+    /* Filtros por Bloco */
+    let currentFilter = 'all';
+    function setupFilterTabs() {
+      const tabs = document.querySelectorAll('.filter-btn');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          currentFilter = tab.dataset.filter;
+          applyVisibility();
+        });
+      });
+    }
+
+    /* Busca por Texto Simultânea */
+    function setupSearchListener() {
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) {
+        searchInput.addEventListener('input', () => {
+          applyVisibility();
+        });
+      }
+    }
+
+    /* Aplicação Conjunta de Filtros e Busca */
+    function applyVisibility() {
+      const searchInput = document.getElementById('searchInput');
+      const term = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+      const secElec = document.getElementById('secElec');
+      const secMec = document.getElementById('secMec');
+      const secInHand = document.getElementById('secInHand');
+
+      // 1. Visibilidade por Seção
+      if (currentFilter === 'all') {
+        if (secElec) secElec.style.display = '';
+        if (secMec) secMec.style.display = '';
+        if (secInHand) secInHand.style.display = '';
+      } else if (currentFilter === 'elec') {
+        if (secElec) secElec.style.display = '';
+        if (secMec) secMec.style.display = 'none';
+        if (secInHand) secInHand.style.display = 'none';
+      } else if (currentFilter === 'mec') {
+        if (secElec) secElec.style.display = 'none';
+        if (secMec) secMec.style.display = '';
+        if (secInHand) secInHand.style.display = 'none';
+      } else if (currentFilter === 'inhand') {
+        if (secElec) secElec.style.display = 'none';
+        if (secMec) secMec.style.display = 'none';
+        if (secInHand) secInHand.style.display = '';
+      }
+
+      // 2. Filtro de Busca em Todas as Linhas
+      document.querySelectorAll('tbody tr').forEach(tr => {
+        const tag = tr.dataset.tag || '';
+        const item = tr.dataset.item || '';
+        const spec = tr.dataset.spec || '';
+
+        const match = term === '' || tag.includes(term) || item.includes(term) || spec.includes(term);
+
+        if (match) {
+          tr.classList.remove('hide-row');
+        } else {
+          tr.classList.add('hide-row');
+        }
+      });
+    }
+
+    /* Inicialização */
+    function init() {
+      renderBuyRows(ELETRONICA_ITEMS, 'tbodyElec', 'elec-row');
+      renderBuyRows(MECANICA_ITEMS, 'tbodyMec', 'mec-row');
+      renderInHandRows(INHAND_ITEMS, 'tbodyInHand');
+      updateTotals();
+      setupCheckboxListeners();
+      setupFilterTabs();
+      setupSearchListener();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "api",
+      "runtimeExecutable": "C:/Users/ponto/AppData/Roaming/Python/Python312/Scripts/uv.exe",
+      "runtimeArgs": ["run", "--directory", "C:/Users/ponto/OneDrive/Desktop/FEIRA - AMA/amazonvision/api", "amazonvision"],
+      "port": 8000
+    },
+    {
+      "name": "api-fotos",
+      "runtimeExecutable": "C:/Users/ponto/AppData/Roaming/Python/Python312/Scripts/uv.exe",
+      "runtimeArgs": ["run", "--env-file", "C:/Users/ponto/AppData/Local/Temp/claude/C--Users-ponto-OneDrive-Desktop-FEIRA---AMA/6e8c96ec-f2c3-4cf0-a6bf-25afe428c3c3/scratchpad/demo-fotos.env", "--directory", "C:/Users/ponto/OneDrive/Desktop/FEIRA - AMA/amazonvision/api", "amazonvision"],
+      "port": 8000
+    },
+    {
+      "name": "desenho-eletrico",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8765", "--bind", "127.0.0.1", "--directory", "C:/Users/ponto/OneDrive/Desktop/FEIRA - AMA/desenho-eletrico"],
+      "port": 8765
+    },
+    {
+      "name": "web-dev",
+      "runtimeExecutable": "pnpm.cmd",
+      "runtimeArgs": ["--dir", "C:/Users/ponto/OneDrive/Desktop/FEIRA - AMA/amazonvision/web", "dev"],
+      "port": 5173
+    }
+  ]
+}

@@ -1,0 +1,3054 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AMAZONVISION 4.0 — Simulador Interativo IoT & CAD Elétrico</title>
+  <style>
+
+    /* ========================================================== */
+    /*           SISTEMA DE CORES MONOCROMÁTICO CAD               */
+    /* ========================================================== */
+    :root {
+      --bg: #ffffff;
+      --fg: #111111;
+      --line: #222222;
+      --line-thin: #555555;
+      --pin-text: #111111;
+      --grid: #e2e8f0;
+      --grid-major: #cbd5e1;
+      --dim: #555555;
+      --trace: #666666;
+      --pad-fill: #ededed;
+      --tag-bg: #f4f4f4;
+      --header-bg: #fafafa;
+      --header-border: #cccccc;
+      color-scheme: light;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0c0e12;
+        --fg: #e2e8f0;
+        --line: #cbd5e1;
+        --line-thin: #8892b0;
+        --pin-text: #ffffff;
+        --grid: #171b22;
+        --grid-major: #232936;
+        --dim: #94a3b8;
+        --trace: #94a3b8;
+        --pad-fill: #1e2430;
+        --tag-bg: #151a23;
+        --header-bg: #11141a;
+        --header-border: #2d3748;
+        color-scheme: dark;
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0c0e12;
+      --fg: #e2e8f0;
+      --line: #cbd5e1;
+      --line-thin: #8892b0;
+      --pin-text: #ffffff;
+      --grid: #171b22;
+      --grid-major: #232936;
+      --dim: #94a3b8;
+      --trace: #94a3b8;
+      --pad-fill: #1e2430;
+      --tag-bg: #151a23;
+      --header-bg: #11141a;
+      --header-border: #2d3748;
+      color-scheme: dark;
+    }
+
+    :root[data-theme="light"] {
+      --bg: #ffffff;
+      --fg: #111111;
+      --line: #222222;
+      --line-thin: #555555;
+      --pin-text: #111111;
+      --grid: #e2e8f0;
+      --grid-major: #cbd5e1;
+      --dim: #555555;
+      --trace: #666666;
+      --pad-fill: #ededed;
+      --tag-bg: #f4f4f4;
+      --header-bg: #fafafa;
+      --header-border: #cccccc;
+      color-scheme: light;
+    }
+
+    /* ========================================================== */
+    /*                    ESTILOS GERAIS                          */
+    /* ========================================================== */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Courier New', Courier, monospace;
+      margin: 0;
+      padding: 8px 12px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    /* CABEÇALHO DO PROJETO */
+    .cad-header {
+      width: 100%;
+      border: 1.5px solid var(--line);
+      background: var(--header-bg);
+      padding: 14px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .cad-header h1 {
+      margin: 0;
+      font-size: 15px;
+      letter-spacing: 1px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .cad-header p {
+      margin: 4px 0 0 0;
+      font-size: 11px;
+      color: var(--dim);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .theme-toggle-btn {
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--line);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 6px 12px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--pad-fill);
+    }
+
+    .nav-pills {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 11px;
+    }
+
+    .nav-pill {
+      color: var(--fg);
+      text-decoration: none;
+      border: 1px solid var(--line-thin);
+      padding: 4px 10px;
+      background: var(--bg);
+      font-weight: bold;
+    }
+
+    .nav-pill:hover {
+      background: var(--pad-fill);
+    }
+
+    /* SEÇÃO DE CADA FOLHA / BLOCO */
+    .sheet-section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sheet-section h2 {
+      margin: 0;
+      font-size: 13px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 6px 10px;
+      border-left: 4px solid var(--line);
+      background: var(--pad-fill);
+      color: var(--fg);
+    }
+
+    .canvas-wrap {
+      overflow: hidden;
+      width: 100%;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      cursor: grab;
+    }
+    .canvas-wrap.panning { cursor: grabbing; }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      user-select: none;
+    }
+
+    svg text {
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    /* ========================================================== */
+    /*           SISTEMA DE ABAS (COMPONENTES / INTERLIGAÇÕES)      */
+    /* ========================================================== */
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      margin: 0;
+      width: 100%;
+      border-bottom: 2px solid var(--header-border);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px 16px;
+      background: var(--tag-bg);
+      color: var(--dim);
+      border: 1px solid var(--header-border);
+      border-bottom: none;
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-align: center;
+      transition: background 0.2s, color 0.2s;
+      position: relative;
+      top: 2px;
+    }
+
+    .tab-btn:first-child {
+      border-radius: 4px 0 0 0;
+    }
+
+    .tab-btn:last-child {
+      border-radius: 0 4px 0 0;
+    }
+
+    .tab-btn.active {
+      background: var(--bg);
+      color: var(--fg);
+      border-bottom: 2px solid var(--bg);
+      top: 2px;
+    }
+
+    .tab-btn:not(.active):hover {
+      background: var(--pad-fill);
+      color: var(--fg);
+    }
+
+    .tab-content {
+      display: none;
+      width: 100%;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .tab-content > .sheet-section {
+      margin-bottom: 32px;
+    }
+
+    .tab-content > .nav-pills {
+      margin-bottom: 32px;
+    }
+
+    /* Navegação interna da Aba 2 */
+    .nav-pills-w {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      width: 100%;
+      margin: 16px 0;
+      padding: 0;
+    }
+
+    .nav-pills-w .nav-pill {
+      /* herda o mesmo estilo do .nav-pill existente */
+    }
+
+    /* ---- FIO / WIRE styles (Aba 2) ---- */
+    .wire-label {
+      font-family: 'Courier New', monospace;
+      font-size: 7px;
+      font-weight: 700;
+      fill: var(--fg);
+    }
+
+    .wire-spec {
+      font-family: 'Courier New', monospace;
+      font-size: 6px;
+      fill: var(--dim);
+    }
+
+    .wire-power {
+      stroke: var(--line);
+      stroke-width: 1.8;
+      fill: none;
+    }
+
+    .wire-gnd {
+      stroke: var(--line);
+      stroke-width: 1.4;
+      fill: none;
+      stroke-dasharray: 8 3;
+    }
+
+    .wire-signal {
+      stroke: var(--line-thin);
+      stroke-width: 1.0;
+      fill: none;
+    }
+
+    .junction-dot {
+      fill: var(--fg);
+      stroke: none;
+    }
+
+    .terminal-block {
+      fill: var(--pad-fill);
+      stroke: var(--line);
+      stroke-width: 1.2;
+    }
+
+    .terminal-label {
+      font-family: 'Courier New', monospace;
+      font-size: 7px;
+      font-weight: 700;
+      fill: var(--fg);
+    }
+
+    .terminal-pin {
+      font-family: 'Courier New', monospace;
+      font-size: 6px;
+      fill: var(--dim);
+    }
+
+    .wire-tag {
+      fill: var(--tag-bg);
+      stroke: var(--line-thin);
+      stroke-width: 0.8;
+    }
+
+    .from-to {
+      font-family: 'Courier New', monospace;
+      font-size: 5.5px;
+      fill: var(--dim);
+    }
+
+    /* ========================================================== */
+    /*           BOTÃO E MODAL DE EXPORTAÇÃO PARA PDF             */
+    /* ========================================================== */
+    .export-pdf-btn {
+      background: var(--tag-bg);
+      color: var(--fg);
+      border: 1.5px solid var(--line);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 6px 14px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    }
+
+    .export-pdf-btn:hover {
+      background: var(--pad-fill);
+      border-color: var(--fg);
+      transform: translateY(-1px);
+    }
+
+    .btn-sheet-pdf {
+      float: right;
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--line-thin);
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 2px 8px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: -2px;
+    }
+
+    .btn-sheet-pdf:hover {
+      background: var(--pad-fill);
+      border-color: var(--line);
+    }
+
+    /* Modal Backdrop */
+    .export-modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(3px);
+      z-index: 99999;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .export-modal-backdrop.open {
+      display: flex;
+    }
+
+    /* Modal Card */
+    .export-modal-card {
+      background: var(--bg);
+      color: var(--fg);
+      border: 2px solid var(--line);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+      width: 100%;
+      max-width: 580px;
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      animation: modalFadeIn 0.18s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96) translateY(-8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .export-modal-header {
+      background: var(--header-bg);
+      border-bottom: 1.5px solid var(--header-border);
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .export-modal-header h3 {
+      margin: 0;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .export-modal-close {
+      background: none;
+      border: none;
+      color: var(--dim);
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 4px 8px;
+      font-family: inherit;
+    }
+
+    .export-modal-close:hover {
+      color: var(--fg);
+    }
+
+    .export-modal-body {
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      font-size: 11px;
+    }
+
+    .export-info-box {
+      background: var(--tag-bg);
+      border: 1px solid var(--header-border);
+      border-left: 4px solid var(--line);
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+
+    .export-options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .export-option-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 10px;
+      border: 1px solid var(--header-border);
+      background: var(--bg);
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+    }
+
+    .export-option-item:hover {
+      background: var(--pad-fill);
+      border-color: var(--line);
+    }
+
+    .export-option-item input[type="radio"] {
+      margin-top: 2px;
+      cursor: pointer;
+      accent-color: var(--line);
+    }
+
+    .export-option-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+    }
+
+    .export-option-title {
+      font-weight: bold;
+      font-size: 11px;
+    }
+
+    .export-option-desc {
+      font-size: 10px;
+      color: var(--dim);
+    }
+
+    .export-sheet-select {
+      margin-top: 4px;
+      padding: 4px 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--line);
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .export-modal-footer {
+      background: var(--header-bg);
+      border-top: 1px solid var(--header-border);
+      padding: 12px 18px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .btn-export-confirm {
+      background: var(--fg);
+      color: var(--bg);
+      border: 1.5px solid var(--fg);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 8px 16px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      transition: opacity 0.15s;
+    }
+
+    .btn-export-confirm:hover {
+      opacity: 0.88;
+    }
+
+    /* ========================================================== */
+    /*           REGRAS DE IMPRESSÃO / PDF PAISAGEM               */
+    /* ========================================================== */
+    @page {
+      size: landscape;
+      margin: 5mm;
+    }
+
+    @media print {
+      /* Cores claras obrigatórias na impressão (fundo branco / traços escuros CAD) */
+      :root {
+        --bg: #ffffff !important;
+        --fg: #111111 !important;
+        --line: #222222 !important;
+        --line-thin: #555555 !important;
+        --pin-text: #111111 !important;
+        --grid: #e2e8f0 !important;
+        --grid-major: #cbd5e1 !important;
+        --dim: #555555 !important;
+        --trace: #666666 !important;
+        --pad-fill: #ededed !important;
+        --tag-bg: #f4f4f4 !important;
+        --header-bg: #fafafa !important;
+        --header-border: #cccccc !important;
+        color-scheme: light !important;
+      }
+
+      html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        color: #111111 !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      /* Ocultar elementos da interface web no PDF */
+      .cad-header,
+      .tab-bar,
+      .nav-pills,
+      .nav-pills-w,
+      .theme-toggle-btn,
+      .export-pdf-btn,
+      .export-modal-backdrop,
+      .btn-sheet-pdf,
+      .sheet-section h2 {
+        display: none !important;
+      }
+
+      /* Controle de abas durante impressão */
+      body.print-mode .tab-content {
+        display: none !important;
+      }
+      body.print-mode .tab-content.print-show-tab {
+        display: block !important;
+      }
+
+      /* Seções ativas no modo de impressão: 1 página por folha, paisagem */
+      body.print-mode .sheet-section {
+        display: none !important;
+      }
+      body.print-mode .sheet-section.print-include {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        overflow: hidden !important;
+      }
+      body.print-mode .sheet-section.print-include:last-of-type {
+        page-break-after: auto !important;
+        break-after: auto !important;
+      }
+
+      /* Comportamento padrão ao usar Ctrl+P direto sem modal */
+      body:not(.print-mode) .tab-content.active .sheet-section {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        overflow: hidden !important;
+      }
+      body:not(.print-mode) .tab-content:not(.active) {
+        display: none !important;
+      }
+
+      .canvas-wrap {
+        width: 100% !important;
+        height: 100% !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+        background: transparent !important;
+      }
+
+      svg {
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        object-fit: contain !important;
+        display: block !important;
+        margin: auto !important;
+      }
+    }
+  
+
+    /* ESTILOS EXCLUSIVOS DO MOTOR DE SIMULAÇÃO */
+    .sim-toolbar {
+      background: var(--tag-bg);
+      border-bottom: 2px solid var(--line);
+      padding: 10px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .sim-btn-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .sim-btn {
+      background: var(--bg);
+      color: var(--fg);
+      border: 1.5px solid var(--line);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 6px 14px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      border-radius: 4px;
+    }
+
+    .sim-btn:hover {
+      background: var(--pad-fill);
+      border-color: var(--fg);
+      transform: translateY(-1px);
+    }
+
+    .sim-btn.btn-play {
+      border-color: #22c55e;
+      color: #22c55e;
+    }
+    .sim-btn.btn-play:hover {
+      background: rgba(34, 197, 94, 0.15);
+    }
+
+    .sim-btn.btn-estop {
+      border-color: #ef4444;
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+    }
+    .sim-btn.btn-estop:hover {
+      background: rgba(239, 68, 68, 0.25);
+    }
+
+    .sim-btn.btn-apple {
+      border-color: #38bdf8;
+      color: #38bdf8;
+    }
+    .sim-btn.btn-apple:hover {
+      background: rgba(56, 189, 248, 0.15);
+    }
+
+    .sim-status-badge {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 6px 14px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1.5px solid var(--line);
+    }
+
+    .status-normal {
+      border-color: #22c55e;
+      color: #22c55e;
+      background: rgba(34, 197, 94, 0.1);
+    }
+
+    .status-estop {
+      border-color: #ef4444;
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.15);
+      animation: pulseAlert 0.8s infinite alternate;
+    }
+
+    @keyframes pulseAlert {
+      from { box-shadow: 0 0 5px rgba(239, 68, 68, 0.3); }
+      to { box-shadow: 0 0 16px rgba(239, 68, 68, 0.8); }
+    }
+
+    .interactive-block {
+      cursor: pointer;
+      transition: filter 0.15s ease;
+    }
+    .interactive-block:hover {
+      filter: drop-shadow(0 0 8px #00e5ff);
+    }
+
+    .led-glow-red {
+      fill: #ff2222 !important;
+      filter: drop-shadow(0 0 8px #ff2222) !important;
+    }
+    .led-glow-green {
+      fill: #22ff55 !important;
+      filter: drop-shadow(0 0 8px #22ff55) !important;
+    }
+    .led-glow-yellow {
+      fill: #ffcc00 !important;
+      filter: drop-shadow(0 0 8px #ffcc00) !important;
+    }
+    .led-off {
+      fill: #1a1a1a !important;
+      filter: none !important;
+    }
+
+    .rail-at-powered {
+      stroke: #ef4444 !important;
+      filter: drop-shadow(0 0 3px rgba(239, 68, 68, 0.6));
+    }
+    .rail-at-cut {
+      stroke: #475569 !important;
+      stroke-dasharray: 6,4 !important;
+      filter: none !important;
+    }
+
+    .motor-spinning {
+      transform-origin: 2052px 550px;
+      animation: spinMotor 0.7s linear infinite;
+    }
+    @keyframes spinMotor {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* DOCK INFERIOR DE TELEMETRIA E SERIAL */
+    .sim-dock {
+      background: var(--tag-bg);
+      border-top: 2px solid var(--line);
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 250px;
+      z-index: 95;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s ease;
+      box-shadow: 0 -8px 24px rgba(0,0,0,0.6);
+    }
+
+    .sim-dock.collapsed {
+      transform: translateY(212px);
+    }
+
+    .sim-dock-header {
+      height: 38px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .sim-dock-title {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sim-dock-tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .sim-dock-tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--dim);
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .sim-dock-tab-btn.active {
+      border-color: var(--line);
+      color: var(--fg);
+      background: var(--pad-fill);
+    }
+
+    .sim-dock-body {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .sim-terminal {
+      flex: 1;
+      background: #06070a;
+      color: #38bdf8;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      line-height: 1.5;
+      padding: 10px 16px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    .sim-meters-grid {
+      width: 440px;
+      background: var(--bg);
+      border-left: 1px solid var(--line);
+      padding: 10px 14px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      overflow-y: auto;
+    }
+
+    .meter-box {
+      background: var(--pad-fill);
+      border: 1px solid var(--line-thin);
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .meter-lbl {
+      color: var(--dim);
+      font-size: 9px;
+      text-transform: uppercase;
+    }
+
+    .meter-val {
+      color: var(--fg);
+      font-size: 13px;
+      font-weight: bold;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CABEÇALHO TÉCNICO CAD -->
+  <header class="cad-header">
+    <div>
+      <h1>AMAZONVISION 4.0 — SIMULADOR INTERATIVO IoT & CAD</h1>
+      <p>SISTEMA ELETRÔNICO MONOCROMÁTICO COM EMULAÇÃO DO FIRMWARE DO ESP32, RELÉ K1 E ATUADORES EM TEMPO REAL</p>
+    </div>
+    <div class="header-actions">
+      <button class="export-pdf-btn" onclick="openExportModal()" title="Exportar projeto ou folha para PDF em formato Paisagem">
+        📄 EXPORTAR PDF
+      </button>
+      <button id="themeToggle" class="theme-toggle-btn" onclick="toggleTheme()" title="Alternar tema Claro / Escuro">
+        [TEMA: CLARO/ESCURO]
+      </button>
+    </div>
+  </header>
+
+  <!-- BARRA DE CONTROLE DE SIMULAÇÃO -->
+  <div class="sim-toolbar">
+    <div class="sim-btn-group">
+      <button id="btn-play-pause" class="sim-btn btn-play" onclick="toggleSimulation()">
+        <span id="play-icon">⏸</span> <span id="play-text">PAUSAR SIMULAÇÃO</span>
+      </button>
+      <button class="sim-btn" onclick="resetSimulation()" title="Reinicializar microcontrolador e barramentos">
+        🔄 REINICIAR (BOOT)
+      </button>
+      <button id="btn-audio" class="sim-btn" onclick="toggleAudio()" title="Ativar/Desativar áudio sintético do Buzzer e Relé">
+        🔊 SOM: ATIVADO
+      </button>
+    </div>
+
+    <!-- INJETORES DE EVENTOS DE CAMPO -->
+    <div class="sim-btn-group">
+      <button class="sim-btn btn-apple" onclick="injectApple(true)" title="Simula uma maçã de primeira qualidade aprovada pela visão computacional">
+        🍏 PASSAR MAÇÃ BOA (MANTER ESTEIRA)
+      </button>
+      <button class="sim-btn btn-apple" onclick="injectApple(false)" title="Simula uma maçã com defeito: aciona braço servo a 60° para descarte">
+        🍎 PASSAR MAÇÃ DEFEITO (DESCARTE 3D)
+      </button>
+      <button id="btn-sim-estop" class="sim-btn btn-estop" onclick="toggleEstop()" title="Pressionar o Botão Cogumelo de Emergência E12">
+        🚨 BATER EMERGÊNCIA (E-STOP)
+      </button>
+    </div>
+
+    <!-- STATUS DO SISTEMA -->
+    <div>
+      <div id="sim-status-display" class="sim-status-badge status-normal">
+        ● ESTADO: OPERAÇÃO NORMAL (ARMADO)
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO PRINCIPAL (PLANTA GERAL ESQUEMÁTICA A1) -->
+  <main style="padding-bottom: 260px;">
+    <section id="planta-geral" class="sheet-section">
+      <h2>PLANTA ELÉTRICA GERAL — ESQUEMÁTICO INTEGRADO DO SISTEMA AMAZONVISION 4.0 (FORMATO A1 PAISAGEM)</h2>
+      <div class="canvas-wrap">
+        <svg viewBox="0 0 2378 1682" width="2378" height="1682" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="grid-pg" width="10" height="10" patternUnits="userSpaceOnUse">
+              <path d="M 10 0 L 0 0 0 10" fill="none" stroke="var(--grid)" stroke-width="0.3"/>
+            </pattern>
+            <pattern id="grid-major-pg" width="50" height="50" patternUnits="userSpaceOnUse">
+              <path d="M 50 0 L 0 0 0 50" fill="none" stroke="var(--grid-major)" stroke-width="0.6"/>
+            </pattern>
+          </defs>
+
+          <!-- Fundo em papel milimetrado A1 (2378x1682) -->
+          <rect width="2378" height="1682" fill="url(#grid-pg)"/>
+          <rect width="2378" height="1682" fill="url(#grid-major-pg)"/>
+
+          <!-- MOLDURA DUPLA CAD A1 -->
+          <rect x="20" y="20" width="2338" height="1642" fill="none" stroke="var(--line)" stroke-width="1.8"/>
+          <rect x="25" y="25" width="2328" height="1632" fill="none" stroke="var(--line)" stroke-width="0.6"/>
+
+          <!-- ========================================================== -->
+          <!--      BARRAMENTOS HORIZONTAIS DE ALIMENTAÇÃO E TERRA        -->
+          <!-- ========================================================== -->
+          <g id="barramentos-pg">
+            <!-- +12V (y=70) -->
+            <line x1="160" y1="70" x2="2330" y2="70" class="wire-power" stroke-width="2.2"/>
+            <rect x="40" y="61" width="115" height="16" rx="2" fill="var(--tag-bg)" stroke="var(--line)" stroke-width="1"/>
+            <text x="97" y="71.5" text-anchor="middle" font-size="6.5" font-weight="700" fill="var(--fg)">+12V = X1:1 / X1:2</text>
+
+            <!-- +12V_AT (y=95) -->
+            <line x1="160" y1="95" x2="2330" y2="95" class="wire-power" stroke-width="2.2"/>
+            <rect x="40" y="86" width="115" height="16" rx="2" fill="var(--tag-bg)" stroke="var(--line)" stroke-width="1"/>
+            <text x="97" y="96.5" text-anchor="middle" font-size="6.5" font-weight="700" fill="var(--fg)">+12V_AT = X1:3 (PÓS-K1)</text>
+
+            <!-- +6V_SV (y=120) -->
+            <line x1="160" y1="120" x2="2330" y2="120" class="wire-power" stroke-width="2.0"/>
+            <rect x="40" y="111" width="115" height="16" rx="2" fill="var(--tag-bg)" stroke="var(--line)" stroke-width="1"/>
+            <text x="97" y="121.5" text-anchor="middle" font-size="6.5" font-weight="700" fill="var(--fg)">RAIL +6V_SV (SERVO)</text>
+
+            <!-- +5V (y=145) -->
+            <line x1="160" y1="145" x2="2330" y2="145" class="wire-power" stroke-width="1.8"/>
+            <rect x="40" y="136" width="115" height="16" rx="2" fill="var(--tag-bg)" stroke="var(--line)" stroke-width="1"/>
+            <text x="97" y="146.5" text-anchor="middle" font-size="6.5" font-weight="700" fill="var(--fg)">RAIL +5V (LÓGICA)</text>
+
+            <!-- +3V3 (y=170) -->
+            <line x1="160" y1="170" x2="2330" y2="170" class="wire-power" stroke-width="1.6"/>
+            <rect x="40" y="161" width="115" height="16" rx="2" fill="var(--tag-bg)" stroke="var(--line)" stroke-width="1"/>
+            <text x="97" y="171.5" text-anchor="middle" font-size="6.5" font-weight="700" fill="var(--fg)">RAIL +3V3 (ESP32)</text>
+
+            <!-- BARRAMENTO GND COMUM (y=1290) -->
+            <line x1="160" y1="1290" x2="2330" y2="1290" class="wire-gnd" stroke-width="2.4"/>
+            <rect x="40" y="1281" width="115" height="18" rx="2" fill="var(--tag-bg)" stroke="var(--line)" stroke-width="1.2"/>
+            <text x="97" y="1292.5" text-anchor="middle" font-size="6.5" font-weight="700" fill="var(--fg)">GND 0V = X1:6…X1:8</text>
+          </g>
+
+          <!-- ========================================================== -->
+          <!--      ZONA 1: ENTRADA AC, FONTE 12V, FUSÍVEIS, X1 E BUCKS   -->
+          <!-- ========================================================== -->
+          <g id="bloco-e19-pg">
+            <rect x="45" y="265" width="85" height="130" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="87" y="282" text-anchor="middle" font-size="8" font-weight="700" fill="var(--fg)">E19 — PLUGUE AC</text>
+            <text x="87" y="292" text-anchor="middle" font-size="5.5" fill="var(--dim)">NBR 14136 2P+T 10A</text>
+            <text x="87" y="388" text-anchor="middle" font-size="5" fill="var(--dim)">127/220V~ + PG13.5</text>
+        <circle cx="130" cy="300" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="130" cy="300" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="123" y="302" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">L</text>
+
+        <circle cx="130" cy="335" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="130" cy="335" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="123" y="337" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">N</text>
+
+        <circle cx="130" cy="370" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="130" cy="370" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="123" y="372" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">PE</text>
+
+          </g>
+
+          <g id="bloco-e27-pe-pg">
+            <rect x="45" y="440" width="85" height="65" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="87" y="458" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">PE / CHASSI</text>
+            <text x="87" y="470" text-anchor="middle" font-size="5" fill="var(--dim)">TERRA PROTEÇÃO ⏚</text>
+            <text x="87" y="482" text-anchor="middle" font-size="5" fill="var(--dim)">CARCAÇA E01 / ESTRUT.</text>
+        <circle cx="130" cy="470" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="130" cy="470" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="123" y="472" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">PE</text>
+
+          </g>
+
+          <g id="bloco-e15-pg">
+            <rect x="185" y="265" width="80" height="100" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="225" y="282" text-anchor="middle" font-size="8" font-weight="700" fill="var(--fg)">E15 — DISJ. 2P</text>
+            <text x="225" y="292" text-anchor="middle" font-size="5.5" fill="var(--dim)">10A CURVA C DIN</text>
+        <circle cx="185" cy="300" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="185" cy="300" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="192" y="302" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">IN_L</text>
+
+        <circle cx="185" cy="335" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="185" cy="335" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="192" y="337" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">IN_N</text>
+
+        <circle cx="265" cy="300" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="265" cy="300" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="258" y="302" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">OUT_L</text>
+
+        <circle cx="265" cy="335" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="265" cy="335" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="258" y="337" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">OUT_N</text>
+
+          </g>
+
+          <g id="bloco-e01-pg">
+            <rect x="310" y="265" width="105" height="125" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="362" y="282" text-anchor="middle" font-size="8" font-weight="700" fill="var(--fg)">E01 — FONTE 12V</text>
+            <text x="362" y="292" text-anchor="middle" font-size="5.5" fill="var(--dim)">12V 10A — VER ETIQUETA</text>
+            <text x="362" y="382" text-anchor="middle" font-size="4.6" font-weight="700" fill="var(--fg)">CONFERIR CHAVE 115/230V!</text>
+        <circle cx="310" cy="300" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="310" cy="300" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="317" y="302" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">AC_L</text>
+
+        <circle cx="310" cy="335" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="310" cy="335" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="317" y="337" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">AC_N</text>
+
+        <circle cx="310" cy="370" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="310" cy="370" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="317" y="372" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">PE ⏚</text>
+
+        <circle cx="415" cy="300" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="415" cy="300" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="408" y="302" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">+12V</text>
+
+        <circle cx="415" cy="355" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="415" cy="355" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="408" y="357" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">GND</text>
+
+          </g>
+
+          <g id="bloco-e16-pg">
+            <rect x="450" y="265" width="80" height="125" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="490" y="282" text-anchor="middle" font-size="8" font-weight="700" fill="var(--fg)">E16 — FUSÍVEIS</text>
+            <text x="490" y="292" text-anchor="middle" font-size="5.2" fill="var(--dim)">PORTA-FUSÍVEL DIN</text>
+            <text x="490" y="325" text-anchor="middle" font-size="5.2" font-weight="700" fill="var(--fg)">F1: 10A GERAL</text>
+            <text x="490" y="340" text-anchor="middle" font-size="5.0" fill="var(--dim)">F2: 5A MOTOR (W050)</text>
+            <text x="490" y="355" text-anchor="middle" font-size="5.0" fill="var(--dim)">F3: 3A SERVO (W011)</text>
+            <text x="490" y="370" text-anchor="middle" font-size="5.0" fill="var(--dim)">F4: 1A LÓGICA (W015)</text>
+        <circle cx="450" cy="300" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="450" cy="300" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="457" y="302" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">IN</text>
+
+        <circle cx="530" cy="300" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="530" cy="300" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="523" y="302" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">OUT</text>
+
+          </g>
+
+          <g id="bloco-x1-pg">
+            <rect x="450" y="455" width="80" height="185" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="490" y="472" text-anchor="middle" font-size="8" font-weight="700" fill="var(--fg)">X1 — BORNE E17</text>
+            <text x="490" y="482" text-anchor="middle" font-size="5" fill="var(--dim)">SAK 6 VIAS (12V/GND)</text>
+        <circle cx="450" cy="490" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="450" cy="490" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="457" y="492" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">1:+12V_G</text>
+
+        <circle cx="530" cy="490" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="530" cy="490" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+
+        <circle cx="530" cy="515" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="530" cy="515" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="523" y="517" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">2:+12V_L</text>
+
+        <circle cx="530" cy="540" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="530" cy="540" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="523" y="542" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">3:+12V_AT</text>
+
+            <text x="490" y="567" text-anchor="middle" font-size="5" fill="var(--dim)">4: RESERVA</text>
+        <circle cx="450" cy="590" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="450" cy="590" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="457" y="592" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">5:GND_F</text>
+
+        <circle cx="530" cy="590" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="530" cy="590" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+
+        <circle cx="530" cy="615" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="530" cy="615" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="523" y="617" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">6:GND_D</text>
+
+          </g>
+
+          <g id="bloco-e02-pg">
+            <rect x="310" y="685" width="100" height="85" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="360" y="702" text-anchor="middle" font-size="8" font-weight="700" fill="var(--fg)">E02 — BUCK 6V</text>
+            <text x="360" y="712" text-anchor="middle" font-size="5.2" fill="var(--dim)">XL4015 5A (PÓS-K1)</text>
+        <circle cx="310" cy="720" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="310" cy="720" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="317" y="722" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">IN+</text>
+
+        <circle cx="310" cy="750" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="310" cy="750" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="317" y="752" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">IN-</text>
+
+        <circle cx="410" cy="720" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="410" cy="720" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="403" y="722" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">OUT+</text>
+
+        <circle cx="410" cy="750" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="410" cy="750" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="403" y="752" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">OUT-</text>
+
+          </g>
+
+          <g id="bloco-e06-pg">
+            <rect x="460" y="705" width="50" height="60" rx="2" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="485" y="732" text-anchor="middle" font-size="6.5" font-weight="700" fill="var(--fg)">E06</text>
+            <text x="485" y="742" text-anchor="middle" font-size="5" fill="var(--dim)">1000µF</text>
+        <circle cx="460" cy="720" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="460" cy="720" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="467" y="722" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">+</text>
+
+        <circle cx="460" cy="750" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="460" cy="750" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="467" y="752" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">-</text>
+
+        <circle cx="510" cy="720" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="510" cy="720" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+
+        <circle cx="510" cy="750" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="510" cy="750" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+
+          </g>
+
+          <g id="bloco-e03-pg">
+            <rect x="310" y="845" width="100" height="85" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="360" y="862" text-anchor="middle" font-size="8" font-weight="700" fill="var(--fg)">E03 — BUCK 5V</text>
+            <text x="360" y="872" text-anchor="middle" font-size="5.2" fill="var(--dim)">MP1584EN 2A CONT. (LÓGICA)</text>
+        <circle cx="310" cy="880" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="310" cy="880" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="317" y="882" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">IN+</text>
+
+        <circle cx="310" cy="910" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="310" cy="910" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="317" y="912" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">IN-</text>
+
+        <circle cx="410" cy="880" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="410" cy="880" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="403" y="882" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">OUT+</text>
+
+        <circle cx="410" cy="910" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="410" cy="910" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="403" y="912" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">OUT-</text>
+
+          </g>
+
+          <!-- ========================================================== -->
+          <!--      ZONA 2: SENSORES S1/S2, E-STOP 11-12, X2 E CLAMPS     -->
+          <!-- ========================================================== -->
+          <g id="bloco-h04-pg" class="interactive-block" onclick="triggerSensor1()" title="Clique para Simular Passagem de Maçã no Sensor S1 (Entrada)">
+            <rect x="680" y="255" width="85" height="90" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="722" y="272" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">H04 — SENSOR S1</text>
+            <text x="722" y="282" text-anchor="middle" font-size="4.8" fill="var(--dim)">ÓPTICO IR 5V (ENT.)</text>
+        <circle cx="680" cy="280" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="680" cy="280" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="687" y="282" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">VCC</text>
+
+        <circle cx="765" cy="305" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="765" cy="305" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="758" y="307" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">OUT</text>
+
+        <circle cx="765" cy="330" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="765" cy="330" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="758" y="332" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">GND</text>
+
+          </g>
+
+          <g id="bloco-e07-pg" class="interactive-block" onclick="triggerSensor2()" title="Clique para Simular Passagem de Maçã no Sensor S2 (Classificação)">
+            <rect x="680" y="425" width="85" height="90" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="722" y="442" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">E07 — SENSOR S2</text>
+            <text x="722" y="452" text-anchor="middle" font-size="4.8" fill="var(--dim)">ÓPTICO IR 5V (SAÍDA)</text>
+        <circle cx="680" cy="450" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="680" cy="450" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="687" y="452" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">VCC</text>
+
+        <circle cx="765" cy="475" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="765" cy="475" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="758" y="477" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">OUT</text>
+
+        <circle cx="765" cy="500" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="765" cy="500" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="758" y="502" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">GND</text>
+
+          </g>
+
+          <g id="bloco-e12a-pg" class="interactive-block" onclick="toggleEstop()" title="Clique para Pressionar / Destravar o Botão de Emergência E12 (Canal NF1)">
+            <rect x="680" y="595" width="85" height="80" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="722" y="612" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">E12-A — E-STOP</text>
+            <text x="722" y="622" text-anchor="middle" font-size="4.8" fill="var(--dim)">NF1 AUX (11-12)</text>
+        <circle cx="765" cy="630" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="765" cy="630" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="758" y="632" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">11:COM</text>
+
+        <circle cx="765" cy="660" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="765" cy="660" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="758" y="662" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">12:NC</text>
+
+          </g>
+
+          <g id="bloco-x2-pg">
+            <rect x="835" y="385" width="65" height="235" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="867" y="402" text-anchor="middle" font-size="7" font-weight="700" fill="var(--fg)">X2 — E17</text>
+            <text x="867" y="411" text-anchor="middle" font-size="4.6" fill="var(--dim)">7 VIAS CAMPO</text>
+        <circle cx="835" cy="420" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="835" cy="420" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="842" y="422" text-anchor="start" font-size="4.6" font-weight="700" fill="var(--pin-text)">1:S1</text>
+
+        <circle cx="900" cy="420" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="900" cy="420" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+
+        <circle cx="835" cy="450" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="835" cy="450" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="842" y="452" text-anchor="start" font-size="4.6" font-weight="700" fill="var(--pin-text)">2:S2</text>
+
+        <circle cx="900" cy="450" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="900" cy="450" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+
+        <circle cx="835" cy="480" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="835" cy="480" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="842" y="482" text-anchor="start" font-size="4.6" font-weight="700" fill="var(--pin-text)">3:G_S1</text>
+
+        <circle cx="900" cy="480" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="900" cy="480" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+
+        <circle cx="835" cy="510" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="835" cy="510" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="842" y="512" text-anchor="start" font-size="4.6" font-weight="700" fill="var(--pin-text)">4:G_S2</text>
+
+        <circle cx="900" cy="510" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="900" cy="510" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+
+        <circle cx="835" cy="540" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="835" cy="540" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="842" y="542" text-anchor="start" font-size="4.6" font-weight="700" fill="var(--pin-text)">5:COM</text>
+
+        <circle cx="900" cy="540" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="900" cy="540" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+
+        <circle cx="835" cy="570" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="835" cy="570" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="842" y="572" text-anchor="start" font-size="4.6" font-weight="700" fill="var(--pin-text)">6:NC</text>
+
+        <circle cx="900" cy="570" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="900" cy="570" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+
+            <text x="867" y="602" text-anchor="middle" font-size="4.6" fill="var(--dim)">7: RESERVA</text>
+          </g>
+
+          <!-- Clamps Esquemáticos E11 + E10 (montados na protoboard E26 na W2) -->
+          <g id="bloco-clamp-s1-pg">
+            <rect x="965" y="342" width="32" height="16" rx="2" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.2"/>
+            <text x="981" y="352" text-anchor="middle" font-size="5" font-weight="700" fill="var(--fg)">E11 1kΩ</text>
+            <rect x="1030" y="330" width="22" height="40" rx="2" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.2"/>
+            <text x="1041" y="352" text-anchor="middle" font-size="4.5" font-weight="700" fill="var(--fg)">E10</text>
+          </g>
+
+          <g id="bloco-clamp-s2-pg">
+            <rect x="965" y="452" width="32" height="16" rx="2" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.2"/>
+            <text x="981" y="462" text-anchor="middle" font-size="5" font-weight="700" fill="var(--fg)">E11 1kΩ</text>
+            <rect x="1030" y="440" width="22" height="40" rx="2" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.2"/>
+            <text x="1041" y="462" text-anchor="middle" font-size="4.5" font-weight="700" fill="var(--fg)">E10</text>
+          </g>
+
+          <!-- ========================================================== -->
+          <!--      ZONA 3: CONTROLE CENTRAL — ESP32 DEVKIT V1 (H01)      -->
+          <!-- ========================================================== -->
+          <g id="bloco-h01-pg">
+            <rect x="1100" y="255" width="230" height="465" rx="4" fill="var(--bg)" stroke="var(--line)" stroke-width="2.2"/>
+            <rect x="1106" y="261" width="218" height="36" rx="2" fill="var(--header-bg)" stroke="var(--line)" stroke-width="1"/>
+            <text x="1215" y="276" text-anchor="middle" font-size="9" font-weight="700" fill="var(--fg)">H01 — ESP32 DEVKIT V1 (30P)</text>
+            <text x="1215" y="290" text-anchor="middle" font-size="5.8" fill="var(--dim)">UNIDADE CENTRAL DE CONTROLE E SEGURANÇA (3,3V)</text>
+
+            <!-- Pinagem LÓGICA (rev. C): posições não são as físicas da placa; ligar pela serigrafia -->
+        <circle cx="1100" cy="320" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1100" cy="320" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1107" y="322" text-anchor="start" font-size="5.8" font-weight="700" fill="var(--pin-text)">3V3 (SAÍDA LDO) *</text>
+
+        <circle cx="1100" cy="480" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1100" cy="480" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1107" y="482" text-anchor="start" font-size="5.8" font-weight="700" fill="var(--pin-text)">D25 · GPIO25 (S1 IN)</text>
+
+        <circle cx="1100" cy="500" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1100" cy="500" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1107" y="502" text-anchor="start" font-size="5.8" font-weight="700" fill="var(--pin-text)">D26 · GPIO26 (S2 IN)</text>
+
+        <circle cx="1100" cy="520" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1100" cy="520" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1107" y="522" text-anchor="start" font-size="5.8" font-weight="700" fill="var(--pin-text)">D27 · GPIO27 (ESTOP NF)</text>
+
+        <circle cx="1100" cy="580" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1100" cy="580" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1107" y="582" text-anchor="start" font-size="5.8" font-weight="700" fill="var(--pin-text)">GND (COMUM)</text>
+
+        <circle cx="1100" cy="600" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1100" cy="600" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1107" y="602" text-anchor="start" font-size="5.8" font-weight="700" fill="var(--pin-text)">D13 · GPIO13 (BUZZER)</text>
+
+        <circle cx="1100" cy="680" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1100" cy="680" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1107" y="682" text-anchor="start" font-size="5.8" font-weight="700" fill="var(--pin-text)">VIN (+5V IN)</text>
+
+
+            <!-- Lado direito: pinagem lógica (rev. C) -->
+        <circle cx="1330" cy="460" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1330" cy="460" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1323" y="462" text-anchor="end" font-size="5.8" font-weight="700" fill="var(--pin-text)">D19 · GPIO19 (MOTOR ON/OFF)</text>
+
+        <circle cx="1330" cy="480" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1330" cy="480" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1323" y="482" text-anchor="end" font-size="5.8" font-weight="700" fill="var(--pin-text)">D18 · GPIO18 (PWM SRV)</text>
+
+        <circle cx="1330" cy="500" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1330" cy="500" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1323" y="502" text-anchor="end" font-size="5.8" font-weight="700" fill="var(--pin-text)">D5 · GPIO5 (LED AMAR)</text>
+
+        <circle cx="1330" cy="520" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1330" cy="520" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1323" y="522" text-anchor="end" font-size="5.8" font-weight="700" fill="var(--pin-text)">TX2 · GPIO17 (LED VERM)</text>
+
+        <circle cx="1330" cy="540" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1330" cy="540" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1323" y="542" text-anchor="end" font-size="5.8" font-weight="700" fill="var(--pin-text)">RX2 · GPIO16 (LED VERD)</text>
+
+        <circle cx="1330" cy="560" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1330" cy="560" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1323" y="562" text-anchor="end" font-size="5.8" font-weight="700" fill="var(--pin-text)">D4 · GPIO4 (RELÉ K1)</text>
+
+        <circle cx="1330" cy="620" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1330" cy="620" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1323" y="622" text-anchor="end" font-size="5.8" font-weight="700" fill="var(--pin-text)">D2 · GPIO2 (LED BOARD)</text>
+
+
+            <rect x="1135" y="645" width="160" height="55" rx="2" fill="var(--pad-fill)" stroke="var(--line-thin)" stroke-width="0.8"/>
+            <text x="1215" y="662" text-anchor="middle" font-size="6" font-weight="700" fill="var(--fg)">FIRMWARE AMAZONVISION 4.0</text>
+            <text x="1215" y="675" text-anchor="middle" font-size="5" fill="var(--dim)">• read_estop() == HIGH (Fail-Safe NF)</text>
+            <text x="1215" y="688" text-anchor="middle" font-size="5" fill="var(--dim)">• Boot Seguro: LOW antes de OUTPUT</text>
+            <text x="1215" y="711" text-anchor="middle" font-size="4.6" font-weight="700" fill="var(--fg)">* LIGAR PELA SERIGRAFIA (D25, D26…). Na DOIT 30P o 3V3 fica no lado do D15.</text>
+          </g>
+
+          <!-- Bloco E14: Webcam USB + Mini-PC Visão Computacional -->
+          <g id="bloco-e14-pg">
+            <rect x="1100" y="820" width="230" height="95" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="1215" y="840" text-anchor="middle" font-size="8" font-weight="700" fill="var(--fg)">E14 — WEBCAM 1080p + HOST VISÃO</text>
+            <text x="1215" y="854" text-anchor="middle" font-size="5.5" fill="var(--dim)">CÂMERA USB 2.0 (CÚPULA ÓPTICA) → MINI-PC YOLOv8</text>
+            <text x="1215" y="870" text-anchor="middle" font-size="5.2" fill="var(--fg)">• Alimentação 5V / Dados via Cabo USB 2.0 Direto no Host</text>
+            <text x="1215" y="884" text-anchor="middle" font-size="5.2" fill="var(--dim)">• Host envia comando de classificação ao ESP32 via USB-UART (Pinos 1/3)</text>
+            <text x="1215" y="898" text-anchor="middle" font-size="5.0" fill="var(--dim)">• Iluminação constante garantida pelo Ring Light E13 (12V 6000K)</text>
+          </g>
+
+          <!-- ========================================================== -->
+          <!--      ZONA 4: SEGURANÇA NR-12 (E12-B, K1 E08, E09, Q2)      -->
+          <!-- ========================================================== -->
+          <g id="bloco-e12b-pg" class="interactive-block" onclick="toggleEstop()" title="Clique para Pressionar / Destravar o Botão de Emergência E12 (Canal NF2 Hardware)">
+            <rect x="1470" y="265" width="75" height="50" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="1507" y="280" text-anchor="middle" font-size="6.8" font-weight="700" fill="var(--fg)">E12-B (E31)</text>
+            <text x="1507" y="308" text-anchor="middle" font-size="4.8" fill="var(--dim)">NF2 (21-22)</text>
+        <circle cx="1470" cy="290" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1470" cy="290" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1477" y="292" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">21</text>
+
+        <circle cx="1545" cy="290" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1545" cy="290" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1538" y="292" text-anchor="end" font-size="5" font-weight="700" fill="var(--pin-text)">22</text>
+
+          </g>
+
+          <g id="bloco-e08-pg">
+            <rect x="1600" y="265" width="95" height="135" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="1647" y="280" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">E08 — RELÉ K1</text>
+  <!-- Estado dos contatos K1 -->
+  <text id="sim-k1-state" x="1647" y="340" fill="#22c55e" font-size="6.5" font-family="monospace" text-anchor="middle" font-weight="bold">[30-87: FECHADO ✓]</text>
+
+            <text x="1647" y="305" text-anchor="middle" font-size="5" fill="var(--dim)">12V 40A (NR-12)</text>
+        <circle cx="1600" cy="290" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1600" cy="290" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1607" y="292" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">85</text>
+
+        <circle cx="1645" cy="400" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1645" cy="400" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1645" y="393" text-anchor="middle" font-size="5" font-weight="700" fill="var(--pin-text)">86</text>
+
+        <circle cx="1600" cy="375" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1600" cy="375" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1607" y="377" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">30</text>
+
+        <circle cx="1695" cy="375" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1695" cy="375" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1688" y="377" text-anchor="end" font-size="5" font-weight="700" fill="var(--pin-text)">87</text>
+
+          </g>
+
+          <g id="bloco-e09-pg">
+            <rect x="1715" y="295" width="30" height="50" rx="2" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.2"/>
+            <text x="1730" y="317" text-anchor="middle" font-size="5.5" font-weight="700" fill="var(--fg)">E09</text>
+            <text x="1730" y="327" text-anchor="middle" font-size="4.5" fill="var(--dim)">1N4007</text>
+            <text x="1730" y="305" text-anchor="middle" font-size="4" font-weight="700" fill="var(--fg)">K (faixa)</text>
+            <text x="1730" y="340" text-anchor="middle" font-size="4" font-weight="700" fill="var(--fg)">A</text>
+          </g>
+
+          <g id="bloco-q2-pg">
+            <rect x="1585" y="445" width="120" height="60" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="1645" y="463" text-anchor="middle" font-size="6.5" font-weight="700" fill="var(--fg)">Q2 BC337-40 (E28)</text>
+            <text x="1645" y="475" text-anchor="middle" font-size="4.8" fill="var(--dim)">+ R_B2 470Ω (E29)</text>
+            <text x="1645" y="485" text-anchor="middle" font-size="4.8" fill="var(--dim)">+ R_PD2 10kΩ (E30)</text>
+        <circle cx="1645" cy="445" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1645" cy="445" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1645" y="456" text-anchor="middle" font-size="5" font-weight="700" fill="var(--pin-text)">C</text>
+
+        <circle cx="1585" cy="475" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1585" cy="475" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1592" y="477" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">B</text>
+
+        <circle cx="1645" cy="505" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1645" cy="505" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1645" y="498" text-anchor="middle" font-size="5" font-weight="700" fill="var(--pin-text)">E</text>
+
+          </g>
+
+          <!-- ========================================================== -->
+          <!--      ZONA 5: ATUADORES DE POTÊNCIA (H02, E04, E05, M13)    -->
+          <!-- ========================================================== -->
+          <g id="bloco-h02-pg">
+            <rect x="1830" y="250" width="120" height="105" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="1890" y="264" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">H02 — SERVO MG996R</text>
+  <!-- Braço 3D do Servo MG996R -->
+  <g id="sim-servo-group" transform="translate(1890, 305)">
+    <circle cx="0" cy="0" r="8" fill="#1e293b" stroke="#f97316" stroke-width="1.5"/>
+    <line id="sim-servo-arm" x1="0" y1="0" x2="26" y2="0" stroke="#f97316" stroke-width="4" stroke-linecap="round" style="transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: 0px 0px; transform: rotate(0deg);"/>
+    <text id="sim-servo-deg" x="0" y="24" fill="#f97316" font-size="7" font-family="monospace" text-anchor="middle" font-weight="bold">0° (LIVRE)</text>
+  </g>
+
+            <text x="1890" y="348" text-anchor="middle" font-size="4.8" fill="var(--dim)">+ BRAÇO 3D (H03) DESVIO</text>
+        <circle cx="1830" cy="275" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1830" cy="275" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1837" y="277" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">PWM (50Hz)</text>
+
+        <circle cx="1830" cy="305" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1830" cy="305" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1837" y="307" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">VCC (+6V)</text>
+
+        <circle cx="1830" cy="335" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1830" cy="335" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1837" y="337" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">GND</text>
+
+          </g>
+
+          <g id="bloco-e04-pg">
+            <rect x="1830" y="485" width="120" height="175" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="1890" y="500" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">E04 — MOSFET D4184</text>
+            <text x="1890" y="510" text-anchor="middle" font-size="4.8" fill="var(--dim)">LIGA/DESLIGA (FIRMWARE ATUAL)</text>
+        <circle cx="1830" cy="520" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1830" cy="520" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1837" y="522" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">VIN+</text>
+
+        <circle cx="1830" cy="550" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1830" cy="550" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1837" y="552" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">VIN-</text>
+
+        <circle cx="1830" cy="580" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1830" cy="580" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1837" y="582" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">VCC</text>
+
+        <circle cx="1830" cy="610" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1830" cy="610" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1837" y="612" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">GND</text>
+
+        <circle cx="1830" cy="640" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1830" cy="640" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1837" y="642" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">SIG</text>
+
+        <circle cx="1950" cy="520" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1950" cy="520" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1943" y="522" text-anchor="end" font-size="5" font-weight="700" fill="var(--pin-text)">VOUT+</text>
+
+        <circle cx="1950" cy="580" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="1950" cy="580" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="1943" y="582" text-anchor="end" font-size="5" font-weight="700" fill="var(--pin-text)">VOUT-</text>
+
+          </g>
+
+          <g id="bloco-m13-pg">
+            <rect x="2015" y="495" width="75" height="110" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="2052" y="512" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">M13 — GA37</text>
+  <!-- Rotor do Motor GA37 -->
+  <g id="sim-motor-rotor" class="motor-spinning">
+    <circle cx="2052" cy="550" r="14" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.2"/>
+    <line x1="2038" y1="550" x2="2066" y2="550" stroke="#00f2fe" stroke-width="2"/>
+    <line x1="2052" y1="536" x2="2052" y2="564" stroke="#00f2fe" stroke-width="2"/>
+    <circle cx="2052" cy="550" r="4" fill="#00f2fe"/>
+  </g>
+
+            <text x="2052" y="598" text-anchor="middle" font-size="4.8" fill="var(--dim)">MOTOR 12V 60RPM</text>
+        <circle cx="2015" cy="520" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="2015" cy="520" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="2022" y="522" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">M+</text>
+
+        <circle cx="2015" cy="580" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="2015" cy="580" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="2022" y="582" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">M-</text>
+
+          </g>
+
+          <g id="bloco-e05-pg">
+            <rect x="1965" y="655" width="30" height="30" rx="2" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.2"/>
+            <text x="1980" y="669" text-anchor="middle" font-size="5.2" font-weight="700" fill="var(--fg)">E05</text>
+            <text x="1980" y="679" text-anchor="middle" font-size="4.4" fill="var(--dim)">1N5822</text>
+            <text x="1968" y="662" text-anchor="start" font-size="4" font-weight="700" fill="var(--fg)">K</text>
+            <text x="1992" y="662" text-anchor="end" font-size="4" font-weight="700" fill="var(--fg)">A</text>
+          </g>
+
+          <!-- ========================================================== -->
+          <!--      ZONA 6: SINALIZAÇÃO (H05, E25+Q1) E RING LIGHT (E13)  -->
+          <!-- ========================================================== -->
+          <g id="bloco-h05-pg">
+            <rect x="2130" y="240" width="120" height="135" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="2190" y="256" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">H05 — LEDs + 330Ω</text>
+  <circle id="sim-led-red" cx="2190" cy="270" r="7" class="led-off" stroke="#fff" stroke-width="0.8"/>
+  <circle id="sim-led-green" cx="2190" cy="310" r="7" class="led-glow-green" stroke="#fff" stroke-width="0.8"/>
+  <circle id="sim-led-yellow" cx="2190" cy="350" r="7" class="led-off" stroke="#fff" stroke-width="0.8"/>
+        <circle cx="2130" cy="270" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="2130" cy="270" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="2137" y="272" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">R+ (VERM)</text>
+
+        <circle cx="2250" cy="270" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="2250" cy="270" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="2243" y="272" text-anchor="end" font-size="5" font-weight="700" fill="var(--pin-text)">R-</text>
+
+        <circle cx="2130" cy="310" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="2130" cy="310" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="2137" y="312" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">G+ (VERD)</text>
+
+        <circle cx="2250" cy="310" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="2250" cy="310" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="2243" y="312" text-anchor="end" font-size="5" font-weight="700" fill="var(--pin-text)">G-</text>
+
+        <circle cx="2130" cy="350" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="2130" cy="350" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="2137" y="352" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">Y+ (AMAR)</text>
+
+        <circle cx="2250" cy="350" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="2250" cy="350" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="2243" y="352" text-anchor="end" font-size="5" font-weight="700" fill="var(--pin-text)">Y-</text>
+
+          </g>
+
+          <g id="bloco-e25-pg">
+            <rect x="2130" y="450" width="120" height="60" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="2190" y="468" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">E25 — BUZZER 5V</text>
+  <!-- Ondas Sonoras do Buzzer -->
+  <g id="sim-buzzer-waves" style="display:none;">
+    <path d="M 2210 475 A 12 12 0 0 1 2210 495" fill="none" stroke="#ef4444" stroke-width="1.8"/>
+    <path d="M 2218 470 A 18 18 0 0 1 2218 500" fill="none" stroke="#ef4444" stroke-width="1.8"/>
+    <path d="M 2226 465 A 24 24 0 0 1 2226 505" fill="none" stroke="#ef4444" stroke-width="1.8"/>
+  </g>
+
+            <text x="2190" y="480" text-anchor="middle" font-size="5" fill="var(--dim)">ALARME AUDÍVEL NR-12</text>
+        <circle cx="2130" cy="480" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="2130" cy="480" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="2137" y="482" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">+5V</text>
+
+        <circle cx="2190" cy="510" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="2190" cy="510" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="2190" y="503" text-anchor="middle" font-size="5" font-weight="700" fill="var(--pin-text)">-</text>
+
+          </g>
+
+          <g id="bloco-q1-pg">
+            <rect x="2130" y="555" width="120" height="60" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="2190" y="573" text-anchor="middle" font-size="6.5" font-weight="700" fill="var(--fg)">Q1 BC337-40 (E28)</text>
+            <text x="2190" y="585" text-anchor="middle" font-size="4.8" fill="var(--dim)">+ E11 1kΩ + R_PD1 10kΩ</text>
+        <circle cx="2190" cy="555" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="2190" cy="555" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="2190" y="566" text-anchor="middle" font-size="5" font-weight="700" fill="var(--pin-text)">C</text>
+
+        <circle cx="2130" cy="585" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="2130" cy="585" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="2137" y="587" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">B</text>
+
+        <circle cx="2190" cy="615" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="2190" cy="615" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="2190" y="608" text-anchor="middle" font-size="5" font-weight="700" fill="var(--pin-text)">E</text>
+
+          </g>
+
+          <g id="bloco-e13-pg">
+            <rect x="2130" y="830" width="120" height="60" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+            <text x="2190" y="848" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">E13 — RING LIGHT</text>
+            <text x="2190" y="860" text-anchor="middle" font-size="5" fill="var(--dim)">LED 12V 6000K CÚPULA</text>
+        <circle cx="2130" cy="860" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="2130" cy="860" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="2137" y="862" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">+12V</text>
+
+        <circle cx="2190" cy="890" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="2190" cy="890" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+        <text x="2190" y="883" text-anchor="middle" font-size="5" font-weight="700" fill="var(--pin-text)">GND</text>
+
+          </g>
+
+          <!-- ========================================================== -->
+          <!--      FIAÇÃO COMPLETA DA PLANTA GERAL (W001 A W083)         -->
+          <!-- ========================================================== -->
+          <g id="fios-pg">
+        <!-- W001: 1,0 VM → W1 -->
+        <path d="M 130,300 L 185,300" fill="none" class="wire-power"/>
+        <circle cx="130" cy="300" r="2.5" class="junction-dot"/>
+        <circle cx="185" cy="300" r="2.5" class="junction-dot"/>
+        <rect x="146.0" y="281.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="157" y="287.5" text-anchor="middle" class="wire-label" font-size="5">W001</text>
+        <text x="157" y="296.5" text-anchor="middle" class="wire-spec" font-size="4.5">1,0 VM → W1</text>
+        <!-- W002: 1,0 AZ → W1 -->
+        <path d="M 130,335 L 185,335" fill="none" class="wire-power"/>
+        <circle cx="130" cy="335" r="2.5" class="junction-dot"/>
+        <circle cx="185" cy="335" r="2.5" class="junction-dot"/>
+        <rect x="146.0" y="316.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="157" y="322.5" text-anchor="middle" class="wire-label" font-size="5">W002</text>
+        <text x="157" y="331.5" text-anchor="middle" class="wire-spec" font-size="4.5">1,0 AZ → W1</text>
+        <!-- W003: 1,0 VD → W1 -->
+        <path d="M 130,370 L 155,370 L 155,470 L 130,470 M 155,420 L 290,420 L 290,370 L 310,370" fill="none" class="wire-gnd"/>
+        <circle cx="130" cy="370" r="2.5" class="junction-dot"/>
+        <circle cx="155" cy="420" r="2.5" class="junction-dot"/>
+        <circle cx="310" cy="370" r="2.5" class="junction-dot"/>
+        <circle cx="130" cy="470" r="2.5" class="junction-dot"/>
+        <rect x="211.0" y="401.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="222" y="407.5" text-anchor="middle" class="wire-label" font-size="5">W003</text>
+        <text x="222" y="416.5" text-anchor="middle" class="wire-spec" font-size="4.5">1,0 VD → W1</text>
+        <!-- W004: 1,0 VM → W1 -->
+        <path d="M 265,300 L 310,300" fill="none" class="wire-power"/>
+        <circle cx="265" cy="300" r="2.5" class="junction-dot"/>
+        <circle cx="310" cy="300" r="2.5" class="junction-dot"/>
+        <rect x="276.0" y="281.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="287" y="287.5" text-anchor="middle" class="wire-label" font-size="5">W004</text>
+        <text x="287" y="296.5" text-anchor="middle" class="wire-spec" font-size="4.5">1,0 VM → W1</text>
+        <!-- W005: 1,0 AZ → W1 -->
+        <path d="M 265,335 L 310,335" fill="none" class="wire-power"/>
+        <circle cx="265" cy="335" r="2.5" class="junction-dot"/>
+        <circle cx="310" cy="335" r="2.5" class="junction-dot"/>
+        <rect x="276.0" y="316.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="287" y="322.5" text-anchor="middle" class="wire-label" font-size="5">W005</text>
+        <text x="287" y="331.5" text-anchor="middle" class="wire-spec" font-size="4.5">1,0 AZ → W1</text>
+        <!-- W006: 1,0 VM → W1 -->
+        <path d="M 415,300 L 450,300" fill="none" class="wire-power"/>
+        <circle cx="415" cy="300" r="2.5" class="junction-dot"/>
+        <circle cx="450" cy="300" r="2.5" class="junction-dot"/>
+        <rect x="421.0" y="281.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="432" y="287.5" text-anchor="middle" class="wire-label" font-size="5">W006</text>
+        <text x="432" y="296.5" text-anchor="middle" class="wire-spec" font-size="4.5">1,0 VM → W1</text>
+        <!-- W007: 1,0 VM → W1 -->
+        <path d="M 530,300 L 545,300 L 545,430 L 435,430 L 435,490 L 450,490" fill="none" class="wire-power"/>
+        <circle cx="530" cy="300" r="2.5" class="junction-dot"/>
+        <circle cx="450" cy="490" r="2.5" class="junction-dot"/>
+        <rect x="479.0" y="411.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="490" y="417.5" text-anchor="middle" class="wire-label" font-size="5">W007</text>
+        <text x="490" y="426.5" text-anchor="middle" class="wire-spec" font-size="4.5">1,0 VM → W1</text>
+        <!-- W008: 1,0 PT → W1 -->
+        <path d="M 415,355 L 422,355 L 422,590 L 450,590" fill="none" class="wire-gnd"/>
+        <circle cx="415" cy="355" r="2.5" class="junction-dot"/>
+        <circle cx="450" cy="590" r="2.5" class="junction-dot"/>
+        <rect x="411.0" y="515.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="422" y="521.5" text-anchor="middle" class="wire-label" font-size="5">W008</text>
+        <text x="422" y="530.5" text-anchor="middle" class="wire-spec" font-size="4.5">1,0 PT → W1</text>
+        <!-- W009: JMP → W1 -->
+        <path d="M 530,490 L 545,490 L 545,515 L 530,515" fill="none" class="wire-power"/>
+        <circle cx="530" cy="490" r="2.5" class="junction-dot"/>
+        <circle cx="530" cy="515" r="2.5" class="junction-dot"/>
+        <rect x="532.0" y="487.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="542" y="493.5" text-anchor="middle" class="wire-label" font-size="5">W009</text>
+        <text x="542" y="502.5" text-anchor="middle" class="wire-spec" font-size="4.5">JMP → W1</text>
+        <!-- W010: JMP → W1 -->
+        <path d="M 530,590 L 545,590 L 545,615 L 530,615" fill="none" class="wire-gnd"/>
+        <circle cx="530" cy="590" r="2.5" class="junction-dot"/>
+        <circle cx="530" cy="615" r="2.5" class="junction-dot"/>
+        <rect x="532.0" y="587.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="542" y="593.5" text-anchor="middle" class="wire-label" font-size="5">W010</text>
+        <text x="542" y="602.5" text-anchor="middle" class="wire-spec" font-size="4.5">JMP → W1</text>
+        <!-- W011: 0,5 BN → W1 -->
+        <path d="M 530,540 L 605,540 L 605,95 M 605,540 L 605,655 L 280,655 L 280,720 L 310,720" fill="none" class="wire-power"/>
+        <circle cx="530" cy="540" r="2.5" class="junction-dot"/>
+        <circle cx="605" cy="540" r="2.5" class="junction-dot"/>
+        <circle cx="605" cy="95" r="2.5" class="junction-dot"/>
+        <circle cx="310" cy="720" r="2.5" class="junction-dot"/>
+        <rect x="455" y="651.5" width="16" height="7" rx="1" fill="var(--bg)" stroke="var(--line)" stroke-width="0.9"/>
+        <line x1="455" y1="655" x2="471" y2="655" stroke="var(--line)" stroke-width="0.6"/>
+        <text x="463" y="649.5" text-anchor="middle" font-size="4.5" font-weight="700" fill="var(--fg)">F3 3A (E16)</text>
+        <rect x="349.0" y="637.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="360" y="643.5" text-anchor="middle" class="wire-label" font-size="5">W011</text>
+        <text x="360" y="652.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 BN → W1</text>
+        <!-- W012: 0,5 PT → W1 -->
+        <path d="M 530,615 L 590,615 L 590,670 L 292,670 L 292,750 L 310,750" fill="none" class="wire-gnd"/>
+        <circle cx="530" cy="615" r="2.5" class="junction-dot"/>
+        <circle cx="590" cy="670" r="2.5" class="junction-dot"/>
+        <circle cx="310" cy="750" r="2.5" class="junction-dot"/>
+        <rect x="241.0" y="730.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="252" y="736.5" text-anchor="middle" class="wire-label" font-size="5">W012</text>
+        <text x="252" y="745.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 PT → W1</text>
+        <!-- W013: 0,5 BN → W1 -->
+        <path d="M 410,720 L 460,720" fill="none" class="wire-power"/>
+        <circle cx="410" cy="720" r="2.5" class="junction-dot"/>
+        <circle cx="460" cy="720" r="2.5" class="junction-dot"/>
+        <rect x="424.0" y="697.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="435" y="703.5" text-anchor="middle" class="wire-label" font-size="5">W013</text>
+        <text x="435" y="712.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 BN → W1</text>
+        <!-- W014: 0,5 PT → W1 -->
+        <path d="M 410,750 L 460,750" fill="none" class="wire-gnd"/>
+        <circle cx="410" cy="750" r="2.5" class="junction-dot"/>
+        <circle cx="460" cy="750" r="2.5" class="junction-dot"/>
+        <rect x="424.0" y="757.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="435" y="763.5" text-anchor="middle" class="wire-label" font-size="5">W014</text>
+        <text x="435" y="772.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 PT → W1</text>
+        <!-- W015: 0,5 VM → W1 (rev. C: só X1:2 → F4 → E03; cor VM) -->
+        <path d="M 530,515 L 620,515 L 620,805 L 280,805 L 280,880 L 310,880" fill="none" class="wire-power"/>
+        <circle cx="530" cy="515" r="2.5" class="junction-dot"/>
+        <circle cx="310" cy="880" r="2.5" class="junction-dot"/>
+        <rect x="455" y="801.5" width="16" height="7" rx="1" fill="var(--bg)" stroke="var(--line)" stroke-width="0.9"/>
+        <line x1="455" y1="805" x2="471" y2="805" stroke="var(--line)" stroke-width="0.6"/>
+        <text x="463" y="799.5" text-anchor="middle" font-size="4.5" font-weight="700" fill="var(--fg)">F4 1A (E16)</text>
+        <rect x="349.0" y="785.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="360" y="791.5" text-anchor="middle" class="wire-label" font-size="5">W015</text>
+        <text x="360" y="800.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 VM → W1</text>
+        <!-- W016: 0,5 PT → W1 -->
+        <path d="M 590,670 L 590,822 L 292,822 L 292,910 L 310,910" fill="none" class="wire-gnd"/>
+        <circle cx="590" cy="670" r="2.5" class="junction-dot"/>
+        <circle cx="310" cy="910" r="2.5" class="junction-dot"/>
+        <rect x="241.0" y="890.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="252" y="896.5" text-anchor="middle" class="wire-label" font-size="5">W016</text>
+        <text x="252" y="905.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 PT → W1</text>
+        <!-- W017: 0,5 BU → W1 -->
+        <path d="M 410,880 L 635,880 L 635,145 M 635,700 L 1085,700 L 1085,680 L 1100,680" fill="none" class="wire-power"/>
+        <circle cx="410" cy="880" r="2.5" class="junction-dot"/>
+        <circle cx="635" cy="700" r="2.5" class="junction-dot"/>
+        <circle cx="635" cy="145" r="2.5" class="junction-dot"/>
+        <circle cx="1100" cy="680" r="2.5" class="junction-dot"/>
+        <rect x="474.0" y="861.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="485" y="867.5" text-anchor="middle" class="wire-label" font-size="5">W017</text>
+        <text x="485" y="876.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 BU → W1</text>
+        <!-- W018: 0,5 PT → W1 -->
+        <path d="M 410,910 L 435,910 L 435,1290" fill="none" class="wire-gnd"/>
+        <circle cx="410" cy="910" r="2.5" class="junction-dot"/>
+        <circle cx="435" cy="1290" r="2.5" class="junction-dot"/>
+        <rect x="424.0" y="975.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="435" y="981.5" text-anchor="middle" class="wire-label" font-size="5">W018</text>
+        <text x="435" y="990.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 PT → W1</text>
+        <!-- W019: 0,5 Vi → W1 -->
+        <path d="M 1100,320 L 1082,320 L 1082,170" fill="none" class="wire-power"/>
+        <circle cx="1100" cy="320" r="2.5" class="junction-dot"/>
+        <circle cx="1082" cy="170" r="2.5" class="junction-dot"/>
+        <rect x="1071.0" y="205.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1082" y="211.5" text-anchor="middle" class="wire-label" font-size="5">W019</text>
+        <text x="1082" y="220.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 Vi → W1</text>
+        <!-- W020: 0,5 PT → W1 -->
+        <path d="M 1100,580 L 1052,580 L 1052,1290" fill="none" class="wire-gnd"/>
+        <circle cx="1100" cy="580" r="2.5" class="junction-dot"/>
+        <circle cx="1052" cy="1290" r="2.5" class="junction-dot"/>
+        <rect x="1041.0" y="1015.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1052" y="1021.5" text-anchor="middle" class="wire-label" font-size="5">W020</text>
+        <text x="1052" y="1030.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 PT → W1</text>
+        <!-- W021: 0,5 BU → W2 -->
+        <path d="M 672,145 L 672,280 L 680,280" fill="none" class="wire-power"/>
+        <circle cx="672" cy="145" r="2.5" class="junction-dot"/>
+        <circle cx="680" cy="280" r="2.5" class="junction-dot"/>
+        <rect x="661.0" y="205.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="672" y="211.5" text-anchor="middle" class="wire-label" font-size="5">W021</text>
+        <text x="672" y="220.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 BU → W2</text>
+        <!-- W022: 0,5 PT → W2 -->
+        <path d="M 765,330 L 805,330 L 805,480 L 835,480" fill="none" class="wire-gnd"/>
+        <circle cx="765" cy="330" r="2.5" class="junction-dot"/>
+        <circle cx="835" cy="480" r="2.5" class="junction-dot"/>
+        <rect x="774.0" y="340.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="785" y="346.5" text-anchor="middle" class="wire-label" font-size="5">W022</text>
+        <text x="785" y="355.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 PT → W2</text>
+        <!-- W023: 0,5 BK → W2 -->
+        <path d="M 765,305 L 820,305 L 820,420 L 835,420" fill="none" class="wire-signal"/>
+        <circle cx="765" cy="305" r="2.5" class="junction-dot"/>
+        <circle cx="835" cy="420" r="2.5" class="junction-dot"/>
+        <rect x="781.0" y="285.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="792" y="291.5" text-anchor="middle" class="wire-label" font-size="5">W023</text>
+        <text x="792" y="300.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 BK → W2</text>
+        <!-- W024: 0,5 BU → W2 -->
+        <path d="M 652,145 L 652,450 L 680,450" fill="none" class="wire-power"/>
+        <circle cx="652" cy="145" r="2.5" class="junction-dot"/>
+        <circle cx="680" cy="450" r="2.5" class="junction-dot"/>
+        <rect x="641.0" y="375.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="652" y="381.5" text-anchor="middle" class="wire-label" font-size="5">W024</text>
+        <text x="652" y="390.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 BU → W2</text>
+        <!-- W025: 0,5 PT → W2 -->
+        <path d="M 765,500 L 790,500 L 790,510 L 835,510" fill="none" class="wire-gnd"/>
+        <circle cx="765" cy="500" r="2.5" class="junction-dot"/>
+        <circle cx="835" cy="510" r="2.5" class="junction-dot"/>
+        <rect x="774.0" y="515.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="785" y="521.5" text-anchor="middle" class="wire-label" font-size="5">W025</text>
+        <text x="785" y="530.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 PT → W2</text>
+        <!-- W026: 0,5 BK → W2 -->
+        <path d="M 765,475 L 790,475 L 790,450 L 835,450" fill="none" class="wire-signal"/>
+        <circle cx="765" cy="475" r="2.5" class="junction-dot"/>
+        <circle cx="835" cy="450" r="2.5" class="junction-dot"/>
+        <rect x="774.0" y="430.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="785" y="436.5" text-anchor="middle" class="wire-label" font-size="5">W026</text>
+        <text x="785" y="445.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 BK → W2</text>
+        <!-- W027: 0,5 BK → W2 -->
+        <path d="M 765,630 L 805,630 L 805,540 L 835,540" fill="none" class="wire-signal"/>
+        <circle cx="765" cy="630" r="2.5" class="junction-dot"/>
+        <circle cx="835" cy="540" r="2.5" class="junction-dot"/>
+        <rect x="774.0" y="610.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="785" y="616.5" text-anchor="middle" class="wire-label" font-size="5">W027</text>
+        <text x="785" y="625.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 BK → W2</text>
+        <!-- W028: 0,5 BK → W2 -->
+        <path d="M 765,660 L 820,660 L 820,570 L 835,570" fill="none" class="wire-signal"/>
+        <circle cx="765" cy="660" r="2.5" class="junction-dot"/>
+        <circle cx="835" cy="570" r="2.5" class="junction-dot"/>
+        <rect x="781.0" y="667.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="792" y="673.5" text-anchor="middle" class="wire-label" font-size="5">W028</text>
+        <text x="792" y="682.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 BK → W2</text>
+        <!-- W029: 0,5 BK → W2 -->
+        <path d="M 900,420 L 925,420 L 925,350 L 940,350" fill="none" class="wire-signal"/>
+        <circle cx="900" cy="420" r="2.5" class="junction-dot"/>
+        <circle cx="940" cy="350" r="2.5" class="junction-dot"/>
+        <rect x="904.0" y="323.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="915" y="329.5" text-anchor="middle" class="wire-label" font-size="5">W029</text>
+        <text x="915" y="338.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 BK → W2</text>
+        <!-- W030: 0,5 BK → W2 -->
+        <path d="M 900,450 L 925,450 L 925,460 L 940,460" fill="none" class="wire-signal"/>
+        <circle cx="900" cy="450" r="2.5" class="junction-dot"/>
+        <circle cx="940" cy="460" r="2.5" class="junction-dot"/>
+        <rect x="907.0" y="427.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="918" y="433.5" text-anchor="middle" class="wire-label" font-size="5">W030</text>
+        <text x="918" y="442.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 BK → W2</text>
+        <!-- W031: 0,5 BK → W2 -->
+        <path d="M 900,540 L 960,540" fill="none" class="wire-signal"/>
+        <circle cx="900" cy="540" r="2.5" class="junction-dot"/>
+        <circle cx="960" cy="540" r="2.5" class="junction-dot"/>
+        <rect x="934.0" y="521.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="945" y="527.5" text-anchor="middle" class="wire-label" font-size="5">W031</text>
+        <text x="945" y="536.5" text-anchor="middle" class="wire-spec" font-size="4.5">0,5 BK → W2</text>
+        <!-- W032: JMP → W2 -->
+        <path d="M 940,350 L 965,350" fill="none" class="wire-signal"/>
+        <circle cx="940" cy="350" r="2.5" class="junction-dot"/>
+        <circle cx="965" cy="350" r="2.5" class="junction-dot"/>
+        <rect x="942.0" y="361.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="952" y="367.5" text-anchor="middle" class="wire-label" font-size="5">W032</text>
+        <text x="952" y="376.5" text-anchor="middle" class="wire-spec" font-size="4.5">JMP → W2</text>
+        <!-- W033: JMP → W2 -->
+        <path d="M 997,350 L 1030,350" fill="none" class="wire-signal"/>
+        <circle cx="997" cy="350" r="2.5" class="junction-dot"/>
+        <circle cx="1030" cy="350" r="2.5" class="junction-dot"/>
+        <rect x="1003.0" y="323.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1013" y="329.5" text-anchor="middle" class="wire-label" font-size="5">W033</text>
+        <text x="1013" y="338.5" text-anchor="middle" class="wire-spec" font-size="4.5">JMP → W2</text>
+        <!-- W034: JMP → W2 -->
+        <path d="M 1041,370 L 1041,390 L 1068,390 L 1068,1290" fill="none" class="wire-gnd"/>
+        <circle cx="1041" cy="370" r="2.5" class="junction-dot"/>
+        <circle cx="1068" cy="1290" r="2.5" class="junction-dot"/>
+        <rect x="1058.0" y="895.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1068" y="901.5" text-anchor="middle" class="wire-label" font-size="5">W034</text>
+        <text x="1068" y="910.5" text-anchor="middle" class="wire-spec" font-size="4.5">JMP → W2</text>
+        <!-- W035: JMP → W2 -->
+        <path d="M 1041,330 L 1041,170" fill="none" class="wire-power"/>
+        <circle cx="1041" cy="330" r="2.5" class="junction-dot"/>
+        <circle cx="1041" cy="170" r="2.5" class="junction-dot"/>
+        <rect x="1031.0" y="245.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1041" y="251.5" text-anchor="middle" class="wire-label" font-size="5">W035</text>
+        <text x="1041" y="260.5" text-anchor="middle" class="wire-spec" font-size="4.5">JMP → W2</text>
+        <!-- W036: JMP → W2 -->
+        <path d="M 1052,350 L 1084,350 L 1084,480 L 1100,480" fill="none" class="wire-signal"/>
+        <circle cx="1052" cy="350" r="2.5" class="junction-dot"/>
+        <circle cx="1100" cy="480" r="2.5" class="junction-dot"/>
+        <rect x="1074.0" y="390.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1084" y="396.5" text-anchor="middle" class="wire-label" font-size="5">W036</text>
+        <text x="1084" y="405.5" text-anchor="middle" class="wire-spec" font-size="4.5">JMP → W2</text>
+        <!-- W037: JMP → W2 -->
+        <path d="M 940,460 L 965,460" fill="none" class="wire-signal"/>
+        <circle cx="940" cy="460" r="2.5" class="junction-dot"/>
+        <circle cx="965" cy="460" r="2.5" class="junction-dot"/>
+        <rect x="942.0" y="471.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="952" y="477.5" text-anchor="middle" class="wire-label" font-size="5">W037</text>
+        <text x="952" y="486.5" text-anchor="middle" class="wire-spec" font-size="4.5">JMP → W2</text>
+        <!-- W038: JMP → W2 -->
+        <path d="M 997,460 L 1030,460" fill="none" class="wire-signal"/>
+        <circle cx="997" cy="460" r="2.5" class="junction-dot"/>
+        <circle cx="1030" cy="460" r="2.5" class="junction-dot"/>
+        <rect x="1003.0" y="471.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1013" y="477.5" text-anchor="middle" class="wire-label" font-size="5">W038</text>
+        <text x="1013" y="486.5" text-anchor="middle" class="wire-spec" font-size="4.5">JMP → W2</text>
+        <!-- W039: JMP → W2 -->
+        <path d="M 1041,480 L 1041,515 L 990,515 L 990,1290" fill="none" class="wire-gnd"/>
+        <circle cx="1041" cy="480" r="2.5" class="junction-dot"/>
+        <circle cx="990" cy="1290" r="2.5" class="junction-dot"/>
+        <rect x="980.0" y="955.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="990" y="961.5" text-anchor="middle" class="wire-label" font-size="5">W039</text>
+        <text x="990" y="970.5" text-anchor="middle" class="wire-spec" font-size="4.5">JMP → W2</text>
+        <!-- W040: JMP → W2 -->
+        <path d="M 1041,440 L 1041,425 L 1062,425 L 1062,170" fill="none" class="wire-power"/>
+        <circle cx="1041" cy="440" r="2.5" class="junction-dot"/>
+        <circle cx="1062" cy="170" r="2.5" class="junction-dot"/>
+        <rect x="1052.0" y="285.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1062" y="291.5" text-anchor="middle" class="wire-label" font-size="5">W040</text>
+        <text x="1062" y="300.5" text-anchor="middle" class="wire-spec" font-size="4.5">JMP → W2</text>
+        <!-- W041: JMP → W2 -->
+        <path d="M 1052,460 L 1058,460 L 1058,500 L 1100,500" fill="none" class="wire-signal"/>
+        <circle cx="1052" cy="460" r="2.5" class="junction-dot"/>
+        <circle cx="1100" cy="500" r="2.5" class="junction-dot"/>
+        <rect x="1074.0" y="503.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1084" y="509.5" text-anchor="middle" class="wire-label" font-size="5">W041</text>
+        <text x="1084" y="518.5" text-anchor="middle" class="wire-spec" font-size="4.5">JMP → W2</text>
+        <!-- W042: JMP → W2 -->
+        <path d="M 960,540 L 1085,540 L 1085,520 L 1100,520" fill="none" class="wire-signal"/>
+        <circle cx="960" cy="540" r="2.5" class="junction-dot"/>
+        <circle cx="1100" cy="520" r="2.5" class="junction-dot"/>
+        <rect x="1015.0" y="550.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1025" y="556.5" text-anchor="middle" class="wire-label" font-size="5">W042</text>
+        <text x="1025" y="565.5" text-anchor="middle" class="wire-spec" font-size="4.5">JMP → W2</text>
+        <!-- W079: JMP → W2 -->
+        <path d="M 900,480 L 912,480 L 912,1290" fill="none" class="wire-gnd"/>
+        <circle cx="900" cy="480" r="2.5" class="junction-dot"/>
+        <circle cx="912" cy="1290" r="2.5" class="junction-dot"/>
+        <rect x="902.0" y="715.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="912" y="721.5" text-anchor="middle" class="wire-label" font-size="5">W079</text>
+        <text x="912" y="730.5" text-anchor="middle" class="wire-spec" font-size="4.5">JMP → W2</text>
+        <!-- W080: JMP → W2 -->
+        <path d="M 900,510 L 926,510 L 926,1290" fill="none" class="wire-gnd"/>
+        <circle cx="900" cy="510" r="2.5" class="junction-dot"/>
+        <circle cx="926" cy="1290" r="2.5" class="junction-dot"/>
+        <rect x="916.0" y="775.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="926" y="781.5" text-anchor="middle" class="wire-label" font-size="5">W080</text>
+        <text x="926" y="790.5" text-anchor="middle" class="wire-spec" font-size="4.5">JMP → W2</text>
+        <!-- W081: JMP → W2 -->
+        <path d="M 900,570 L 940,570 L 940,1290" fill="none" class="wire-gnd"/>
+        <circle cx="900" cy="570" r="2.5" class="junction-dot"/>
+        <circle cx="940" cy="1290" r="2.5" class="junction-dot"/>
+        <rect x="930.0" y="835.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="940" y="841.5" text-anchor="middle" class="wire-label" font-size="5">W081</text>
+        <text x="940" y="850.5" text-anchor="middle" class="wire-spec" font-size="4.5">JMP → W2</text>
+        <!-- W083: 1,0 PT → W1 (rev. C — retorno GND direto X1:6 → barramento) -->
+        <path d="M 530,615 L 538,615 L 538,628 L 575,628 L 575,1290" fill="none" class="wire-gnd" stroke-width="2.2"/>
+        <circle cx="530" cy="615" r="2.5" class="junction-dot"/>
+        <circle cx="575" cy="1290" r="2.5" class="junction-dot"/>
+        <rect x="564.0" y="1135.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="575" y="1141.5" text-anchor="middle" class="wire-label" font-size="5">W083</text>
+        <text x="575" y="1150.5" text-anchor="middle" class="wire-spec" font-size="4.5">1,0 PT → W1</text>
+        <!-- W043: 22AWG → W3 -->
+        <path d="M 510,720 L 568,720 L 568,120" fill="none" class="wire-power"/>
+        <circle cx="510" cy="720" r="2.5" class="junction-dot"/>
+        <circle cx="568" cy="120" r="2.5" class="junction-dot"/>
+        <rect x="557.0" y="215.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="568" y="221.5" text-anchor="middle" class="wire-label" font-size="5">W043</text>
+        <text x="568" y="230.5" text-anchor="middle" class="wire-spec" font-size="4.5">22AWG → W3</text>
+        <!-- W044: 22AWG → W3 -->
+        <path d="M 510,750 L 530,750 L 530,1290" fill="none" class="wire-gnd"/>
+        <circle cx="510" cy="750" r="2.5" class="junction-dot"/>
+        <circle cx="530" cy="1290" r="2.5" class="junction-dot"/>
+        <rect x="519.0" y="975.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="530" y="981.5" text-anchor="middle" class="wire-label" font-size="5">W044</text>
+        <text x="530" y="990.5" text-anchor="middle" class="wire-spec" font-size="4.5">22AWG → W3</text>
+        <!-- W045: 22AWG → W3 -->
+        <path d="M 510,720 L 584,720 L 584,120" fill="none" class="wire-power"/>
+        <circle cx="510" cy="720" r="2.5" class="junction-dot"/>
+        <circle cx="584" cy="120" r="2.5" class="junction-dot"/>
+        <rect x="573.0" y="265.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="584" y="271.5" text-anchor="middle" class="wire-label" font-size="5">W045</text>
+        <text x="584" y="280.5" text-anchor="middle" class="wire-spec" font-size="4.5">22AWG → W3</text>
+        <!-- W046: 22AWG → W3 -->
+        <path d="M 510,750 L 550,750 L 550,1290" fill="none" class="wire-gnd"/>
+        <circle cx="510" cy="750" r="2.5" class="junction-dot"/>
+        <circle cx="550" cy="1290" r="2.5" class="junction-dot"/>
+        <rect x="539.0" y="1035.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="550" y="1041.5" text-anchor="middle" class="wire-label" font-size="5">W046</text>
+        <text x="550" y="1050.5" text-anchor="middle" class="wire-spec" font-size="4.5">22AWG → W3</text>
+        <!-- W047: 22AWG → W3 -->
+        <path d="M 1812,120 L 1812,305 L 1830,305" fill="none" class="wire-power"/>
+        <circle cx="1812" cy="120" r="2.5" class="junction-dot"/>
+        <circle cx="1830" cy="305" r="2.5" class="junction-dot"/>
+        <rect x="1801.0" y="240.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1812" y="246.5" text-anchor="middle" class="wire-label" font-size="5">W047</text>
+        <text x="1812" y="255.5" text-anchor="middle" class="wire-spec" font-size="4.5">22AWG → W3</text>
+        <!-- W048: 22AWG → W3 -->
+        <path d="M 1830,335 L 1812,335 L 1812,1290" fill="none" class="wire-gnd"/>
+        <circle cx="1830" cy="335" r="2.5" class="junction-dot"/>
+        <circle cx="1812" cy="1290" r="2.5" class="junction-dot"/>
+        <rect x="1801.0" y="390.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1812" y="396.5" text-anchor="middle" class="wire-label" font-size="5">W048</text>
+        <text x="1812" y="405.5" text-anchor="middle" class="wire-spec" font-size="4.5">22AWG → W3</text>
+        <!-- W049: 26AWG → W3 -->
+        <path d="M 1330,480 L 1355,480 L 1355,192 L 1780,192 L 1780,275 L 1830,275" fill="none" class="wire-signal"/>
+        <circle cx="1330" cy="480" r="2.5" class="junction-dot"/>
+        <circle cx="1830" cy="275" r="2.5" class="junction-dot"/>
+        <rect x="1509.0" y="175.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1520" y="181.5" text-anchor="middle" class="wire-label" font-size="5">W049</text>
+        <text x="1520" y="190.5" text-anchor="middle" class="wire-spec" font-size="4.5">26AWG → W3</text>
+        <!-- W050: 18AWG → W3 -->
+        <path d="M 1794,95 L 1794,520 L 1830,520" fill="none" class="wire-power"/>
+        <circle cx="1794" cy="95" r="2.5" class="junction-dot"/>
+        <circle cx="1830" cy="520" r="2.5" class="junction-dot"/>
+        <rect x="1790.5" y="468" width="7" height="16" rx="1" fill="var(--bg)" stroke="var(--line)" stroke-width="0.9"/>
+        <line x1="1794" y1="468" x2="1794" y2="484" stroke="var(--line)" stroke-width="0.6"/>
+        <text x="1803.5" y="475" text-anchor="middle" font-size="4.2" font-weight="700" fill="var(--fg)">F2</text>
+        <text x="1803.5" y="481" text-anchor="middle" font-size="4.2" font-weight="700" fill="var(--fg)">5A</text>
+        <rect x="1783.0" y="440.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1794" y="446.5" text-anchor="middle" class="wire-label" font-size="5">W050</text>
+        <text x="1794" y="455.5" text-anchor="middle" class="wire-spec" font-size="4.5">18AWG → W3</text>
+        <!-- W051: 18AWG → W3 -->
+        <path d="M 1830,550 L 1794,550 L 1794,1290" fill="none" class="wire-gnd"/>
+        <circle cx="1830" cy="550" r="2.5" class="junction-dot"/>
+        <circle cx="1794" cy="1290" r="2.5" class="junction-dot"/>
+        <rect x="1783.0" y="715.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1794" y="721.5" text-anchor="middle" class="wire-label" font-size="5">W051</text>
+        <text x="1794" y="730.5" text-anchor="middle" class="wire-spec" font-size="4.5">18AWG → W3</text>
+        <!-- W052: 26AWG → W3 -->
+        <path d="M 1776,170 L 1776,580 L 1830,580" fill="none" class="wire-power"/>
+        <circle cx="1776" cy="170" r="2.5" class="junction-dot"/>
+        <circle cx="1830" cy="580" r="2.5" class="junction-dot"/>
+        <rect x="1765.0" y="490.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1776" y="496.5" text-anchor="middle" class="wire-label" font-size="5">W052</text>
+        <text x="1776" y="505.5" text-anchor="middle" class="wire-spec" font-size="4.5">26AWG → W3</text>
+        <!-- W053: 26AWG → W3 -->
+        <path d="M 1830,610 L 1776,610 L 1776,1290" fill="none" class="wire-gnd"/>
+        <circle cx="1830" cy="610" r="2.5" class="junction-dot"/>
+        <circle cx="1776" cy="1290" r="2.5" class="junction-dot"/>
+        <rect x="1765.0" y="775.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1776" y="781.5" text-anchor="middle" class="wire-label" font-size="5">W053</text>
+        <text x="1776" y="790.5" text-anchor="middle" class="wire-spec" font-size="4.5">26AWG → W3</text>
+        <!-- W054: 26AWG → W3 -->
+        <path d="M 1330,460 L 1345,460 L 1345,640 L 1830,640" fill="none" class="wire-signal"/>
+        <circle cx="1330" cy="460" r="2.5" class="junction-dot"/>
+        <circle cx="1830" cy="640" r="2.5" class="junction-dot"/>
+        <rect x="1509.0" y="621.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1520" y="627.5" text-anchor="middle" class="wire-label" font-size="5">W054</text>
+        <text x="1520" y="636.5" text-anchor="middle" class="wire-spec" font-size="4.5">26AWG → W3</text>
+        <!-- W055: 18AWG → W3 -->
+        <path d="M 1950,520 L 2015,520" fill="none" class="wire-power"/>
+        <circle cx="1950" cy="520" r="2.5" class="junction-dot"/>
+        <circle cx="2015" cy="520" r="2.5" class="junction-dot"/>
+        <rect x="1972.0" y="497.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1982" y="503.5" text-anchor="middle" class="wire-label" font-size="5">W055</text>
+        <text x="1982" y="512.5" text-anchor="middle" class="wire-spec" font-size="4.5">18AWG → W3</text>
+        <!-- W056: 18AWG → W3 -->
+        <path d="M 1950,580 L 2015,580" fill="none" class="wire-power"/>
+        <circle cx="1950" cy="580" r="2.5" class="junction-dot"/>
+        <circle cx="2015" cy="580" r="2.5" class="junction-dot"/>
+        <rect x="1972.0" y="557.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1982" y="563.5" text-anchor="middle" class="wire-label" font-size="5">W056</text>
+        <text x="1982" y="572.5" text-anchor="middle" class="wire-spec" font-size="4.5">18AWG → W3</text>
+        <!-- W057: 22AWG → W3 -->
+        <path d="M 1960,520 L 1960,670 L 1965,670" fill="none" class="wire-signal"/>
+        <circle cx="1960" cy="520" r="2.5" class="junction-dot"/>
+        <circle cx="1965" cy="670" r="2.5" class="junction-dot"/>
+        <rect x="1950.0" y="705.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1960" y="711.5" text-anchor="middle" class="wire-label" font-size="5">W057</text>
+        <text x="1960" y="720.5" text-anchor="middle" class="wire-spec" font-size="4.5">22AWG → W3</text>
+        <!-- W058: 22AWG → W3 -->
+        <path d="M 1995,670 L 2002,670 L 2002,580" fill="none" class="wire-signal"/>
+        <circle cx="1995" cy="670" r="2.5" class="junction-dot"/>
+        <circle cx="2002" cy="580" r="2.5" class="junction-dot"/>
+        <rect x="1992.0" y="705.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="2002" y="711.5" text-anchor="middle" class="wire-label" font-size="5">W058</text>
+        <text x="2002" y="720.5" text-anchor="middle" class="wire-spec" font-size="4.5">22AWG → W3</text>
+        <!-- W059: 26AWG → W4 -->
+        <path d="M 1330,520 L 1385,520 L 1385,204 L 2085,204 L 2085,270 L 2130,270" fill="none" class="wire-signal"/>
+        <circle cx="1330" cy="520" r="2.5" class="junction-dot"/>
+        <circle cx="2130" cy="270" r="2.5" class="junction-dot"/>
+        <rect x="2075.0" y="235.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="2085" y="241.5" text-anchor="middle" class="wire-label" font-size="5">W059</text>
+        <text x="2085" y="250.5" text-anchor="middle" class="wire-spec" font-size="4.5">26AWG → W4</text>
+        <!-- W060: 26AWG → W4 -->
+        <path d="M 2250,270 L 2275,270 L 2275,1290" fill="none" class="wire-gnd"/>
+        <circle cx="2250" cy="270" r="2.5" class="junction-dot"/>
+        <circle cx="2275" cy="1290" r="2.5" class="junction-dot"/>
+        <rect x="2265.0" y="390.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="2275" y="396.5" text-anchor="middle" class="wire-label" font-size="5">W060</text>
+        <text x="2275" y="405.5" text-anchor="middle" class="wire-spec" font-size="4.5">26AWG → W4</text>
+        <!-- W061: 26AWG → W4 -->
+        <path d="M 1330,540 L 1400,540 L 1400,216 L 2065,216 L 2065,310 L 2130,310" fill="none" class="wire-signal"/>
+        <circle cx="1330" cy="540" r="2.5" class="junction-dot"/>
+        <circle cx="2130" cy="310" r="2.5" class="junction-dot"/>
+        <rect x="2055.0" y="277.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="2065" y="283.5" text-anchor="middle" class="wire-label" font-size="5">W061</text>
+        <text x="2065" y="292.5" text-anchor="middle" class="wire-spec" font-size="4.5">26AWG → W4</text>
+        <!-- W062: 26AWG → W4 -->
+        <path d="M 2250,310 L 2295,310 L 2295,1290" fill="none" class="wire-gnd"/>
+        <circle cx="2250" cy="310" r="2.5" class="junction-dot"/>
+        <circle cx="2295" cy="1290" r="2.5" class="junction-dot"/>
+        <rect x="2285.0" y="430.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="2295" y="436.5" text-anchor="middle" class="wire-label" font-size="5">W062</text>
+        <text x="2295" y="445.5" text-anchor="middle" class="wire-spec" font-size="4.5">26AWG → W4</text>
+        <!-- W063: 26AWG → W4 -->
+        <path d="M 1330,500 L 1370,500 L 1370,228 L 2045,228 L 2045,350 L 2130,350" fill="none" class="wire-signal"/>
+        <circle cx="1330" cy="500" r="2.5" class="junction-dot"/>
+        <circle cx="2130" cy="350" r="2.5" class="junction-dot"/>
+        <rect x="2035.0" y="321.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="2045" y="327.5" text-anchor="middle" class="wire-label" font-size="5">W063</text>
+        <text x="2045" y="336.5" text-anchor="middle" class="wire-spec" font-size="4.5">26AWG → W4</text>
+        <!-- W064: 26AWG → W4 -->
+        <path d="M 2250,350 L 2315,350 L 2315,1290" fill="none" class="wire-gnd"/>
+        <circle cx="2250" cy="350" r="2.5" class="junction-dot"/>
+        <circle cx="2315" cy="1290" r="2.5" class="junction-dot"/>
+        <rect x="2305.0" y="470.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="2315" y="476.5" text-anchor="middle" class="wire-label" font-size="5">W064</text>
+        <text x="2315" y="485.5" text-anchor="middle" class="wire-spec" font-size="4.5">26AWG → W4</text>
+        <!-- W065: 22AWG → W4 -->
+        <path d="M 2112,145 L 2112,480 L 2130,480" fill="none" class="wire-power"/>
+        <circle cx="2112" cy="145" r="2.5" class="junction-dot"/>
+        <circle cx="2130" cy="480" r="2.5" class="junction-dot"/>
+        <rect x="2102.0" y="390.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="2112" y="396.5" text-anchor="middle" class="wire-label" font-size="5">W065</text>
+        <text x="2112" y="405.5" text-anchor="middle" class="wire-spec" font-size="4.5">22AWG → W4</text>
+        <!-- W066: 26AWG → W4 -->
+        <path d="M 2190,510 L 2190,555" fill="none" class="wire-signal"/>
+        <circle cx="2190" cy="510" r="2.5" class="junction-dot"/>
+        <circle cx="2190" cy="555" r="2.5" class="junction-dot"/>
+        <rect x="2210.0" y="523.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="2220" y="529.5" text-anchor="middle" class="wire-label" font-size="5">W066</text>
+        <text x="2220" y="538.5" text-anchor="middle" class="wire-spec" font-size="4.5">26AWG → W4</text>
+        <!-- W067: 26AWG → W4 -->
+        <path d="M 1100,600 L 1070,600 L 1070,745 L 2112,745 L 2112,585 L 2130,585" fill="none" class="wire-signal"/>
+        <circle cx="1100" cy="600" r="2.5" class="junction-dot"/>
+        <circle cx="2130" cy="585" r="2.5" class="junction-dot"/>
+        <rect x="1569.0" y="727.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1580" y="733.5" text-anchor="middle" class="wire-label" font-size="5">W067</text>
+        <text x="1580" y="742.5" text-anchor="middle" class="wire-spec" font-size="4.5">26AWG → W4</text>
+        <!-- W068: 22AWG → W4 -->
+        <path d="M 2190,615 L 2190,640 L 2260,640 L 2260,1290" fill="none" class="wire-gnd"/>
+        <circle cx="2190" cy="615" r="2.5" class="junction-dot"/>
+        <circle cx="2260" cy="1290" r="2.5" class="junction-dot"/>
+        <rect x="2250.0" y="695.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="2260" y="701.5" text-anchor="middle" class="wire-label" font-size="5">W068</text>
+        <text x="2260" y="710.5" text-anchor="middle" class="wire-spec" font-size="4.5">22AWG → W4</text>
+        <!-- W069: 22AWG → W4 -->
+        <path d="M 1450,70 L 1450,290 L 1470,290" fill="none" class="wire-power"/>
+        <circle cx="1450" cy="70" r="2.5" class="junction-dot"/>
+        <circle cx="1470" cy="290" r="2.5" class="junction-dot"/>
+        <rect x="1440.0" y="240.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1450" y="246.5" text-anchor="middle" class="wire-label" font-size="5">W069</text>
+        <text x="1450" y="255.5" text-anchor="middle" class="wire-spec" font-size="4.5">22AWG → W4</text>
+        <!-- W082: 22AWG → W4 -->
+        <path d="M 1545,290 L 1600,290" fill="none" class="wire-power"/>
+        <circle cx="1545" cy="290" r="2.5" class="junction-dot"/>
+        <circle cx="1600" cy="290" r="2.5" class="junction-dot"/>
+        <rect x="1562.0" y="300.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1572" y="306.5" text-anchor="middle" class="wire-label" font-size="5">W082</text>
+        <text x="1572" y="315.5" text-anchor="middle" class="wire-spec" font-size="4.5">22AWG → W4</text>
+        <!-- W070: 22AWG → W4 -->
+        <path d="M 1645,400 L 1645,445" fill="none" class="wire-signal"/>
+        <circle cx="1645" cy="400" r="2.5" class="junction-dot"/>
+        <circle cx="1645" cy="445" r="2.5" class="junction-dot"/>
+        <rect x="1605.0" y="415.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1615" y="421.5" text-anchor="middle" class="wire-label" font-size="5">W070</text>
+        <text x="1615" y="430.5" text-anchor="middle" class="wire-spec" font-size="4.5">22AWG → W4</text>
+        <!-- W071: 26AWG → W4 -->
+        <path d="M 1330,560 L 1425,560 L 1425,475 L 1585,475" fill="none" class="wire-signal"/>
+        <circle cx="1330" cy="560" r="2.5" class="junction-dot"/>
+        <circle cx="1585" cy="475" r="2.5" class="junction-dot"/>
+        <rect x="1495.0" y="455.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1505" y="461.5" text-anchor="middle" class="wire-label" font-size="5">W071</text>
+        <text x="1505" y="470.5" text-anchor="middle" class="wire-spec" font-size="4.5">26AWG → W4</text>
+        <!-- W072: 22AWG → W4 -->
+        <path d="M 1645,505 L 1645,1290" fill="none" class="wire-gnd"/>
+        <circle cx="1645" cy="505" r="2.5" class="junction-dot"/>
+        <circle cx="1645" cy="1290" r="2.5" class="junction-dot"/>
+        <rect x="1635.0" y="555.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1645" y="561.5" text-anchor="middle" class="wire-label" font-size="5">W072</text>
+        <text x="1645" y="570.5" text-anchor="middle" class="wire-spec" font-size="4.5">22AWG → W4</text>
+        <!-- W073: 22AWG → W4 -->
+        <path d="M 1582,290 L 1582,250 L 1730,250 L 1730,295" fill="none" class="wire-signal"/>
+        <circle cx="1582" cy="290" r="2.5" class="junction-dot"/>
+        <circle cx="1730" cy="295" r="2.5" class="junction-dot"/>
+        <rect x="1645.0" y="231.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1655" y="237.5" text-anchor="middle" class="wire-label" font-size="5">W073</text>
+        <text x="1655" y="246.5" text-anchor="middle" class="wire-spec" font-size="4.5">22AWG → W4</text>
+        <!-- W074: 22AWG → W4 -->
+        <path d="M 1730,345 L 1730,415 L 1645,415" fill="none" class="wire-signal"/>
+        <circle cx="1730" cy="345" r="2.5" class="junction-dot"/>
+        <circle cx="1645" cy="415" r="2.5" class="junction-dot"/>
+        <rect x="1720.0" y="375.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1730" y="381.5" text-anchor="middle" class="wire-label" font-size="5">W074</text>
+        <text x="1730" y="390.5" text-anchor="middle" class="wire-spec" font-size="4.5">22AWG → W4</text>
+        <!-- W075: 14AWG → W4 -->
+        <path d="M 1430,70 L 1430,375 L 1600,375" fill="none" class="wire-power"/>
+        <circle cx="1430" cy="70" r="2.5" class="junction-dot"/>
+        <circle cx="1600" cy="375" r="2.5" class="junction-dot"/>
+        <rect x="1505.0" y="355.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1515" y="361.5" text-anchor="middle" class="wire-label" font-size="5">W075</text>
+        <text x="1515" y="370.5" text-anchor="middle" class="wire-spec" font-size="4.5">14AWG → W4</text>
+        <!-- W076: 14AWG → W4 -->
+        <path d="M 1695,375 L 1755,375 L 1755,95" fill="none" class="wire-power"/>
+        <circle cx="1695" cy="375" r="2.5" class="junction-dot"/>
+        <circle cx="1755" cy="95" r="2.5" class="junction-dot"/>
+        <rect x="1745.0" y="255.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="1755" y="261.5" text-anchor="middle" class="wire-label" font-size="5">W076</text>
+        <text x="1755" y="270.5" text-anchor="middle" class="wire-spec" font-size="4.5">14AWG → W4</text>
+        <!-- W077: 22AWG → W4 -->
+        <path d="M 2025,70 L 2025,420 L 2100,420 L 2100,860 L 2130,860" fill="none" class="wire-power"/>
+        <circle cx="2025" cy="70" r="2.5" class="junction-dot"/>
+        <circle cx="2130" cy="860" r="2.5" class="junction-dot"/>
+        <rect x="2090.0" y="805.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="2100" y="811.5" text-anchor="middle" class="wire-label" font-size="5">W077</text>
+        <text x="2100" y="820.5" text-anchor="middle" class="wire-spec" font-size="4.5">22AWG → W4</text>
+        <!-- W078: 22AWG → W4 -->
+        <path d="M 2190,890 L 2190,1290" fill="none" class="wire-gnd"/>
+        <circle cx="2190" cy="890" r="2.5" class="junction-dot"/>
+        <circle cx="2190" cy="1290" r="2.5" class="junction-dot"/>
+        <rect x="2180.0" y="955.5" width="20" height="8" rx="1.5" class="wire-tag"/>
+        <text x="2190" y="961.5" text-anchor="middle" class="wire-label" font-size="5">W078</text>
+        <text x="2190" y="970.5" text-anchor="middle" class="wire-spec" font-size="4.5">22AWG → W4</text>
+          </g>
+
+          <!-- ========================================================== -->
+          <!--      RODAPÉ TÉCNICO: LEGENDA, NOTAS E CARIMBO A1           -->
+          <!-- ========================================================== -->
+          <g id="legenda-pg">
+            <rect x="40" y="1330" width="540" height="310" rx="3" fill="var(--bg)" stroke="var(--line)" stroke-width="1.2"/>
+            <rect x="40" y="1330" width="540" height="22" fill="var(--header-bg)" stroke="var(--line)" stroke-width="1"/>
+            <text x="310" y="1345" text-anchor="middle" font-size="8" font-weight="700" fill="var(--fg)">LEGENDA DE BARRAMENTOS, CONDUTORES E SÍMBOLOS CAD</text>
+            <line x1="55" y1="1375" x2="125" y2="1375" class="wire-power" stroke-width="2.2"/>
+            <text x="140" y="1378" font-size="6.5" font-weight="700" fill="var(--fg)">Barramentos e Linhas de Potência (+12V, +12V_AT, +6V_SV, +5V, +3V3)</text>
+            <line x1="55" y1="1405" x2="125" y2="1405" class="wire-gnd" stroke-width="1.8"/>
+            <text x="140" y="1408" font-size="6.5" font-weight="700" fill="var(--fg)">Retorno Comum (GND 0V Unificado) e Proteção Equipotencial (PE ⏚)</text>
+            <line x1="55" y1="1435" x2="125" y2="1435" class="wire-signal" stroke-width="1.2"/>
+            <text x="140" y="1438" font-size="6.5" font-weight="700" fill="var(--fg)">Linhas de Sinal, Sensores, Clamps e Comandos PWM / GPIO (3,3V / 5V)</text>
+            <text x="55" y="1475" font-size="6" font-weight="700" fill="var(--fg)">CÓDIGO DE CORES DE CONDUTORES (NBR 5410 / NR-12):</text>
+            <text x="55" y="1495" font-size="5.5" fill="var(--dim)">• VM (Vermelho): +12V / +6V / +5V Potência e LED Vermelho | PT / BK (Preto): GND 0V e Sinais Sensores</text>
+            <text x="55" y="1513" font-size="5.5" fill="var(--dim)">• AZ / BU (Azul): Neutro AC (1,0 mm²) e +5V Sensores (0,5 mm²) | VD (Verde): Terra PE ⏚ e LED Verde</text>
+            <text x="55" y="1531" font-size="5.5" fill="var(--dim)">• BN (Marrom): +12V_AT Buck Servo e Coletor Buzzer/Relé | AM (Amarelo): LED Amarelo e PWM Motor</text>
+            <text x="55" y="1549" font-size="5.5" fill="var(--dim)">• LJ (Laranja): Comando Base Q1/Q2 | Vi (Violeta): Rail +3,3V | JMP (H06): Jumpers na Protoboard E26</text>
+            <text x="55" y="1580" font-size="6" font-weight="700" fill="var(--fg)">REFERÊNCIA CRUZADA ENTRE FOLHAS:</text>
+            <text x="55" y="1598" font-size="5.5" fill="var(--dim)">• W001–W020, W083 → Folha W1 | W021–W042, W079–W081 → Folha W2 | W043–W058 → Folha W3 | W059–W078, W082 → Folha W4</text>
+          </g>
+
+          <g id="notas-pg">
+            <rect x="600" y="1330" width="1140" height="310" rx="3" fill="var(--bg)" stroke="var(--line)" stroke-width="1.2"/>
+            <rect x="600" y="1330" width="1140" height="22" fill="var(--header-bg)" stroke="var(--line)" stroke-width="1"/>
+            <text x="1170" y="1345" text-anchor="middle" font-size="8" font-weight="700" fill="var(--fg)">NOTAS TÉCNICAS OBRIGATÓRIAS DE SEGURANÇA (NR-12), MONTAGEM E FIRMWARE</text>
+            <text x="615" y="1375" font-size="6.5" font-weight="700" fill="var(--fg)">1. NOTA DE MONTAGEM — PROTOBOARD E26 (OMITIDA NO ESQUEMÁTICO GERAL):</text>
+            <text x="615" y="1393" font-size="5.8" fill="var(--dim)">Circuitos de clamp (E11 1kΩ + E10 BAT54S), resistores de pull-down (E30 10kΩ), drivers NPN (Q1/Q2 BC337-40) e barramentos lógicos (+5V, +3V3, GND)</text>
+            <text x="615" y="1409" font-size="5.8" fill="var(--dim)">são montados fisicamente na Protoboard 830 pontos E26 (jumpers W032–W042 e W079–W081) — ver Folha de Detalhe W2. Correntes de potência correm FORA da E26.</text>
+            <text x="615" y="1438" font-size="6.5" font-weight="700" fill="var(--fg)">2. ARQUITETURA DE SEGURANÇA NR-12 (DUPLO CANAL DE EMERGÊNCIA E12):</text>
+            <text x="615" y="1456" font-size="5.8" fill="var(--dim)">• Canal 1 (Hardware Puro): O bloco NF2 E12-B (21-22, fios W069/W082) interrompe fisicamente a bobina 85 do Relé K1 (E08), cortando +12V_AT (Motor M13 e</text>
+            <text x="615" y="1472" font-size="5.8" fill="var(--dim)">  Buck 6V do Servo E02/H02) instantaneamente mesmo em caso de travamento de software no ESP32.</text>
+            <text x="615" y="1488" font-size="5.8" fill="var(--dim)">• Canal 2 (Diagnóstico Firmware Fail-Safe): O bloco NF1 E12-A (11-12, fios W027/W028/W081) mantém GPIO27 aterrado (LOW) em operação normal. Se o botão for</text>
+            <text x="615" y="1504" font-size="5.8" fill="var(--dim)">  pressionado OU o cabo de campo romper, o pull-up interno leva GPIO27 a HIGH (read_estop() == HIGH), acionando parada por software, LED Vermelho e Buzzer.</text>
+            <text x="615" y="1533" font-size="6.5" font-weight="700" fill="var(--fg)">3. PROTEÇÃO DE NÍVEL LÓGICO 3,3V E ATERRAMENTO FUNCIONAL/PROTETIVO:</text>
+            <text x="615" y="1551" font-size="5.8" fill="var(--dim)">• Sensores ópticos S1 (H04) e S2 (E07) operam em 5V e têm seus sinais limitados em ~3,55V pelo divisor/clamp série 1kΩ (E11) + Schottky duplo BAT54S (E10).</text>
+            <text x="615" y="1567" font-size="5.8" fill="var(--dim)">• Condutor PE verde (W003, 1,0 mm²) conectado obrigatoriamente ao borne ⏚ da carcaça metálica da fonte chaveada E01 e à estrutura metálica da esteira.</text>
+            <text x="615" y="1583" font-size="5.8" fill="var(--dim)">• Balanço de Potência Fonte E01 (12V 10A = 120W): Consumo nominal contínuo ≈ 2,8 A (34W); pico máximo simultâneo (motor stall + servo stall) ≈ 6,1 A (margem 39%).</text>
+            <text x="615" y="1598" font-size="6.2" font-weight="700" fill="var(--fg)">4. REVISÃO C (08/11/2026) — CORREÇÕES DA AUDITORIA TÉCNICA:</text>
+            <text x="615" y="1610" font-size="5.4" fill="var(--dim)">• W083 (1,0 mm² PT) liga X1:6 direto ao Barramento GND (= bornes X1:6…X1:8 em ponte): nenhum retorno de motor/servo passa mais por dentro dos bucks E02/E03. • W015 passa a ser VM (vermelho).</text>
+            <text x="615" y="1622" font-size="5.4" fill="var(--dim)">• Barramentos desenhados = bornes físicos: +12V = X1:1/X1:2 (W075 sai do X1:1; W069 e W077 do X1:2), +12V_AT = X1:3. • Fusíveis E16 em série: F2 5A no W050, F3 3A no W011, F4 1A no W015.</text>
+            <text x="615" y="1634" font-size="5.4" fill="var(--dim)">• ESP32: ligar pela SERIGRAFIA (posições do desenho são lógicas). • Faixa (K) do E09 no pino 85 e do E05 no M+. • BAT54S: pino 3 = sinal, pino 2 = 3V3, pino 1 = GND. • Fonte: conferir etiqueta e chave 115/230V.</text>
+          </g>
+
+          <g id="carimbo-pg">
+            <rect x="1760" y="1330" width="575" height="310" rx="3" fill="var(--header-bg)" stroke="var(--line)" stroke-width="1.8"/>
+            <line x1="1760" y1="1385" x2="2335" y2="1385" stroke="var(--line)" stroke-width="1"/>
+            <line x1="1760" y1="1455" x2="2335" y2="1455" stroke="var(--line)" stroke-width="1"/>
+            <line x1="1760" y1="1545" x2="2335" y2="1545" stroke="var(--line)" stroke-width="1"/>
+            <line x1="2047" y1="1545" x2="2047" y2="1640" stroke="var(--line)" stroke-width="0.8"/>
+            <text x="2047" y="1355" text-anchor="middle" font-size="11" font-weight="700" fill="var(--fg)">FUNDAÇÃO CENTRO DE ANÁLISE, PESQUISA E INOVAÇÃO — FUCAPI</text>
+            <text x="2047" y="1374" text-anchor="middle" font-size="8" fill="var(--dim)">FEIRA TECNOLÓGICA FUCAPI 2026 — ENGENHARIA ELÉTRICA E COMPUTAÇÃO</text>
+            <text x="2047" y="1415" text-anchor="middle" font-size="12" font-weight="700" fill="var(--fg)">AMAZONVISION 4.0 — PLANTA ELÉTRICA GERAL</text>
+            <text x="2047" y="1438" text-anchor="middle" font-size="8" fill="var(--dim)">ESTEIRA SELETORA DE MAÇÃS COM VISÃO COMPUTACIONAL, ESP32 E SEGURANÇA NR-12</text>
+            <text x="1780" y="1480" font-size="7" font-weight="700" fill="var(--fg)">RESUMO DA PLANTA:</text>
+            <text x="1780" y="1500" font-size="6.5" fill="var(--dim)">• 83 Condutores Numerados (W001 a W083) | 11 GPIOs Ativos no ESP32 (H01)</text>
+            <text x="1780" y="1518" font-size="6.5" fill="var(--dim)">• 6 Barramentos DC (+12V, +12V_AT, +6V_SV, +5V, +3V3, GND) + Malha PE ⏚</text>
+            <text x="1780" y="1536" font-size="6.5" fill="var(--dim)">• Conformidade: ABNT NBR 5410, IEC 60617, NR-12 (Parada de Emergência Duplo Canal)</text>
+            <text x="1903" y="1572" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">FORMATO: A1 (2378×1682)</text>
+            <text x="1903" y="1595" text-anchor="middle" font-size="7" fill="var(--dim)">DATA: NOVEMBRO / 2026</text>
+            <text x="1903" y="1618" text-anchor="middle" font-size="7" fill="var(--dim)">AUDITORIA: REV. C — 08/11/2026</text>
+            <text x="2191" y="1575" text-anchor="middle" font-size="10" font-weight="700" fill="var(--fg)">FOLHA: PG 1/1</text>
+            <text x="2191" y="1605" text-anchor="middle" font-size="9" font-weight="700" fill="var(--fg)">REVISÃO: C (PÓS-AUDITORIA)</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL DE EXPORTAÇÃO PDF -->
+  <div id="export-modal" class="export-modal-backdrop" onclick="handleBackdropClick(event)">
+    <div class="export-modal-card">
+      <div class="export-modal-header">
+        <h3>📄 Exportar Desenho Técnico para PDF</h3>
+        <button class="export-modal-close" onclick="closeExportModal()" title="Fechar">✕</button>
+      </div>
+      <div class="export-modal-body">
+        <div class="export-info-box">
+          <strong>📐 Configuração Automática de Impressão:</strong><br>
+          Orientação <strong>Paisagem (Landscape)</strong> com enquadramento proporcional de <strong>1 folha por página</strong>, pronta para impressão direta em papel <strong>A4</strong> ou <strong>A3</strong>.
+        </div>
+
+        <div class="export-options-list">
+          <label class="export-option-item">
+            <input type="radio" name="export-scope" value="current" id="opt-current">
+            <div class="export-option-text">
+              <span class="export-option-title" id="lbl-current-sheet">Folha Atual Visualizada (1 Página)</span>
+              <span class="export-option-desc">Gera um PDF contendo exatamente a folha que você está inspecionando agora.</span>
+            </div>
+          </label>
+
+          <label class="export-option-item">
+            <input type="radio" name="export-scope" value="planta" id="opt-planta" checked>
+            <div class="export-option-text">
+              <span class="export-option-title">Planta Geral A1 Integrada (1 Página) [Recomendado]</span>
+              <span class="export-option-desc">Esquemático completo com todos os 82 fios (W001–W082), 6 barramentos e carimbo FUCAPI.</span>
+            </div>
+          </label>
+
+          <label class="export-option-item">
+            <input type="radio" name="export-scope" value="interligacoes" id="opt-interligacoes">
+            <div class="export-option-text">
+              <span class="export-option-title">Caderno de Interligações W1–W5 (5 Páginas)</span>
+              <span class="export-option-desc">5 páginas (1 por folha): W1 Alimentação, W2 Sensores, W3 Atuadores, W4 Sinalização, W5 Tabela.</span>
+            </div>
+          </label>
+
+          <label class="export-option-item">
+            <input type="radio" name="export-scope" value="blocos" id="opt-blocos">
+            <div class="export-option-text">
+              <span class="export-option-title">Caderno de Componentes — Blocos 1–9 (9 Páginas)</span>
+              <span class="export-option-desc">9 páginas (1 por bloco) com pinagem real e mecânica de cada peça.</span>
+            </div>
+          </label>
+
+          <label class="export-option-item">
+            <input type="radio" name="export-scope" value="select-single" id="opt-specific">
+            <div class="export-option-text">
+              <span class="export-option-title">Folha Específica Individual (1 Página)</span>
+              <span class="export-option-desc">Selecione uma única folha para exportação:</span>
+              <select id="select-specific-sheet" class="export-sheet-select" onclick="document.getElementById('opt-specific').checked=true">
+                <optgroup label="Aba 3 — Planta Geral">
+                  <option value="planta-geral" selected>Planta Geral A1 (Esquemático Integrado)</option>
+                </optgroup>
+                <optgroup label="Aba 2 — Interligações Ponto a Ponto">
+                  <option value="wiring-1">Folha W1 — Alimentação e Distribuição</option>
+                  <option value="wiring-2">Folha W2 — Sensores Ópticos e E-STOP</option>
+                  <option value="wiring-3">Folha W3 — Atuadores (Servo e Motor)</option>
+                  <option value="wiring-4">Folha W4 — Sinalização, Buzzer e Relé K1</option>
+                  <option value="wiring-5">Folha W5 — Tabela Geral e Unifilar</option>
+                </optgroup>
+                <optgroup label="Aba 1 — Componentes">
+                  <option value="bloco-1">Bloco 1 — ESP32 DevKit V1 (30 pinos)</option>
+                  <option value="bloco-2">Bloco 2 — Fontes e Bucks (E01, E02, E03)</option>
+                  <option value="bloco-3">Bloco 3 — Proteções e Relé (E15, E16, E08, E09)</option>
+                  <option value="bloco-4">Bloco 4 — Sensores S1/S2 e E-STOP (H04, E07, E12)</option>
+                  <option value="bloco-5">Bloco 5 — Atuadores (H02 Servo, H03, M13 Motor)</option>
+                  <option value="bloco-6">Bloco 6 — Drivers (E04 MOSFET, E05, E10 Clamps)</option>
+                  <option value="bloco-7">Bloco 7 — Passivos e LEDs (E06, E11, H05)</option>
+                  <option value="bloco-8">Bloco 8 — Auxiliares (E13 Ring Light, E25 Buzzer, E26)</option>
+                  <option value="bloco-9">Bloco 9 — Bornes e Caixa (X1, X2, E17, E18, E27)</option>
+                </optgroup>
+              </select>
+            </div>
+          </label>
+
+          <label class="export-option-item">
+            <input type="radio" name="export-scope" value="all" id="opt-all">
+            <div class="export-option-text">
+              <span class="export-option-title">Caderno Completo do Projeto (15 Páginas)</span>
+              <span class="export-option-desc">Reúne os 9 blocos de componentes + as 5 folhas de fiação + a Planta Geral.</span>
+            </div>
+          </label>
+        </div>
+
+        <div style="font-size: 10px; color: var(--dim); line-height: 1.4;">
+          💡 <em>Na janela de impressão do navegador, certifique-se de que o destino seja <strong>"Salvar como PDF"</strong> e o papel esteja configurado em <strong>A4</strong> ou <strong>A3</strong>.</em>
+        </div>
+      </div>
+      <div class="export-modal-footer">
+        <button class="theme-toggle-btn" onclick="closeExportModal()">CANCELAR</button>
+        <button class="btn-export-confirm" onclick="executePdfExport()">🖨️ IMPRIMIR / SALVAR PDF</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
+
+  <!-- DOCK INFERIOR RETRÁTIL (MONITOR SERIAL & MULTÍMETRO) -->
+  <div id="sim-dock" class="sim-dock">
+    <div class="sim-dock-header" onclick="toggleDock()">
+      <div class="sim-dock-title">
+        <span>⚡ PAINEL DE CONTROLE DE BANCADA & TELEMETRIA IoT</span>
+        <span id="dock-arrow" style="font-size:12px; color:var(--dim);">▼ (Clique para recolher)</span>
+      </div>
+      <div class="sim-dock-tabs" onclick="event.stopPropagation()">
+        <button id="tab-btn-term" class="sim-dock-tab-btn active" onclick="switchDockTab('terminal')">MONITOR SERIAL (115200 BPS)</button>
+        <button id="tab-btn-meters" class="sim-dock-tab-btn" onclick="switchDockTab('meters')">MULTÍMETRO DIGITAL VIRTUAL</button>
+      </div>
+    </div>
+    <div class="sim-dock-body">
+      <!-- CONSOLE SERIAL -->
+      <div id="sim-terminal" class="sim-terminal"></div>
+
+      <!-- INSTRUMENTOS / MEDIÇÕES -->
+      <div id="sim-meters" class="sim-meters-grid" style="display:none;">
+        <div class="meter-box">
+          <div class="meter-lbl">Barramento Geral +12V</div>
+          <div class="meter-val" id="meter-v12">12.02 V</div>
+        </div>
+        <div class="meter-box">
+          <div class="meter-lbl">+12V_AT (Atuadores Pós-K1)</div>
+          <div class="meter-val" id="meter-v12-at" style="color:#22c55e;">12.00 V</div>
+        </div>
+        <div class="meter-box">
+          <div class="meter-lbl">Saída Buck 6V (Servo H02)</div>
+          <div class="meter-val" id="meter-v6">6.00 V</div>
+        </div>
+        <div class="meter-box">
+          <div class="meter-lbl">Saída Buck 5V (ESP32/Sens)</div>
+          <div class="meter-val" id="meter-v5">5.01 V</div>
+        </div>
+        <div class="meter-box">
+          <div class="meter-lbl">Corrente Total Fonte E01</div>
+          <div class="meter-val" id="meter-curr">1.84 A</div>
+        </div>
+        <div class="meter-box">
+          <div class="meter-lbl">Status Relé de Segurança K1</div>
+          <div class="meter-val" id="meter-k1" style="color:#22c55e;">ATRACADO (ON)</div>
+        </div>
+        <div class="meter-box">
+          <div class="meter-lbl">Motor Esteira M13 (GA37)</div>
+          <div class="meter-val" id="meter-motor" style="color:#22c55e;">60 RPM (LIGADO)</div>
+        </div>
+        <div class="meter-box">
+          <div class="meter-lbl">Servo MG996R (Braço 3D)</div>
+          <div class="meter-val" id="meter-servo">0° (REPOUSO)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================================
+    //           SISTEMA DE TEMA CLARO / ESCURO                  //
+    // ==========================================================
+    function toggleTheme() {
+      var root = document.documentElement;
+      var curTheme = root.getAttribute('data-theme') || 'dark';
+      var newTheme = curTheme === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', newTheme);
+      var btn = document.getElementById('themeToggle');
+      if (btn) {
+        btn.textContent = newTheme === 'light' ? '[TEMA: CLARO]' : '[TEMA: ESCURO]';
+      }
+    }
+
+// ==========================================================
+    //           SISTEMA DE EXPORTAÇÃO PARA PDF (PAISAGEM)       //
+    // ==========================================================
+    function openExportModal() {
+      var modal = document.getElementById('export-modal');
+      if (!modal) return;
+
+      // Detecta a aba e folha atualmente ativas
+      var activeTab = document.querySelector('.tab-content.active');
+      var sheetTitle = 'Planta Geral A1';
+
+      if (activeTab) {
+        if (activeTab.id === 'tab-planta') {
+          sheetTitle = 'Planta Geral A1';
+          document.getElementById('opt-planta').checked = true;
+        } else if (activeTab.id === 'tab-interligacoes') {
+          sheetTitle = 'Folhas W1–W5';
+          document.getElementById('opt-interligacoes').checked = true;
+        } else if (activeTab.id === 'tab-componentes') {
+          sheetTitle = 'Blocos 1–9';
+          document.getElementById('opt-blocos').checked = true;
+        }
+      }
+
+      var lblCurrent = document.getElementById('lbl-current-sheet');
+      if (lblCurrent) {
+        lblCurrent.textContent = 'Folha Atual Visualizada (' + sheetTitle + ') — 1 Página';
+      }
+
+      modal.classList.add('open');
+    }
+
+    function closeExportModal() {
+      var modal = document.getElementById('export-modal');
+      if (modal) modal.classList.remove('open');
+    }
+
+    function handleBackdropClick(e) {
+      if (e.target && e.target.id === 'export-modal') {
+        closeExportModal();
+      }
+    }
+
+    // Tecla ESC fecha o modal
+    window.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' || e.keyCode === 27) {
+        closeExportModal();
+      }
+    });
+
+    function executePdfExport() {
+      var selected = document.querySelector('input[name="export-scope"]:checked');
+      var scope = selected ? selected.value : 'planta';
+      closeExportModal();
+      prepareAndPrint(scope);
+    }
+
+    function exportSingleSheet(sectionId) {
+      prepareAndPrint('single:' + sectionId);
+    }
+
+    function prepareAndPrint(scope) {
+      // Limpa classes anteriores de impressão
+      document.body.classList.remove('print-mode');
+      document.querySelectorAll('.tab-content').forEach(function(el) {
+        el.classList.remove('print-show-tab');
+      });
+      document.querySelectorAll('.sheet-section').forEach(function(el) {
+        el.classList.remove('print-include');
+      });
+
+      var targetSections = [];
+
+      if (scope === 'current') {
+        var activeTab = document.querySelector('.tab-content.active');
+        if (activeTab && activeTab.id === 'tab-planta') {
+          targetSections.push('planta-geral');
+        } else if (activeTab && activeTab.id === 'tab-interligacoes') {
+          // Busca a seção visível na viewport ou a primeira da aba
+          targetSections.push('wiring-1');
+        } else {
+          targetSections.push('bloco-1');
+        }
+      } else if (scope === 'planta') {
+        targetSections.push('planta-geral');
+      } else if (scope.indexOf('single:') === 0) {
+        var secId = scope.split(':')[1];
+        targetSections.push(secId);
+      } else if (scope === 'select-single') {
+        var selVal = document.getElementById('select-specific-sheet').value;
+        targetSections.push(selVal);
+      } else if (scope === 'interligacoes') {
+        targetSections = ['wiring-1', 'wiring-2', 'wiring-3', 'wiring-4', 'wiring-5'];
+      } else if (scope === 'blocos') {
+        targetSections = ['bloco-1', 'bloco-2', 'bloco-3', 'bloco-4', 'bloco-5', 'bloco-6', 'bloco-7', 'bloco-8', 'bloco-9'];
+      } else if (scope === 'all') {
+        targetSections = [
+          'bloco-1', 'bloco-2', 'bloco-3', 'bloco-4', 'bloco-5', 'bloco-6', 'bloco-7', 'bloco-8', 'bloco-9',
+          'wiring-1', 'wiring-2', 'wiring-3', 'wiring-4', 'wiring-5',
+          'planta-geral'
+        ];
+      }
+
+      // Aplica classes de impressão para os alvos
+      targetSections.forEach(function(id) {
+        var sec = document.getElementById(id);
+        if (sec) {
+          sec.classList.add('print-include');
+          var parentTab = sec.closest('.tab-content');
+          if (parentTab) {
+            parentTab.classList.add('print-show-tab');
+          }
+        }
+      });
+
+      document.body.classList.add('print-mode');
+
+      // Pequeno timeout para o navegador recalcular layout antes da chamada de print
+      setTimeout(function() {
+        window.print();
+      }, 100);
+    }
+
+    // Restaura o estado normal da tela ao concluir ou cancelar a impressão
+    window.addEventListener('afterprint', function() {
+      document.body.classList.remove('print-mode');
+      document.querySelectorAll('.tab-content').forEach(function(el) {
+        el.classList.remove('print-show-tab');
+      });
+      document.querySelectorAll('.sheet-section').forEach(function(el) {
+        el.classList.remove('print-include');
+      });
+    });
+  
+
+    // ==========================================================
+    //           MOTOR DE SIMULAÇÃO IoT & FIRMWARE ESP32         //
+    // ==========================================================
+
+    // Áudio Sintético via Web Audio API (Buzzer 2.3kHz e Relé K1)
+    var audioCtx = null;
+    var audioEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        try {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        } catch(e) {
+          console.warn("Web Audio indisponível.");
+        }
+      }
+    }
+
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      var btn = document.getElementById('btn-audio');
+      if (btn) {
+        btn.textContent = audioEnabled ? '🔊 SOM: ATIVADO' : '🔇 SOM: MUDO';
+      }
+    }
+
+    function playRelayClick(closing) {
+      if (!audioEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(closing ? 320 : 180, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.04);
+    }
+
+    function playBuzzerBeep() {
+      if (!audioEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(2300, audioCtx.currentTime); // Frequência típica de buzzer ativo
+      gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.12);
+    }
+
+    // Estado da Máquina (Espelhado no firmware main.cpp)
+    var SIM_RUNNING = true;
+    var STATE_ESTOP = false;
+    var MOTOR_ON = true;
+    var SERVO_ANGLE = 0; // 0 a 60 graus
+    var K1_ENERGIZED = true;
+    var SENSOR_S1_ACTIVE = false;
+    var SENSOR_S2_ACTIVE = false;
+    var SIM_TIME = 0;
+
+    function logSerial(msg) {
+      var term = document.getElementById('sim-terminal');
+      if (!term) return;
+      var ts = (SIM_TIME / 1000).toFixed(2);
+      term.textContent += '[' + ts + 's] ' + msg + '\n';
+      term.scrollTop = term.scrollHeight;
+    }
+
+    function toggleSimulation() {
+      SIM_RUNNING = !SIM_RUNNING;
+      document.getElementById('play-icon').textContent = SIM_RUNNING ? '⏸' : '▶';
+      document.getElementById('play-text').textContent = SIM_RUNNING ? 'PAUSAR SIMULAÇÃO' : 'INICIAR SIMULAÇÃO';
+      logSerial(SIM_RUNNING ? 'SIMULAÇÃO RETOMADA.' : 'SIMULAÇÃO PAUSADA.');
+    }
+
+    function resetSimulation() {
+      STATE_ESTOP = false;
+      MOTOR_ON = true;
+      SERVO_ANGLE = 0;
+      K1_ENERGIZED = true;
+      SENSOR_S1_ACTIVE = false;
+      SENSOR_S2_ACTIVE = false;
+      SIM_TIME = 0;
+      
+      var term = document.getElementById('sim-terminal');
+      if (term) term.textContent = '';
+      
+      logSerial('════════════════════════════════════════════════════════');
+      logSerial('BOOT: ESP32-DEVKIT V1 (240MHz) REINICIALIZADO COM SUCESSO');
+      logSerial('FIRMWARE: AmazonVision 4.0 (Rev. C - NR-12 Fail-Safe)');
+      logSerial('HAL: Configurando pinos: S1=25, S2=26, ESTOP=27, K1=4, MOTOR=19, SERVO=18');
+      logSerial('BOOT SEGURO: Pinos de potência acionados em LOW antes de OUTPUT');
+      logSerial('CANAL 1 (HARDWARE): E12-B NF2 fechado. Bobina 85 energizada.');
+      logSerial('CANAL 2 (DIAGNÓSTICO): E12-A NF1 fechado ao GND. GPIO27 = LOW (read_estop == 0)');
+      logSerial('RELÉ K1 ATRACADO: Barramento +12V_AT liberado para Atuadores.');
+      logSerial('ESTEIRA LIGADA: Motor GA37 acionado via MOSFET D4184 (GPIO19 HIGH).');
+      logSerial('SISTEMA PRONTO. Aguardando detecção de maçãs no Sensor S1...');
+      logSerial('════════════════════════════════════════════════════════');
+      
+      updateSimGraphics();
+    }
+
+    function toggleEstop() {
+      STATE_ESTOP = !STATE_ESTOP;
+      if (STATE_ESTOP) {
+        K1_ENERGIZED = false;
+        MOTOR_ON = false;
+        playRelayClick(false);
+        logSerial('🚨 ALERTA CRÍTICO: BOTÃO DE EMERGÊNCIA E12 PRESSIONADO!');
+        logSerial('  [HARDWARE] NF2 (21-22) aberto: Bobina K1 desenergizada instantaneamente!');
+        logSerial('  [SOFTWARE] NF1 (11-12) aberto: GPIO27 em HIGH via pull-up (read_estop == 1).');
+        logSerial('  [SEGURANÇA] Barramento +12V_AT CORTADO (0.0V). Motor e Servo sem energia.');
+        logSerial('  [ALARME] LED Vermelho ativo. Buzzer em pulsos de advertência sonoros.');
+      } else {
+        K1_ENERGIZED = true;
+        MOTOR_ON = true;
+        playRelayClick(true);
+        logSerial('🔓 BOTÃO DE EMERGÊNCIA DESTRAVADO (GIRADO).');
+        logSerial('  [RESET] K1 rearmado. +12V_AT restaurado. Sistema voltando à operação normal.');
+      }
+      updateSimGraphics();
+    }
+
+    function triggerSensor1() {
+      if (STATE_ESTOP) {
+        logSerial('AVISO: Sensor S1 acionado, mas o sistema está em PARADA DE EMERGÊNCIA.');
+        return;
+      }
+      SENSOR_S1_ACTIVE = true;
+      logSerial('🍏 SENSOR S1 (H04) ATIVADO: Maçã entrou na esteira transportadora.');
+      logSerial('  Sinal limitado em 3.55V pelo Clamp BAT54S. GPIO25 = LOW.');
+      updateSimGraphics();
+      setTimeout(function() {
+        SENSOR_S1_ACTIVE = false;
+        updateSimGraphics();
+      }, 500);
+    }
+
+    function triggerSensor2() {
+      if (STATE_ESTOP) return;
+      SENSOR_S2_ACTIVE = true;
+      logSerial('📍 SENSOR S2 (E07) ATIVADO: Maçã chegou na cúpula de visão computacional.');
+      updateSimGraphics();
+      setTimeout(function() {
+        SENSOR_S2_ACTIVE = false;
+        updateSimGraphics();
+      }, 500);
+    }
+
+    function injectApple(approved) {
+      if (STATE_ESTOP) {
+        alert('O sistema está em PARADA DE EMERGÊNCIA (E-STOP). Destrave o botão de emergência primeiro.');
+        return;
+      }
+      triggerSensor1();
+      logSerial('>> [HOST YOLOv8] Câmera E14 capturou imagem da maçã.');
+      setTimeout(function() {
+        triggerSensor2();
+        if (approved) {
+          logSerial('>> [DECISÃO VISÃO] Maçã APROVADA (Classe 1). Manter esteira contínua.');
+          SERVO_ANGLE = 0;
+        } else {
+          logSerial('>> [DECISÃO VISÃO] Maçã REJEITADA (Defeito). Acionando Servo MG996R (GPIO18 PWM 60°)...');
+          SERVO_ANGLE = 60;
+          setTimeout(function() {
+            logSerial('>> [SERVO] Braço retornou à posição neutra de repouso (0°).');
+            SERVO_ANGLE = 0;
+            updateSimGraphics();
+          }, 900);
+        }
+        updateSimGraphics();
+      }, 1200);
+    }
+
+    function updateSimGraphics() {
+      // 1. Status Display
+      var statusDisp = document.getElementById('sim-status-display');
+      var btnEstop = document.getElementById('btn-sim-estop');
+      if (statusDisp) {
+        if (STATE_ESTOP) {
+          statusDisp.className = 'sim-status-badge status-estop';
+          statusDisp.textContent = '🚨 ESTADO: EMERGÊNCIA (E-STOP ATIVO)';
+          if (btnEstop) btnEstop.textContent = '🔓 DESTRAVAR EMERGÊNCIA';
+        } else {
+          statusDisp.className = 'sim-status-badge status-normal';
+          statusDisp.textContent = '● ESTADO: OPERAÇÃO NORMAL (ARMADO)';
+          if (btnEstop) btnEstop.textContent = '🚨 BATER EMERGÊNCIA (E-STOP)';
+        }
+      }
+
+      // 2. Barramento +12V_AT
+      var railAt = document.getElementById('sim-rail-12v-at');
+      if (railAt) {
+        railAt.setAttribute('class', K1_ENERGIZED ? 'wire-power rail-at-powered' : 'wire-power rail-at-cut');
+      }
+
+      // 3. Relé K1 Texto
+      var k1Txt = document.getElementById('sim-k1-state');
+      if (k1Txt) {
+        k1Txt.textContent = K1_ENERGIZED ? '[30-87: FECHADO ✓]' : '[30-87: ABERTO ✕]';
+        k1Txt.setAttribute('fill', K1_ENERGIZED ? '#22c55e' : '#ef4444');
+      }
+
+      // 4. LEDs H05
+      var ledR = document.getElementById('sim-led-red');
+      var ledG = document.getElementById('sim-led-green');
+      var ledY = document.getElementById('sim-led-yellow');
+      if (ledR && ledG && ledY) {
+        if (STATE_ESTOP) {
+          ledR.setAttribute('class', 'led-glow-red');
+          ledG.setAttribute('class', 'led-off');
+          ledY.setAttribute('class', 'led-off');
+        } else {
+          ledR.setAttribute('class', 'led-off');
+          ledG.setAttribute('class', 'led-glow-green');
+          ledY.setAttribute('class', 'led-off');
+        }
+      }
+
+      // 5. Motor M13 Rotor
+      var rotor = document.getElementById('sim-motor-rotor');
+      if (rotor) {
+        rotor.style.display = MOTOR_ON ? 'block' : 'none';
+      }
+
+      // 6. Servo Arm
+      var arm = document.getElementById('sim-servo-arm');
+      var armTxt = document.getElementById('sim-servo-deg');
+      if (arm) {
+        arm.style.transform = 'rotate(' + (-SERVO_ANGLE) + 'deg)';
+      }
+      if (armTxt) {
+        armTxt.textContent = SERVO_ANGLE > 0 ? SERVO_ANGLE + '° (DESCARTE)' : '0° (LIVRE)';
+        armTxt.setAttribute('fill', SERVO_ANGLE > 0 ? '#ef4444' : '#f97316');
+      }
+
+      // 7. Buzzer Waves
+      var buzzerWaves = document.getElementById('sim-buzzer-waves');
+      if (buzzerWaves) {
+        buzzerWaves.style.display = STATE_ESTOP ? 'block' : 'none';
+      }
+
+      // 8. Sensores Visual Feed
+      var s1Block = document.getElementById('bloco-h04-pg');
+      if (s1Block) {
+        s1Block.style.opacity = SENSOR_S1_ACTIVE ? '0.7' : '1.0';
+      }
+      var s2Block = document.getElementById('bloco-e07-pg');
+      if (s2Block) {
+        s2Block.style.opacity = SENSOR_S2_ACTIVE ? '0.7' : '1.0';
+      }
+
+      // 9. Multímetro Virtual
+      var m12At = document.getElementById('meter-v12-at');
+      var mCurr = document.getElementById('meter-curr');
+      var mK1 = document.getElementById('meter-k1');
+      var mMotor = document.getElementById('meter-motor');
+      var mServo = document.getElementById('meter-servo');
+      
+      if (m12At) {
+        m12At.textContent = K1_ENERGIZED ? '12.00 V' : '0.00 V';
+        m12At.style.color = K1_ENERGIZED ? '#22c55e' : '#ef4444';
+      }
+      if (mCurr) {
+        mCurr.textContent = STATE_ESTOP ? '0.28 A' : (SERVO_ANGLE > 0 ? '3.45 A (Pico Servo)' : '1.84 A');
+      }
+      if (mK1) {
+        mK1.textContent = K1_ENERGIZED ? 'ATRACADO (ON)' : 'DESLIGADO (OFF)';
+        mK1.style.color = K1_ENERGIZED ? '#22c55e' : '#ef4444';
+      }
+      if (mMotor) {
+        mMotor.textContent = MOTOR_ON ? '60 RPM (LIGADO)' : '0 RPM (PARADO)';
+        mMotor.style.color = MOTOR_ON ? '#22c55e' : '#ef4444';
+      }
+      if (mServo) {
+        mServo.textContent = SERVO_ANGLE > 0 ? SERVO_ANGLE + '° (DESCARTE ATIVO)' : '0° (REPOUSO)';
+      }
+    }
+
+    // Loop de Clock da Simulação (Tick de 100ms)
+    var buzzerTick = 0;
+    setInterval(function() {
+      if (!SIM_RUNNING) return;
+      SIM_TIME += 100;
+      
+      if (STATE_ESTOP) {
+        buzzerTick++;
+        if (buzzerTick % 4 === 0) { // apita a cada 400ms em emergência
+          playBuzzerBeep();
+        }
+      }
+    }, 100);
+
+    // Controles do Dock Inferior
+    function toggleDock() {
+      var dock = document.getElementById('sim-dock');
+      var arrow = document.getElementById('dock-arrow');
+      if (dock) {
+        dock.classList.toggle('collapsed');
+        if (arrow) {
+          arrow.textContent = dock.classList.contains('collapsed') ? '▲ (Clique para expandir)' : '▼ (Clique para recolher)';
+        }
+      }
+    }
+
+    function switchDockTab(tab) {
+      var term = document.getElementById('sim-terminal');
+      var meters = document.getElementById('sim-meters');
+      var btnT = document.getElementById('tab-btn-term');
+      var btnM = document.getElementById('tab-btn-meters');
+      if (tab === 'terminal') {
+        if (term) term.style.display = 'block';
+        if (meters) meters.style.display = 'none';
+        if (btnT) btnT.className = 'sim-dock-tab-btn active';
+        if (btnM) btnM.className = 'sim-dock-tab-btn';
+      } else {
+        if (term) term.style.display = 'none';
+        if (meters) meters.style.display = 'grid';
+        if (btnT) btnT.className = 'sim-dock-tab-btn';
+        if (btnM) btnM.className = 'sim-dock-tab-btn active';
+      }
+    }
+
+    // Inicialização ao carregar a página
+    window.addEventListener('DOMContentLoaded', function() {
+      resetSimulation();
+    });
+  </script>
+</body>
+</html>

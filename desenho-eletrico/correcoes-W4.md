@@ -1,0 +1,193 @@
+# PROMPT DE CORRECOES — BLOCO W4: SINALIZAÇÃO, DADOS E PROTEÇÃO (+ 3 fios no W2)
+
+## CONTEXTO
+
+Voce esta editando o arquivo unico:
+`file:///C:/Users/ponto/OneDrive/Desktop/FEIRA%20-%20AMA/desenho-eletrico/esp32.html`
+
+O Bloco W4 ja existe (secao `id="wiring-4"`, linhas ~8983-10571). Ele foi desenhado e auditado.
+A auditoria encontrou **3 erros eletricos de projeto**, **1 erro de XML** e **sobreposicoes** (fios passando por dentro de componentes e por cima de textos).
+Ha tambem **1 erro critico na folha W2** (Parte C): os GND dos sensores e o NF do E-STOP terminam no borne X2 e nao seguem para o GND.
+
+**REGRA ABSOLUTA**: altere SOMENTE `<section id="wiring-4">` (Partes A e B) e, na Parte C, SOMENTE os 3 fios novos dentro de `<section id="wiring-2">`. NAO toque no CSS, no script, na Tab 1, no W1, no W3, nem nos pills de navegacao.
+
+**FERRAMENTA DE VERIFICACAO** (rodar no fim e colar a saida no seu relatorio):
+```
+cd "C:\Users\ponto\OneDrive\Desktop\FEIRA - AMA\desenho-eletrico"
+python auditar_folha.py wiring-4
+python auditar_folha.py wiring-2 fios-gnd-x2-w2
+```
+O auditor ja ignora os ultimos 14 px de cada fio junto ao pad (numero do terminal e contorno do proprio componente).
+Tudo que ele listar em **FIO x CORPO** ou **FIO x TEXTO** precisa ser resolvido. Cruzamento fio-com-fio (sem junction dot) e permitido, desde que a pelo menos 6 px de qualquer junction dot.
+
+---
+
+## RESULTADO DA AUDITORIA
+
+### ITENS APROVADOS (NAO MEXER)
+- ✅ 20 fios presentes (W059-W078), tabela com 20 registros
+- ✅ Zero cores literais — somente variaveis CSS
+- ✅ Pattern IDs unicos (grid-w4, grid-major-w4, hatch-w4, arrow-w4) e nenhum ID duplicado no documento
+- ✅ Moldura dupla correta (1400x900), nada fora da moldura
+- ✅ Componentes reais copiados com transform (H01, H05, E25, E08+E09, E13)
+- ✅ Bloco de titulo (FOLHA 4/5, NOV 2026, REV A)
+- ✅ Flyback E09 com polaridade correta (K no +, A no -)
+- ✅ Resistor E11 1 kΩ do buzzer (W067) e calculo da corrente dos LEDs
+
+---
+
+## PARTE A — CORRECOES ELETRICAS (mudam o circuito)
+
+### A1 — CRITICO: BC547 NAO AGUENTA A BOBINA DO RELE
+**Problema**: BC547 tem Ic maximo de **100 mA**. A bobina do rele automotivo E08 consome **150-200 mA** (a propria Nota 3 diz isso). O transistor Q2 queima ou nao satura.
+**Correcao**: trocar Q1 **e** Q2 por **BC337-40** (Ic 800 mA, hFE 250-630, mesma pinagem TO-92).
+- Substituir TODOS os textos "BC547" da secao W4 por "BC337-40" (simbolos Q1/Q2, notas, caixa `especificacoes-sinalizacao-w4`, tabela).
+
+### A2 — CRITICO: RESISTOR DE BASE DO Q2 E PULL-DOWNS
+**Problema**: com 1 kΩ, Ib = (3,3-0,8)/1000 = 2,5 mA. Para 200 mA o Q2 precisaria de β forçado 80, ou seja, NAO satura (aquece e o rele pode nao fechar). Alem disso, sem pull-down, durante o boot/reset do ESP32 o GPIO fica em alta impedancia e o rele/buzzer podem disparar sozinhos.
+**Correcao**:
+1. Resistor de base do Q2: **470 Ω**, rotulo `R_B2 470Ω` (NAO e E11). Ib ≈ 5,3 mA → β forçado ≈ 38 → saturacao garantida no BC337-40.
+2. Resistor de base do Q1 continua **E11 1 kΩ** (buzzer 30-80 mA, β forçado ≈ 12-30, ok).
+3. Adicionar **pull-down 10 kΩ base-emissor** em Q1 (`R_PD1 10kΩ`) e Q2 (`R_PD2 10kΩ`). Desenho: resistor inline pequeno (retangulo 12×5) com o mesmo estilo dos resistores existentes.
+
+### A3 — CRITICO: GPIO5 E PINO DE STRAPPING (RELE PODE ESTALAR NO BOOT)
+**Problema**: o GPIO5 do ESP32 e pino de strapping e emite PWM durante o boot. Ligado ao rele de seguranca, o K1 pode fechar por alguns ms ao energizar a maquina e alimentar os atuadores.
+**Correcao**: **trocar** as funcoes do GPIO5 e do GPIO4:
+- **Rele K1 → GPIO4** (pino 28 = D4, pad SVG **(282, 305.5)**). O GPIO4 nao tem funcao de boot.
+- **LED amarelo → GPIO5** (pino 25 = D5, pad SVG **(282, 256)**). Piscar no boot e inofensivo para um LED.
+- Badges (grupo `gpio-destaques-w4`): o de y=249-263 vira `GPIO5 → LED Y` e o de y=299-313 vira `GPIO4 → RELÉ K1`.
+- Atualizar tabela (W063, W071), Nota 1 e Nota 3 (`AV_PIN_RELAY = 4`, `AV_PIN_LED_Y = 5`).
+
+### A4 — CRITICO NR-12: E-STOP PRECISA CORTAR O RELE POR HARDWARE
+**Problema**: hoje o corte do K1 depende 100% do software (ESP32 le o E-STOP no GPIO27 e desliga o GPIO do rele). A NR-12 exige que a parada de emergencia atue diretamente no circuito de comando, sem depender de programa.
+**Correcao**: incluir um **2º bloco de contato NF do botao E12** (contatos **21-22**, peca modular de 22 mm, montada no mesmo cogumelo) **em serie com a bobina** do K1:
+- **W069** passa a ser: `+12V rail` (685, 232) → `E12-B:21` (685, 268).
+- Simbolo inline do contato NF entre **(685, 268)** e **(685, 296)**: dois terminais (circulo r=2.5) + barra do contato fechado (simbolo IEC de contato NF). Rotulo em 2 linhas, font-size 4.5, em x≈655-681, y≈274-292: `E12-B` / `NF 21-22`.
+- **NOVO FIO W082**: `E12-B:22` (685, 296) → (685, 342.5) → `E08:85` (705, 342.5). Classe `wire-power`, 22 AWG, cor VM. Tag em y≈322-329.
+- Tag do W069 em y≈245-252 (entre o rail +12V e o contato).
+- Nota 3: acrescentar "E12-B (NF 21-22) em serie com a bobina: apertar o E-STOP desarma K1 mesmo com o ESP32 travado".
+
+---
+
+## PARTE B — CORRECOES VISUAIS E DE ROTEAMENTO (W4)
+
+### B1 — XML: `</g>` SOBRANDO
+Na linha ~9474 ha um `</g>` a mais logo depois do fechamento de `<g id="esp32-devkit-w4">` (duas linhas `</g>` seguidas). Remover UM deles. (W4 tem 15 `<g` e 16 `</g>`.)
+
+### B2 — BADGES GPIO POR BAIXO DOS FIOS
+Os fios W059/W061/W063/W071 saem do pad e passam POR CIMA dos badges (texto riscado). Mover o grupo inteiro `<g id="gpio-destaques-w4">` para **logo depois** do `</g>` de `<g id="fios-w4">`. Assim o badge (fill `var(--pad-fill)`) cobre o inicio do fio e o fio "sai" do badge.
+
+### B3 — REMOVER A COTA VERTICAL DO ESP32 NA COPIA W4
+O texto `51.4 mm (escala ampliada)` e sua linha de cota ficam entre os pads direitos e os badges, e todos os fios de GPIO cortam essa cota. Remover a cota vertical (linha + texto) **somente** da copia `esp32-devkit-w4`. Ela continua visivel no W2/W3.
+
+### B4 — BARRAMENTOS +12V E +5V
+Os fios dos LEDs sobem em x=420/425/430 e cortam o inicio dos rails e as caixas `← +12V (W1)` / `← +5V (W1)` (x=400-470).
+- Rail **+12V**: de **x=470** ate x=850 (y=232). Rail **+5V**: de **x=470** ate x=570 (y=250). Manter a seta indicando a origem na W1 no inicio de cada rail.
+- Caixa do +12V: `rect x="852" y="225" width="110" height="14"`, texto `+12V (FONTE E01) ← W1`.
+- Caixa do +5V: `rect x="574" y="244" width="42" height="12"`, texto `+5V (E03) ← W1` (font-size 4.5).
+- Com isso, o tronco GND em x=465 tambem deixa de cruzar os rails.
+
+### B5 — CAIXA "CIRCUITO SÉRIE" DO H05
+O retangulo `CIRCUITO SERIE: GPIO -> R330Ω -> ...` (x=470-629, y=212-231) fica exatamente no caminho dos retornos de GND W060/W062/W064. Remover essa caixa (e seus textos) da copia `bloco-h05-w4`. O conteudo ja esta na Nota 1.
+
+### B6 — FIOS DE LED APOS A TROCA DO A3
+- **W063** (LED Y, agora do GPIO5): `M 282,256 L 420,256 L 420,175 L 580.8,175 L 580.8,190`.
+- **W059** e **W061**: manter (282,273 → x=430 → H05:R+; 282,289 → x=425 → H05:G+).
+- Tags de W059/W061/W063 continuam em x=390-412 na linha de cada pino (W063 na linha y=256).
+
+### B7 — W068 (Q1:E → GND) NAO PODE ATRAVESSAR O RING LIGHT
+Novo percurso ate o tronco GND: `M 562.5,440 L 562.5,465 L 465,465`. Junction dot em **(465, 465)**. Tag no trecho horizontal (x≈500-522).
+Pull-down **R_PD1 10kΩ**: do no da base (W067 em **(545, 430)**) descendo ate **(545, 452)** e indo a **(562.5, 452)** sobre o W068. Junction dots em (545, 430) e (562.5, 452).
+
+### B8 — W077 (+12V → RING LIGHT) NAO PODE ATRAVESSAR E13, W065 E O TRONCO
+Nova saida do rail +12V em **x=620**: `M 620,232 L 620,650 L 490,650 L 490,621.5`. Junction dot em (620, 232). Remover o dot antigo de (475, 232).
+O trecho horizontal em y=650 cruza o W078 (x=540). Cruzamento permitido, SEM dot. Tag do W077 no trecho vertical (y≈520, x≈609-631).
+
+### B9 — W075 (+12V → E08:30) NAO PODE PASSAR POR DENTRO DO RELE
+Hoje desce reto em x=726 atravessando o corpo do rele e o soquete. Novo percurso pela esquerda:
+`M 650,232 L 650,428 L 726,428 L 726,401`. Junction dot em (650, 232).
+
+### B10 — Q2 SAI DE CIMA DO SOQUETE; W070, W071, W072 E RAIL +12V_AT
+O Q2 esta colado no soquete e o W071 atravessa o soquete (y=380, x=662-781).
+- **Q2** (BC337-40) centro em **(812, 405)**: C no topo (812, 395), B a esquerda (802, 405), E embaixo (812, 415). Label `Q2` acima, `BC337-40` abaixo-direita.
+- **W070** (bobina- → Q2:C): `M 791,342.5 L 791,385 L 812,385 L 812,395` (passa no canal x=781-800, entre soquete e E09, abaixo do E09).
+- **Rail +12V_AT**: descer para **y=500** (de x=774 ate 1040), com caixa/seta `+12V_AT → W3 (Atuadores)` na ponta direita.
+- **W076** (E08:87 → +12V_AT): `M 774,401 L 774,500`. Junction dot em (774, 500).
+- **W071** (GPIO4 → Q2:B): `M 282,305.5 L 395,305.5 L 395,472 L 700,472` + **R_B2 470Ω** (retangulo 24×8 em x=700-724, y=468-476) + `M 724,472 L 797,472 L 797,405 L 802,405`. Tag do W071 no trecho y=472 (x≈520-542), NAO na linha do pino.
+- **R_PD2 10kΩ**: entre (797, 425) no W071 e (812, 425) no W072 (mini resistor horizontal 12×5). Junction dots nos dois pontos.
+- **W072** (Q2:E → GND): `M 812,415 L 812,660`. Cruza o rail +12V_AT em y=500 (permitido, sem dot). Junction dot em (812, 660).
+- Remover o resistor E11 antigo do Q2 (x=638-662, y=376-384) e o simbolo Q2 antigo.
+
+### B11 — W073 (FLYBACK K) NAO PODE CRUZAR O CORPO DO RELE
+O catodo do E09 tem que ir para o lado da bobina **depois** do contato E12-B (no W082).
+Novo percurso: `M 820,306 L 845,306 L 845,252 L 700,252 L 700,310 L 685,310`. Junction dot em **(685, 310)** sobre o W082.
+O W074 (anodo → 86) fica como esta.
+
+### B12 — TITULO DO E08 EM CIMA DO RAIL +12V
+O tag `E08` e os textos `RELÉ AUTOMOTIVO 12V 40A` / `K1 — SECCIONAMENTO NR-12` ficam sobre o rail y=232. Envolver esses 3 elementos (tag + 2 textos) em um `<g transform="translate(0,-44)">` **dentro** do `bloco-e08-w4` (o grupo tem scale 0.5, entao -44 local = 22 px SVG para cima).
+
+### B13 — TAGS SOBREPOSTAS
+As tags W070/W074 (perto de x=796-817, y=334-360) e W060/W062/W064 (cada spec "GND 26AWG" encosta na tag seguinte) se sobrepoem. Reposicionar para que nenhum `rect.wire-tag` nem `text.wire-spec` encoste em outro. Sugestao: specs dos GND dos LEDs a direita da tag (mesma linha) em vez de 9 px abaixo.
+
+### B14 — TABELA, NOTAS E ESPECIFICACOES
+- Tabela: titulo `TABELA DE FIAÇÃO PONTO A PONTO (W059–W078 + W082)`. Linhas a atualizar:
+
+| ID   | DE                          | PARA                         | BITOLA | COR | NOTA                                                              |
+|------|-----------------------------|------------------------------|--------|-----|-------------------------------------------------------------------|
+| W063 | H01:GPIO5 (D5 p25)          | H05:Y+ (Anodo Amar.)         | 26 AWG | AM  | GPIO5→R330Ω→LED Y (PROCESSANDO)                                    |
+| W067 | H01:GPIO13 (D13 p15)        | Q1:B (Base via E11 1kΩ)      | 26 AWG | LJ  | Q1 = BC337-40 + R_PD1 10kΩ                                         |
+| W069 | +12V rail (Fonte E01)       | E12-B:21 (2º NF E-STOP)      | 22 AWG | VM  | +12V → NF 21-22 → bobina K1 (corte por hardware)                   |
+| W071 | H01:GPIO4 (D4 p28)          | Q2:B (Base via R_B2 470Ω)    | 26 AWG | LJ  | Q2 = BC337-40 + R_PD2 10kΩ                                         |
+| W073 | E09:K (Catodo Flyb.)        | Junção W082 (Bob+)           | 22 AWG | AX  | Flyback no lado da bobina                                          |
+| W082 | E12-B:22 (2º NF E-STOP)     | E08:85 (Bobina +)            | 22 AWG | VM  | NOVO — E-STOP corta K1 sem depender do ESP32                       |
+
+  Se faltar altura, reduzir o passo das linhas (minimo font-size 4.4) em vez de sair da moldura. Rodape: "W079-W081 pertencem a folha W2 (retornos GND do borne X2)".
+- Nota 1: LED Y passa para **GPIO5**.
+- Nota 2: Q1 = **BC337-40**, Ib = (3,3-0,7)/1kΩ = 2,6 mA, Ic buzzer ≤ 80 mA (β forçado ≥ 32). Pull-down R_PD1 10 kΩ garante buzzer mudo no boot.
+- Nota 3: Q2 = **BC337-40** com **R_B2 470 Ω** (Ib ≈ 5,3 mA, β forçado ≈ 38 para 200 mA) e **R_PD2 10 kΩ**. Comando no **GPIO4** (GPIO5 e strapping). **E12-B NF 21-22 em serie com a bobina**. GPIO4 LOW → rele desarmado → +12V_AT cortado.
+- Nota 5: W082 = 22 AWG. Trocar "(ate 40A)" por "rele 40 A; carga real ≤ 5 A protegida pelo fusivel da W1; 14 AWG suporta ~15 A".
+- Caixa `especificacoes-sinalizacao-w4`: BC547 → BC337-40, incluir R_B2 470 Ω, R_PD1/R_PD2 10 kΩ e E12-B.
+
+---
+
+## PARTE C — FOLHA W2: 3 RETORNOS DE GND QUE FALTAM
+
+**Problema (critico)**: no borne X2, os pads de saida (lado direito, x=466) de **X2:3 (GND S1, y=240)**, **X2:4 (GND S2, y=292)** e **X2:6 (ESTOP NC, y=396)** nao tem fio. Os sensores S1/S2 recebem +5 V mas nao tem retorno de GND (nao funcionam) e o contato NF do E-STOP nao fecha para lugar nenhum.
+
+**Correcao**: dentro de `<section id="wiring-2">`, criar o grupo `<g id="fios-gnd-x2-w2">` com 3 fios novos, cada um com wire-tag, wire-label e wire-spec, classe `wire-gnd`:
+
+| ID   | DE                     | PARA               | SECAO          | NOTA                                   |
+|------|------------------------|--------------------|----------------|----------------------------------------|
+| W079 | X2:3 (466, 240)        | GND rail E26 (y=140) | jumper (H06) | Retorno GND do sensor S1               |
+| W080 | X2:4 (466, 292)        | GND rail E26 (y=140) | jumper (H06) | Retorno GND do sensor S2               |
+| W081 | X2:6 (466, 396)        | GND rail E26 (y=140) | jumper (H06) | Fecha o NF do E-STOP no GND (fail-safe) |
+
+Sugestao de rota: 3 faixas verticais paralelas no canal entre o borne X2 e a protoboard (x≈538, 544, 550), subindo ate y≈146-154 e entrando no rail GND da protoboard (linha y=140, x=580-910) em x≈600/606/612, com junction dot em cada chegada. O canal ja tem W029 (x=525), W030 (x=515) e W031 (x=520). Cruzar esses fios e permitido, passar por cima de tags e textos nao.
+Acrescentar as 3 linhas na tabela da W2 (`tabela-fios-w2`) e mudar o titulo para W021-W042 + W079-W081. Nao mexer em mais nada da W2.
+
+---
+
+## CHECKLIST DE VALIDACAO
+
+- [ ] `python auditar_folha.py wiring-4` sem FIO x CORPO e sem FIO x TEXTO (exceto "(sem ID)" do tronco GND, se restar so o cruzamento com tag propria)
+- [ ] `python auditar_folha.py wiring-2 fios-gnd-x2-w2` sem ocorrencias
+- [ ] W4 com 15 `<g` e 15 `</g>`
+- [ ] Nenhum "BC547" restante na W4; Q1 e Q2 = BC337-40
+- [ ] R_B2 470Ω, R_PD1 10kΩ, R_PD2 10kΩ desenhados e com junction dots
+- [ ] Rele K1 no GPIO4 (282, 305.5); LED Y no GPIO5 (282, 256); badges atualizados
+- [ ] E12-B (NF 21-22) em serie: W069 → E12-B → W082 → E08:85; flyback W073 chega no W082
+- [ ] W075, W073, W071 fora do corpo do rele; W068, W077 fora do ring light
+- [ ] Rails +12V/+5V comecando em x=470; rail +12V_AT em y=500
+- [ ] Tabela W4 com 21 linhas (W059-W078 + W082) e tabela W2 com W079-W081
+- [ ] Zero cores literais, IDs unicos (novos elementos com sufixo -w4 / -w2)
+
+---
+
+## REGRAS INVIOLAVEIS
+
+1. **SOMENTE** variaveis CSS para cores (`var(--bg)`, `var(--fg)`, `var(--line)`, `var(--line-thin)`, `var(--pin-text)`, `var(--grid)`, `var(--grid-major)`, `var(--dim)`, `var(--trace)`, `var(--pad-fill)`, `var(--tag-bg)`, `var(--header-bg)`, `var(--header-border)`).
+2. NAO altere CSS, script, Tab 1, W1, W3, nav pills. Na W2, somente a Parte C.
+3. Pads through-hole: sempre dois circulos concentricos (r=5 stroke 1 + r=2 fill `var(--bg)`).
+4. Fios iniciam e terminam exatamente nas coordenadas de pads/terminais. Nunca no ar.
+5. Junction dots (`circle.junction-dot`) em todo no com 3+ ligacoes. Cruzamentos sem dot.
+6. Nao remover nenhum fio existente (W059-W078 continuam todos; W082 e novo).

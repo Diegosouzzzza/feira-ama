@@ -1,0 +1,640 @@
+12291:             <line x1="160" y1="1290" x2="2330" y2="1290" class="wire-gnd" stroke-width="2.4"/>
+12292:             <rect x="40" y="1281" width="115" height="18" rx="2" fill="var(--tag-bg)" stroke="var(--line)" stroke-width="1.2"/>
+12293:             <text x="97" y="1292.5" text-anchor="middle" font-size="6.5" font-weight="700" fill="var(--fg)">GND 0V = X1:6…X1:8</text>
+12294:           </g>
+12295: 
+12296:           <!-- ========================================================== -->
+12297:           <!--      ZONA 1: ENTRADA AC, FONTE 12V, FUSÍVEIS, X1 E BUCKS   -->
+12298:           <!-- ========================================================== -->
+12299:           <g id="bloco-e19-pg">
+12300:             <rect x="45" y="265" width="85" height="130" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12301:             <text x="87" y="282" text-anchor="middle" font-size="8" font-weight="700" fill="var(--fg)">E19 — PLUGUE AC</text>
+12302:             <text x="87" y="292" text-anchor="middle" font-size="5.5" fill="var(--dim)">NBR 14136 2P+T 10A</text>
+12303:             <text x="87" y="388" text-anchor="middle" font-size="5" fill="var(--dim)">127/220V~ + PG13.5</text>
+12304:         <circle cx="130" cy="300" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12305:         <circle cx="130" cy="300" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12306:         <text x="123" y="302" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">L</text>
+12307: 
+12308:         <circle cx="130" cy="335" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12309:         <circle cx="130" cy="335" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12310:         <text x="123" y="337" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">N</text>
+12311: 
+12312:         <circle cx="130" cy="370" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12313:         <circle cx="130" cy="370" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12314:         <text x="123" y="372" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">PE</text>
+12315: 
+12316:           </g>
+12317: 
+12318:           <g id="bloco-e27-pe-pg">
+12319:             <rect x="45" y="440" width="85" height="65" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12320:             <text x="87" y="458" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">PE / CHASSI</text>
+12321:             <text x="87" y="470" text-anchor="middle" font-size="5" fill="var(--dim)">TERRA PROTEÇÃO ⏚</text>
+12322:             <text x="87" y="482" text-anchor="middle" font-size="5" fill="var(--dim)">CARCAÇA E01 / ESTRUT.</text>
+12323:         <circle cx="130" cy="470" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12324:         <circle cx="130" cy="470" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12325:         <text x="123" y="472" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">PE</text>
+12326: 
+12327:           </g>
+12328: 
+12329:           <g id="bloco-e15-pg">
+12330:             <rect x="185" y="265" width="80" height="100" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12331:             <text x="225" y="282" text-anchor="middle" font-size="8" font-weight="700" fill="var(--fg)">E15 — DISJ. 2P</text>
+12332:             <text x="225" y="292" text-anchor="middle" font-size="5.5" fill="var(--dim)">10A CURVA C DIN</text>
+12333:         <circle cx="185" cy="300" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12334:         <circle cx="185" cy="300" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12335:         <text x="192" y="302" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">IN_L</text>
+12336: 
+12337:         <circle cx="185" cy="335" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12338:         <circle cx="185" cy="335" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12339:         <text x="192" y="337" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">IN_N</text>
+12340: 
+12341:         <circle cx="265" cy="300" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12342:         <circle cx="265" cy="300" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12343:         <text x="258" y="302" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">OUT_L</text>
+12344: 
+12345:         <circle cx="265" cy="335" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12346:         <circle cx="265" cy="335" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12347:         <text x="258" y="337" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">OUT_N</text>
+12348: 
+12349:           </g>
+12350: 
+12351:           <g id="bloco-e01-pg">
+12352:             <rect x="310" y="265" width="105" height="125" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12353:             <text x="362" y="282" text-anchor="middle" font-size="8" font-weight="700" fill="var(--fg)">E01 — FONTE 12V</text>
+12354:             <text x="362" y="292" text-anchor="middle" font-size="5.5" fill="var(--dim)">12V 10A — VER ETIQUETA</text>
+12355:             <text x="362" y="382" text-anchor="middle" font-size="4.6" font-weight="700" fill="var(--fg)">CONFERIR CHAVE 115/230V!</text>
+12356:         <circle cx="310" cy="300" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12357:         <circle cx="310" cy="300" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12358:         <text x="317" y="302" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">AC_L</text>
+12359: 
+12360:         <circle cx="310" cy="335" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12361:         <circle cx="310" cy="335" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12362:         <text x="317" y="337" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">AC_N</text>
+12363: 
+12364:         <circle cx="310" cy="370" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12365:         <circle cx="310" cy="370" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12366:         <text x="317" y="372" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">PE ⏚</text>
+12367: 
+12368:         <circle cx="415" cy="300" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12369:         <circle cx="415" cy="300" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12370:         <text x="408" y="302" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">+12V</text>
+12371: 
+12372:         <circle cx="415" cy="355" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12373:         <circle cx="415" cy="355" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12374:         <text x="408" y="357" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">GND</text>
+12375: 
+12376:           </g>
+12377: 
+12378:           <g id="bloco-e16-pg">
+12379:             <rect x="450" y="265" width="80" height="125" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12380:             <text x="490" y="282" text-anchor="middle" font-size="8" font-weight="700" fill="var(--fg)">E16 — FUSÍVEIS</text>
+12381:             <text x="490" y="292" text-anchor="middle" font-size="5.2" fill="var(--dim)">PORTA-FUSÍVEL DIN</text>
+12382:             <text x="490" y="325" text-anchor="middle" font-size="5.2" font-weight="700" fill="var(--fg)">F1: 10A GERAL</text>
+12383:             <text x="490" y="340" text-anchor="middle" font-size="5.0" fill="var(--dim)">F2: 3A MOTOR (W050)</text>
+12384:             <text x="490" y="355" text-anchor="middle" font-size="5.0" fill="var(--dim)">F3: 3A SERVO (W011)</text>
+12385:             <text x="490" y="370" text-anchor="middle" font-size="5.0" fill="var(--dim)">F4: 1A LÓGICA (W015)</text>
+12386:         <circle cx="450" cy="300" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12387:         <circle cx="450" cy="300" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12388:         <text x="457" y="302" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">IN</text>
+12389: 
+12390:         <circle cx="530" cy="300" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12391:         <circle cx="530" cy="300" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12392:         <text x="523" y="302" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">OUT</text>
+12393: 
+12394:           </g>
+12395: 
+12396:           <g id="bloco-x1-pg">
+12397:             <rect x="450" y="455" width="80" height="185" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12398:             <text x="490" y="472" text-anchor="middle" font-size="8" font-weight="700" fill="var(--fg)">X1 — BORNE E17</text>
+12399:             <text x="490" y="482" text-anchor="middle" font-size="5" fill="var(--dim)">SAK 6 VIAS (12V/GND)</text>
+12400:         <circle cx="450" cy="490" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12401:         <circle cx="450" cy="490" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12402:         <text x="457" y="492" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">1:+12V_G</text>
+12403: 
+12404:         <circle cx="530" cy="490" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12405:         <circle cx="530" cy="490" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12406: 
+12407:         <circle cx="530" cy="515" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12408:         <circle cx="530" cy="515" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12409:         <text x="523" y="517" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">2:+12V_L</text>
+12410: 
+12411:         <circle cx="530" cy="540" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12412:         <circle cx="530" cy="540" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12413:         <text x="523" y="542" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">3:+12V_AT</text>
+12414: 
+12415:             <text x="490" y="567" text-anchor="middle" font-size="5" fill="var(--dim)">4: RESERVA</text>
+12416:         <circle cx="450" cy="590" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12417:         <circle cx="450" cy="590" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12418:         <text x="457" y="592" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">5:GND_F</text>
+12419: 
+12420:         <circle cx="530" cy="590" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12421:         <circle cx="530" cy="590" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12422: 
+12423:         <circle cx="530" cy="615" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12424:         <circle cx="530" cy="615" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12425:         <text x="523" y="617" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">6:GND_D</text>
+12426: 
+12427:           </g>
+12428: 
+12429:           <g id="bloco-e02-pg">
+12430:             <rect x="310" y="685" width="100" height="85" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12431:             <text x="360" y="702" text-anchor="middle" font-size="8" font-weight="700" fill="var(--fg)">E02 — BUCK 6V</text>
+12432:             <text x="360" y="712" text-anchor="middle" font-size="5.2" fill="var(--dim)">XL4015 5A SERVO+MOTOR</text>
+12433:         <circle cx="310" cy="720" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12434:         <circle cx="310" cy="720" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12435:         <text x="317" y="722" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">IN+</text>
+12436: 
+12437:         <circle cx="310" cy="750" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12438:         <circle cx="310" cy="750" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12439:         <text x="317" y="752" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">IN-</text>
+12440: 
+12441:         <circle cx="410" cy="720" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12442:         <circle cx="410" cy="720" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12443:         <text x="403" y="722" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">OUT+</text>
+12444: 
+12445:         <circle cx="410" cy="750" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12446:         <circle cx="410" cy="750" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12447:         <text x="403" y="752" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">OUT-</text>
+12448: 
+12449:           </g>
+12450: 
+12451:           <g id="bloco-e06-pg">
+12452:             <rect x="460" y="705" width="50" height="60" rx="2" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12453:             <text x="485" y="732" text-anchor="middle" font-size="6.5" font-weight="700" fill="var(--fg)">E06</text>
+12454:             <text x="485" y="742" text-anchor="middle" font-size="5" fill="var(--dim)">1000µF</text>
+12455:         <circle cx="460" cy="720" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12456:         <circle cx="460" cy="720" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12457:         <text x="467" y="722" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">+</text>
+12458: 
+12459:         <circle cx="460" cy="750" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12460:         <circle cx="460" cy="750" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12461:         <text x="467" y="752" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">-</text>
+12462: 
+12463:         <circle cx="510" cy="720" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12464:         <circle cx="510" cy="720" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12465: 
+12466:         <circle cx="510" cy="750" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12467:         <circle cx="510" cy="750" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12468: 
+12469:           </g>
+12470: 
+12471:           <g id="bloco-e03-pg">
+12472:             <rect x="310" y="845" width="100" height="85" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12473:             <text x="360" y="862" text-anchor="middle" font-size="8" font-weight="700" fill="var(--fg)">E03 — BUCK 5V</text>
+12474:             <text x="360" y="872" text-anchor="middle" font-size="5.2" fill="var(--dim)">LM2596 (LÓGICA)</text>
+12475:         <circle cx="310" cy="880" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12476:         <circle cx="310" cy="880" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12477:         <text x="317" y="882" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">IN+</text>
+12478: 
+12479:         <circle cx="310" cy="910" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12480:         <circle cx="310" cy="910" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12481:         <text x="317" y="912" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">IN-</text>
+12482: 
+12483:         <circle cx="410" cy="880" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12484:         <circle cx="410" cy="880" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12485:         <text x="403" y="882" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">OUT+</text>
+12486: 
+12487:         <circle cx="410" cy="910" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12488:         <circle cx="410" cy="910" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12489:         <text x="403" y="912" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">OUT-</text>
+12490: 
+12491:           </g>
+12492: 
+12493:           <!-- ========================================================== -->
+12494:           <!--      ZONA 2: SENSORES S1/S2, E-STOP 11-12, X2 E CLAMPS     -->
+12495:           <!-- ========================================================== -->
+12496:           <g id="bloco-h04-pg">
+12497:             <rect x="680" y="255" width="85" height="90" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12498:             <text x="722" y="272" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">H04 — SENSOR S1</text>
+12499:             <text x="722" y="282" text-anchor="middle" font-size="4.8" fill="var(--dim)">ÓPTICO IR 5V (ENT.)</text>
+12500:         <circle cx="680" cy="280" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12501:         <circle cx="680" cy="280" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12502:         <text x="687" y="282" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">VCC</text>
+12503: 
+12504:         <circle cx="765" cy="305" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12505:         <circle cx="765" cy="305" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12506:         <text x="758" y="307" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">OUT</text>
+12507: 
+12508:         <circle cx="765" cy="330" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12509:         <circle cx="765" cy="330" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12510:         <text x="758" y="332" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">GND</text>
+12511: 
+12512:           </g>
+12513: 
+12514:           <g id="bloco-e07-pg">
+12515:             <rect x="680" y="425" width="85" height="90" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12516:             <text x="722" y="442" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">E07 — SENSOR S2</text>
+12517:             <text x="722" y="452" text-anchor="middle" font-size="4.8" fill="var(--dim)">ÓPTICO IR 5V (SAÍDA)</text>
+12518:         <circle cx="680" cy="450" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12519:         <circle cx="680" cy="450" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12520:         <text x="687" y="452" text-anchor="start" font-size="5.5" font-weight="700" fill="var(--pin-text)">VCC</text>
+12521: 
+12522:         <circle cx="765" cy="475" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12523:         <circle cx="765" cy="475" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12524:         <text x="758" y="477" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">OUT</text>
+12525: 
+12526:         <circle cx="765" cy="500" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12527:         <circle cx="765" cy="500" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12528:         <text x="758" y="502" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">GND</text>
+12529: 
+12530:           </g>
+12531: 
+12532:           <g id="bloco-e12a-pg">
+12533:             <rect x="680" y="595" width="85" height="80" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12534:             <text x="722" y="612" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">E12-A — E-STOP</text>
+12535:             <text x="722" y="622" text-anchor="middle" font-size="4.8" fill="var(--dim)">NF1 AUX (11-12)</text>
+12536:         <circle cx="765" cy="630" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12537:         <circle cx="765" cy="630" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12538:         <text x="758" y="632" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">11:COM</text>
+12539: 
+12540:         <circle cx="765" cy="660" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12541:         <circle cx="765" cy="660" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12542:         <text x="758" y="662" text-anchor="end" font-size="5.5" font-weight="700" fill="var(--pin-text)">12:NC</text>
+12543: 
+12544:           </g>
+12545: 
+12546:           <g id="bloco-x2-pg">
+12547:             <rect x="835" y="385" width="65" height="235" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12548:             <text x="867" y="402" text-anchor="middle" font-size="7" font-weight="700" fill="var(--fg)">X2 — E17</text>
+12549:             <text x="867" y="411" text-anchor="middle" font-size="4.6" fill="var(--dim)">7 VIAS CAMPO</text>
+12550:         <circle cx="835" cy="420" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12551:         <circle cx="835" cy="420" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12552:         <text x="842" y="422" text-anchor="start" font-size="4.6" font-weight="700" fill="var(--pin-text)">1:S1</text>
+12553: 
+12554:         <circle cx="900" cy="420" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12555:         <circle cx="900" cy="420" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12556: 
+12557:         <circle cx="835" cy="450" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12558:         <circle cx="835" cy="450" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12559:         <text x="842" y="452" text-anchor="start" font-size="4.6" font-weight="700" fill="var(--pin-text)">2:S2</text>
+12560: 
+12561:         <circle cx="900" cy="450" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12562:         <circle cx="900" cy="450" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12563: 
+12564:         <circle cx="835" cy="480" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12565:         <circle cx="835" cy="480" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12566:         <text x="842" y="482" text-anchor="start" font-size="4.6" font-weight="700" fill="var(--pin-text)">3:G_S1</text>
+12567: 
+12568:         <circle cx="900" cy="480" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12569:         <circle cx="900" cy="480" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12570: 
+12571:         <circle cx="835" cy="510" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12572:         <circle cx="835" cy="510" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12573:         <text x="842" y="512" text-anchor="start" font-size="4.6" font-weight="700" fill="var(--pin-text)">4:G_S2</text>
+12574: 
+12575:         <circle cx="900" cy="510" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12576:         <circle cx="900" cy="510" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12577: 
+12578:         <circle cx="835" cy="540" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12579:         <circle cx="835" cy="540" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12580:         <text x="842" y="542" text-anchor="start" font-size="4.6" font-weight="700" fill="var(--pin-text)">5:COM</text>
+12581: 
+12582:         <circle cx="900" cy="540" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12583:         <circle cx="900" cy="540" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12584: 
+12585:         <circle cx="835" cy="570" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12586:         <circle cx="835" cy="570" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12587:         <text x="842" y="572" text-anchor="start" font-size="4.6" font-weight="700" fill="var(--pin-text)">6:NC</text>
+12588: 
+12589:         <circle cx="900" cy="570" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12590:         <circle cx="900" cy="570" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12591: 
+12592:             <text x="867" y="602" text-anchor="middle" font-size="4.6" fill="var(--dim)">7: RESERVA</text>
+12593:           </g>
+12594: 
+12595:           <!-- Clamps Esquemáticos E11 + E10 (montados na protoboard E26 na W2) -->
+12596:           <g id="bloco-clamp-s1-pg">
+12597:             <rect x="965" y="342" width="32" height="16" rx="2" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.2"/>
+12598:             <text x="981" y="352" text-anchor="middle" font-size="5" font-weight="700" fill="var(--fg)">E11 1kΩ</text>
+12599:             <rect x="1030" y="330" width="22" height="40" rx="2" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.2"/>
+12600:             <text x="1041" y="352" text-anchor="middle" font-size="4.5" font-weight="700" fill="var(--fg)">E10</text>
+12601:           </g>
+12602: 
+12603:           <g id="bloco-clamp-s2-pg">
+12604:             <rect x="965" y="452" width="32" height="16" rx="2" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.2"/>
+12605:             <text x="981" y="462" text-anchor="middle" font-size="5" font-weight="700" fill="var(--fg)">E11 1kΩ</text>
+12606:             <rect x="1030" y="440" width="22" height="40" rx="2" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.2"/>
+12607:             <text x="1041" y="462" text-anchor="middle" font-size="4.5" font-weight="700" fill="var(--fg)">E10</text>
+12608:           </g>
+12609: 
+12610:           <!-- ========================================================== -->
+12611:           <!--      ZONA 3: CONTROLE CENTRAL — ESP32 DEVKIT V1 (H01)      -->
+12612:           <!-- ========================================================== -->
+12613:           <g id="bloco-h01-pg">
+12614:             <rect x="1100" y="255" width="230" height="465" rx="4" fill="var(--bg)" stroke="var(--line)" stroke-width="2.2"/>
+12615:             <rect x="1106" y="261" width="218" height="36" rx="2" fill="var(--header-bg)" stroke="var(--line)" stroke-width="1"/>
+12616:             <text x="1215" y="276" text-anchor="middle" font-size="9" font-weight="700" fill="var(--fg)">H01 — ESP32 DEVKIT V1 (30P)</text>
+12617:             <text x="1215" y="290" text-anchor="middle" font-size="5.8" fill="var(--dim)">UNIDADE CENTRAL DE CONTROLE E SEGURANÇA (3,3V)</text>
+12618: 
+12619:             <!-- Pinagem LÓGICA (rev. C): posições não são as físicas da placa; ligar pela serigrafia -->
+12620:         <circle cx="1100" cy="320" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12621:         <circle cx="1100" cy="320" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12622:         <text x="1107" y="322" text-anchor="start" font-size="5.8" font-weight="700" fill="var(--pin-text)">3V3 (SAÍDA LDO) *</text>
+12623: 
+12624:         <circle cx="1100" cy="480" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12625:         <circle cx="1100" cy="480" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12626:         <text x="1107" y="482" text-anchor="start" font-size="5.8" font-weight="700" fill="var(--pin-text)">D25 · GPIO25 (S1 IN)</text>
+12627: 
+12628:         <circle cx="1100" cy="500" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12629:         <circle cx="1100" cy="500" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12630:         <text x="1107" y="502" text-anchor="start" font-size="5.8" font-weight="700" fill="var(--pin-text)">D26 · GPIO26 (S2 IN)</text>
+12631: 
+12632:         <circle cx="1100" cy="520" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12633:         <circle cx="1100" cy="520" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12634:         <text x="1107" y="522" text-anchor="start" font-size="5.8" font-weight="700" fill="var(--pin-text)">D27 · GPIO27 (ESTOP NF)</text>
+12635: 
+12636:         <circle cx="1100" cy="580" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12637:         <circle cx="1100" cy="580" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12638:         <text x="1107" y="582" text-anchor="start" font-size="5.8" font-weight="700" fill="var(--pin-text)">GND (COMUM)</text>
+12639: 
+12640:         <circle cx="1100" cy="600" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12641:         <circle cx="1100" cy="600" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12642:         <text x="1107" y="602" text-anchor="start" font-size="5.8" font-weight="700" fill="var(--pin-text)">D13 · GPIO13 (BUZZER)</text>
+12643: 
+12644:         <circle cx="1100" cy="680" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12645:         <circle cx="1100" cy="680" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12646:         <text x="1107" y="682" text-anchor="start" font-size="5.8" font-weight="700" fill="var(--pin-text)">VIN (+5V IN)</text>
+12647: 
+12648: 
+12649:             <!-- Lado direito: pinagem lógica (rev. C) -->
+12650:         <circle cx="1330" cy="460" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12651:         <circle cx="1330" cy="460" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12652:         <text x="1323" y="462" text-anchor="end" font-size="5.8" font-weight="700" fill="var(--pin-text)">D19 · GPIO19 (MOTOR ON/OFF)</text>
+12653: 
+12654:         <circle cx="1330" cy="480" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12655:         <circle cx="1330" cy="480" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12656:         <text x="1323" y="482" text-anchor="end" font-size="5.8" font-weight="700" fill="var(--pin-text)">D18 · GPIO18 (PWM SRV)</text>
+12657: 
+12658:         <circle cx="1330" cy="500" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12659:         <circle cx="1330" cy="500" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12660:         <text x="1323" y="502" text-anchor="end" font-size="5.8" font-weight="700" fill="var(--pin-text)">D5 · GPIO5 (LED AMAR)</text>
+12661: 
+12662:         <circle cx="1330" cy="520" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12663:         <circle cx="1330" cy="520" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12664:         <text x="1323" y="522" text-anchor="end" font-size="5.8" font-weight="700" fill="var(--pin-text)">TX2 · GPIO17 (LED VERM)</text>
+12665: 
+12666:         <circle cx="1330" cy="540" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12667:         <circle cx="1330" cy="540" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12668:         <text x="1323" y="542" text-anchor="end" font-size="5.8" font-weight="700" fill="var(--pin-text)">RX2 · GPIO16 (LED VERD)</text>
+12669: 
+12670:         <circle cx="1330" cy="560" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12671:         <circle cx="1330" cy="560" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12672:         <text x="1323" y="562" text-anchor="end" font-size="5.8" font-weight="700" fill="var(--pin-text)">D4 · GPIO4 (RELÉ K1)</text>
+12673: 
+12674:         <circle cx="1330" cy="620" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12675:         <circle cx="1330" cy="620" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12676:         <text x="1323" y="622" text-anchor="end" font-size="5.8" font-weight="700" fill="var(--pin-text)">D2 · GPIO2 (LED BOARD)</text>
+12677: 
+12678: 
+12679:             <rect x="1135" y="645" width="160" height="55" rx="2" fill="var(--pad-fill)" stroke="var(--line-thin)" stroke-width="0.8"/>
+12680:             <text x="1215" y="662" text-anchor="middle" font-size="6" font-weight="700" fill="var(--fg)">FIRMWARE AMAZONVISION 4.0</text>
+12681:             <text x="1215" y="675" text-anchor="middle" font-size="5" fill="var(--dim)">• read_estop() == HIGH (Fail-Safe NF)</text>
+12682:             <text x="1215" y="688" text-anchor="middle" font-size="5" fill="var(--dim)">• Boot Seguro: LOW antes de OUTPUT</text>
+12683:             <text x="1215" y="711" text-anchor="middle" font-size="4.6" font-weight="700" fill="var(--fg)">* LIGAR PELA SERIGRAFIA (D25, D26…). Na DOIT 30P o 3V3 fica no lado do D15.</text>
+12684:           </g>
+12685: 
+12686:           <!-- Bloco E14: Webcam USB + Mini-PC Visão Computacional -->
+12687:           <g id="bloco-e14-pg">
+12688:             <rect x="1100" y="820" width="230" height="95" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12689:             <text x="1215" y="840" text-anchor="middle" font-size="8" font-weight="700" fill="var(--fg)">E14 — WEBCAM 1080p + HOST VISÃO</text>
+12690:             <text x="1215" y="854" text-anchor="middle" font-size="5.5" fill="var(--dim)">CÂMERA USB 2.0 (CÚPULA ÓPTICA) → MINI-PC YOLOv8</text>
+12691:             <text x="1215" y="870" text-anchor="middle" font-size="5.2" fill="var(--fg)">• Alimentação 5V / Dados via Cabo USB 2.0 Direto no Host</text>
+12692:             <text x="1215" y="884" text-anchor="middle" font-size="5.2" fill="var(--dim)">• Host envia comando de classificação ao ESP32 via USB-UART (Pinos 1/3)</text>
+12693:             <text x="1215" y="898" text-anchor="middle" font-size="5.0" fill="var(--dim)">• Iluminação constante garantida pelo Ring Light E13 (12V 6000K)</text>
+12694:           </g>
+12695: 
+12696:           <!-- ========================================================== -->
+12697:           <!--      ZONA 4: SEGURANÇA NR-12 (E12-B, K1 E08, E09, Q2)      -->
+12698:           <!-- ========================================================== -->
+12699:           <g id="bloco-e12b-pg">
+12700:             <rect x="1470" y="265" width="75" height="50" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12701:             <text x="1507" y="280" text-anchor="middle" font-size="6.8" font-weight="700" fill="var(--fg)">E12-B (E31)</text>
+12702:             <text x="1507" y="308" text-anchor="middle" font-size="4.8" fill="var(--dim)">NF2 (21-22)</text>
+12703:         <circle cx="1470" cy="290" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12704:         <circle cx="1470" cy="290" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12705:         <text x="1477" y="292" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">21</text>
+12706: 
+12707:         <circle cx="1545" cy="290" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12708:         <circle cx="1545" cy="290" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12709:         <text x="1538" y="292" text-anchor="end" font-size="5" font-weight="700" fill="var(--pin-text)">22</text>
+12710: 
+12711:           </g>
+12712: 
+12713:           <g id="bloco-e08-pg">
+12714:             <rect x="1600" y="265" width="95" height="135" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12715:             <text x="1647" y="280" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">E08 — RELÉ K1</text>
+12716:             <text x="1647" y="305" text-anchor="middle" font-size="5" fill="var(--dim)">12V 40A (NR-12)</text>
+12717:         <circle cx="1600" cy="290" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12718:         <circle cx="1600" cy="290" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12719:         <text x="1607" y="292" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">85</text>
+12720: 
+12721:         <circle cx="1645" cy="400" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12722:         <circle cx="1645" cy="400" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12723:         <text x="1645" y="393" text-anchor="middle" font-size="5" font-weight="700" fill="var(--pin-text)">86</text>
+12724: 
+12725:         <circle cx="1600" cy="375" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12726:         <circle cx="1600" cy="375" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12727:         <text x="1607" y="377" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">30</text>
+12728: 
+12729:         <circle cx="1695" cy="375" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12730:         <circle cx="1695" cy="375" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12731:         <text x="1688" y="377" text-anchor="end" font-size="5" font-weight="700" fill="var(--pin-text)">87</text>
+12732: 
+12733:           </g>
+12734: 
+12735:           <g id="bloco-e09-pg">
+12736:             <rect x="1715" y="295" width="30" height="50" rx="2" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.2"/>
+12737:             <text x="1730" y="317" text-anchor="middle" font-size="5.5" font-weight="700" fill="var(--fg)">E09</text>
+12738:             <text x="1730" y="327" text-anchor="middle" font-size="4.5" fill="var(--dim)">1N4007</text>
+12739:             <text x="1730" y="305" text-anchor="middle" font-size="4" font-weight="700" fill="var(--fg)">K (faixa)</text>
+12740:             <text x="1730" y="340" text-anchor="middle" font-size="4" font-weight="700" fill="var(--fg)">A</text>
+12741:           </g>
+12742: 
+12743:           <g id="bloco-q2-pg">
+12744:             <rect x="1585" y="445" width="120" height="60" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12745:             <text x="1645" y="463" text-anchor="middle" font-size="6.5" font-weight="700" fill="var(--fg)">Q2 BC337-40 (E28)</text>
+12746:             <text x="1645" y="475" text-anchor="middle" font-size="4.8" fill="var(--dim)">+ R_B2 470Ω (E29)</text>
+12747:             <text x="1645" y="485" text-anchor="middle" font-size="4.8" fill="var(--dim)">+ R_PD2 10kΩ (E30)</text>
+12748:         <circle cx="1645" cy="445" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12749:         <circle cx="1645" cy="445" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12750:         <text x="1645" y="456" text-anchor="middle" font-size="5" font-weight="700" fill="var(--pin-text)">C</text>
+12751: 
+12752:         <circle cx="1585" cy="475" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12753:         <circle cx="1585" cy="475" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12754:         <text x="1592" y="477" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">B</text>
+12755: 
+12756:         <circle cx="1645" cy="505" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12757:         <circle cx="1645" cy="505" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12758:         <text x="1645" y="498" text-anchor="middle" font-size="5" font-weight="700" fill="var(--pin-text)">E</text>
+12759: 
+12760:           </g>
+12761: 
+12762:           <!-- ========================================================== -->
+12763:           <!--      ZONA 5: ATUADORES DE POTÊNCIA (H02, E04, E05, M13)    -->
+12764:           <!-- ========================================================== -->
+12765:           <g id="bloco-h02-pg">
+12766:             <rect x="1830" y="250" width="120" height="105" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12767:             <text x="1890" y="264" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">H02 — SERVO MG996R</text>
+12768:             <text x="1890" y="348" text-anchor="middle" font-size="4.8" fill="var(--dim)">+ BRAÇO 3D (H03) DESVIO</text>
+12769:         <circle cx="1830" cy="275" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12770:         <circle cx="1830" cy="275" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12771:         <text x="1837" y="277" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">PWM (50Hz)</text>
+12772: 
+12773:         <circle cx="1830" cy="305" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12774:         <circle cx="1830" cy="305" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12775:         <text x="1837" y="307" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">VCC (+6V)</text>
+12776: 
+12777:         <circle cx="1830" cy="335" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12778:         <circle cx="1830" cy="335" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12779:         <text x="1837" y="337" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">GND</text>
+12780: 
+12781:           </g>
+12782: 
+12783:           <g id="bloco-e04-pg">
+12784:             <rect x="1830" y="485" width="120" height="175" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12785:             <text x="1890" y="500" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">E04 — MOSFET D4184</text>
+12786:             <text x="1890" y="510" text-anchor="middle" font-size="4.8" fill="var(--dim)">LIGA/DESLIGA (FIRMWARE ATUAL)</text>
+12787:         <circle cx="1830" cy="520" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12788:         <circle cx="1830" cy="520" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12789:         <text x="1837" y="522" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">VIN+</text>
+12790: 
+12791:         <circle cx="1830" cy="550" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12792:         <circle cx="1830" cy="550" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12793:         <text x="1837" y="552" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">VIN-</text>
+12794: 
+12795:         <circle cx="1830" cy="580" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12796:         <circle cx="1830" cy="580" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12797:         <text x="1837" y="582" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">VCC</text>
+12798: 
+12799:         <circle cx="1830" cy="610" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12800:         <circle cx="1830" cy="610" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12801:         <text x="1837" y="612" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">GND</text>
+12802: 
+12803:         <circle cx="1830" cy="640" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12804:         <circle cx="1830" cy="640" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12805:         <text x="1837" y="642" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">SIG</text>
+12806: 
+12807:         <circle cx="1950" cy="520" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12808:         <circle cx="1950" cy="520" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12809:         <text x="1943" y="522" text-anchor="end" font-size="5" font-weight="700" fill="var(--pin-text)">VOUT+</text>
+12810: 
+12811:         <circle cx="1950" cy="580" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12812:         <circle cx="1950" cy="580" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12813:         <text x="1943" y="582" text-anchor="end" font-size="5" font-weight="700" fill="var(--pin-text)">VOUT-</text>
+12814: 
+12815:           </g>
+12816: 
+12817:           <g id="bloco-m13-pg">
+12818:             <rect x="2015" y="495" width="75" height="110" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12819:             <text x="2052" y="512" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">M13 — MOTOR TT</text>
+12820:             <text x="2052" y="590" text-anchor="middle" font-size="4.8" fill="var(--dim)">DC 3–6V 1:48</text>
+12821:             <text x="2052" y="598" text-anchor="middle" font-size="4.8" fill="var(--dim)">(AMARELO) @ 6V</text>
+12822:         <circle cx="2015" cy="520" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12823:         <circle cx="2015" cy="520" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12824:         <text x="2022" y="522" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">M+</text>
+12825: 
+12826:         <circle cx="2015" cy="580" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12827:         <circle cx="2015" cy="580" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12828:         <text x="2022" y="582" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">M-</text>
+12829: 
+12830:           </g>
+12831: 
+12832:           <g id="bloco-e05-pg">
+12833:             <rect x="1965" y="655" width="30" height="30" rx="2" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.2"/>
+12834:             <text x="1980" y="669" text-anchor="middle" font-size="5.2" font-weight="700" fill="var(--fg)">E05</text>
+12835:             <text x="1980" y="679" text-anchor="middle" font-size="4.4" fill="var(--dim)">1N5822</text>
+12836:             <text x="1968" y="662" text-anchor="start" font-size="4" font-weight="700" fill="var(--fg)">K</text>
+12837:             <text x="1992" y="662" text-anchor="end" font-size="4" font-weight="700" fill="var(--fg)">A</text>
+12838:           </g>
+12839: 
+12840:           <!-- ========================================================== -->
+12841:           <!--      ZONA 6: SINALIZAÇÃO (H05, E25+Q1) E RING LIGHT (E13)  -->
+12842:           <!-- ========================================================== -->
+12843:           <g id="bloco-h05-pg">
+12844:             <rect x="2130" y="240" width="120" height="135" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12845:             <text x="2190" y="256" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">H05 — LEDs + 330Ω</text>
+12846:         <circle cx="2130" cy="270" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12847:         <circle cx="2130" cy="270" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12848:         <text x="2137" y="272" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">R+ (VERM)</text>
+12849: 
+12850:         <circle cx="2250" cy="270" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12851:         <circle cx="2250" cy="270" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12852:         <text x="2243" y="272" text-anchor="end" font-size="5" font-weight="700" fill="var(--pin-text)">R-</text>
+12853: 
+12854:         <circle cx="2130" cy="310" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12855:         <circle cx="2130" cy="310" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12856:         <text x="2137" y="312" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">G+ (VERD)</text>
+12857: 
+12858:         <circle cx="2250" cy="310" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12859:         <circle cx="2250" cy="310" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12860:         <text x="2243" y="312" text-anchor="end" font-size="5" font-weight="700" fill="var(--pin-text)">G-</text>
+12861: 
+12862:         <circle cx="2130" cy="350" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12863:         <circle cx="2130" cy="350" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12864:         <text x="2137" y="352" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">Y+ (AMAR)</text>
+12865: 
+12866:         <circle cx="2250" cy="350" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12867:         <circle cx="2250" cy="350" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12868:         <text x="2243" y="352" text-anchor="end" font-size="5" font-weight="700" fill="var(--pin-text)">Y-</text>
+12869: 
+12870:           </g>
+12871: 
+12872:           <g id="bloco-e25-pg">
+12873:             <rect x="2130" y="450" width="120" height="60" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12874:             <text x="2190" y="468" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">E25 — BUZZER 5V</text>
+12875:             <text x="2190" y="480" text-anchor="middle" font-size="5" fill="var(--dim)">ALARME AUDÍVEL NR-12</text>
+12876:         <circle cx="2130" cy="480" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12877:         <circle cx="2130" cy="480" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12878:         <text x="2137" y="482" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">+5V</text>
+12879: 
+12880:         <circle cx="2190" cy="510" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12881:         <circle cx="2190" cy="510" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12882:         <text x="2190" y="503" text-anchor="middle" font-size="5" font-weight="700" fill="var(--pin-text)">-</text>
+12883: 
+12884:           </g>
+12885: 
+12886:           <g id="bloco-q1-pg">
+12887:             <rect x="2130" y="555" width="120" height="60" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12888:             <text x="2190" y="573" text-anchor="middle" font-size="6.5" font-weight="700" fill="var(--fg)">Q1 BC337-40 (E28)</text>
+12889:             <text x="2190" y="585" text-anchor="middle" font-size="4.8" fill="var(--dim)">+ E11 1kΩ + R_PD1 10kΩ</text>
+12890:         <circle cx="2190" cy="555" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12891:         <circle cx="2190" cy="555" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12892:         <text x="2190" y="566" text-anchor="middle" font-size="5" font-weight="700" fill="var(--pin-text)">C</text>
+12893: 
+12894:         <circle cx="2130" cy="585" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12895:         <circle cx="2130" cy="585" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12896:         <text x="2137" y="587" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">B</text>
+12897: 
+12898:         <circle cx="2190" cy="615" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12899:         <circle cx="2190" cy="615" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12900:         <text x="2190" y="608" text-anchor="middle" font-size="5" font-weight="700" fill="var(--pin-text)">E</text>
+12901: 
+12902:           </g>
+12903: 
+12904:           <g id="bloco-e13-pg">
+12905:             <rect x="2130" y="830" width="120" height="60" rx="3" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1.4"/>
+12906:             <text x="2190" y="848" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--fg)">E13 — RING LIGHT</text>
+12907:             <text x="2190" y="860" text-anchor="middle" font-size="5" fill="var(--dim)">LED 12V 6000K CÚPULA</text>
+12908:         <circle cx="2130" cy="860" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12909:         <circle cx="2130" cy="860" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12910:         <text x="2137" y="862" text-anchor="start" font-size="5" font-weight="700" fill="var(--pin-text)">+12V</text>
+12911: 
+12912:         <circle cx="2190" cy="890" r="4" fill="var(--pad-fill)" stroke="var(--line)" stroke-width="1"/>
+12913:         <circle cx="2190" cy="890" r="1.6" fill="var(--bg)" stroke="var(--line)" stroke-width="0.5"/>
+12914:         <text x="2190" y="883" text-anchor="middle" font-size="5" font-weight="700" fill="var(--pin-text)">GND</text>
+12915: 
+12916:           </g>
+12917: 
+12918:           <!-- ========================================================== -->
+12919:           <!--      FIAÇÃO COMPLETA DA PLANTA GERAL (W001 A W083)         -->
+12920:           <!-- ========================================================== -->
+12921:           <g id="fios-pg">
+12922:         <!-- W001: 1,0 VM → W1 -->
+12923:         <path d="M 130,300 L 185,300" fill="none" class="wire-power"/>
+12924:         <circle cx="130" cy="300" r="2.5" class="junction-dot"/>
+12925:         <circle cx="185" cy="300" r="2.5" class="junction-dot"/>
+12926:         <rect x="146.0" y="281.5" width="22" height="8" rx="1.5" class="wire-tag"/>
+12927:         <text x="157" y="287.5" text-anchor="middle" class="wire-label" font-size="5">W001</text>
+12928:         <text x="157" y="296.5" text-anchor="middle" class="wire-spec" font-size="4.5">1,0 VM → W1</text>
+12929:         <!-- W002: 1,0 AZ → W1 -->
+12930:         <path d="M 130,335 L 185,335" fill="none" class="wire-power"/>

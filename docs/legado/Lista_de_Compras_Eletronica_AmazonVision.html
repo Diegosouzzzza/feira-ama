@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compras de Eletrônica</title>
+<style>
+  :root {
+    --ink: #1c2321;
+    --muted: #5d6763;
+    --line: #d9dfdc;
+    --soft: #f3f6f4;
+    --brand: #1f6b4a;
+    --brand-soft: #e3f1ea;
+    --warn: #8a5a00;
+    --warn-soft: #fff4dc;
+    --bad: #9b2c2c;
+    --bad-soft: #fde8e8;
+    --bg: #fbfcfb;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 14px/1.45 "Segoe UI", Arial, sans-serif;
+  }
+  .page { max-width: 1080px; margin: 0 auto; padding: 28px 16px 64px; }
+  header.doc { display: flex; justify-content: space-between; gap: 24px; align-items: flex-end;
+    border-bottom: 3px solid var(--brand); padding-bottom: 14px; }
+  header.doc h1 { margin: 0; font-size: 26px; letter-spacing: -0.01em; }
+  header.doc p { margin: 2px 0 0; color: var(--muted); }
+  .meta { text-align: right; color: var(--muted); font-size: 13px; white-space: nowrap; }
+  .meta strong { color: var(--ink); }
+
+  .controls { margin: 18px 0; display: grid; gap: 12px; grid-template-columns: 1fr auto; align-items: start;
+    background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .controls h2 { margin: 0 0 6px; font-size: 14px; }
+  .scenarios { display: flex; flex-wrap: wrap; gap: 6px; }
+  .scenarios label { border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; cursor: pointer;
+    background: var(--soft); font-size: 13px; }
+  .scenarios input { display: none; }
+  .scenarios label:has(input:checked) { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .scenario-note { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+  .actions { display: flex; flex-direction: column; gap: 8px; }
+  button { font: inherit; border-radius: 8px; padding: 9px 16px; cursor: pointer; border: 1px solid var(--line); background: #fff; }
+  button.primary { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 600; }
+
+  .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+  .summary div { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; }
+  .summary span { display: block; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  .summary strong { font-size: 20px; }
+
+  .notes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .note { border-radius: 10px; padding: 12px 14px; font-size: 13px; }
+  .note h3 { margin: 0 0 6px; font-size: 13px; }
+  .note ul { margin: 0; padding-left: 18px; }
+  .note.ask { background: var(--warn-soft); border: 1px solid #f0d9a8; }
+  .note.avoid { background: var(--bad-soft); border: 1px solid #f3c4c4; }
+
+  section.group { margin-bottom: 18px; break-inside: auto; }
+  section.group h2 { font-size: 15px; margin: 0 0 6px; display: flex; gap: 8px; align-items: baseline; }
+  section.group h2 small { color: var(--muted); font-weight: 400; font-size: 12px; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; min-width: 760px; border-collapse: collapse; background: #fff; border: 1px solid var(--line); table-layout: fixed; }
+  th:nth-child(1) { width: 4%; } th:nth-child(2) { width: 22%; } th:nth-child(3) { width: 32%; }
+  th:nth-child(4) { width: 9%; } th:nth-child(5) { width: 12%; } th:nth-child(6) { width: 10%; } th:nth-child(7) { width: 11%; }
+  th, td { border-bottom: 1px solid var(--line); padding: 7px 8px; vertical-align: top; text-align: left; }
+  th { background: var(--soft); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  tr { break-inside: avoid; }
+  td.chk { text-align: center; }
+  td.item { font-weight: 600; }
+  td.spec { color: #34403c; font-size: 13px; }
+  td.qty, td.price, td.sub { white-space: nowrap; }
+  td.sub { text-align: right; font-variant-numeric: tabular-nums; }
+  input.num { width: 64px; font: inherit; padding: 3px 6px; border: 1px solid var(--line); border-radius: 6px; text-align: right; }
+  .un { color: var(--muted); font-size: 12px; margin-left: 3px; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+  .tag.Essencial { background: var(--brand-soft); color: var(--brand); }
+  .tag.Reserva { background: #e8eef8; color: #2d4f86; }
+  .tag.Recomendado { background: var(--warn-soft); color: var(--warn); }
+  .tag.Ferramenta { background: #eee; color: #444; }
+  tr.off td:not(.chk) { opacity: .4; }
+  tr.off td.item { text-decoration: line-through; }
+  tr.pending td.sub { color: var(--warn); font-size: 12px; }
+  .total-row { display: flex; justify-content: flex-end; gap: 16px; padding: 12px 4px; font-size: 16px; border-top: 2px solid var(--ink); }
+
+  .sign { display: none; }
+  footer { color: var(--muted); font-size: 12px; margin-top: 24px; }
+
+  @media (max-width: 720px) {
+    .controls, .notes, .summary { grid-template-columns: 1fr; }
+    header.doc { flex-direction: column; align-items: flex-start; }
+    .meta { text-align: left; }
+  }
+
+  @page { size: A4; margin: 14mm 12mm; }
+  @media print {
+    body { background: #fff; font-size: 11px; }
+    .page { padding: 0; max-width: none; }
+    .controls, .actions, .no-print { display: none !important; }
+    .summary div, table { border-color: #bbb; }
+    th { background: #eee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .tag, .note, header.doc { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    tr.off, section.group.empty { display: none; }
+    table { min-width: 0; }
+    th, td { padding: 6px 5px; }
+    .tag { padding: 1px 6px; font-size: 10px; }
+    td.spec { font-size: 11px; }
+    section.group h2 { break-after: avoid; page-break-after: avoid; }
+    thead { display: table-header-group; }
+    input.num { border: none; padding: 0; width: 34px; text-align: right; }
+    input.p { width: 100%; border-bottom: 1px solid #999; border-radius: 0; }
+    input.p::placeholder { color: transparent; }
+    td.chk input { display: none; }
+    td.chk::before { content: "☐"; font-size: 14px; }
+    .sign { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-top: 36px; }
+    .sign div { border-top: 1px solid #555; padding-top: 4px; color: var(--muted); font-size: 11px; }
+    .table-wrap { overflow: visible; }
+  }
+</style>
+</head>
+<body>
+<div style="background:#9b2c2c;color:#fff;padding:14px 18px;
+     font-family:system-ui,sans-serif;font-weight:700;font-size:14px;
+     text-align:center;border-bottom:3px solid #4a1515">
+  ⚠ DOCUMENTO ARQUIVADO — Superseded em 2026-11-06.
+  Esta lista é de 1-out-2026 e NÃO reflete a arquitetura atual
+  (mono-fonte 12V, sensor NPN 5V, esteira 3D-impressa).
+  Consulte a BOM oficial em
+  <code>BOM_AmazonVision_v2.html</code> na raiz do projeto.
+</div>
+<div class="page">
+  <header class="doc">
+    <div>
+      <h1>AmazonVision 4.0 · Compras de eletrônica</h1>
+      <p>Feira Tecnológica FUCAPI 2026 · do ESP32 ao motor da esteira</p>
+    </div>
+    <div class="meta">
+      Gerado em <strong id="today"></strong><br>
+      Motor: <strong id="scenarioLabel"></strong>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div>
+      <h2>Tipo de motor da esteira</h2>
+      <div class="scenarios" id="scenarios"></div>
+      <p class="scenario-note" id="scenarioNote"></p>
+      <p class="scenario-note">Desmarque o que a equipe já tem. Itens desmarcados não entram no total nem no PDF. Quantidades e preços ficam salvos neste navegador.</p>
+    </div>
+    <div class="actions">
+      <button class="primary" onclick="window.print()">Gerar PDF</button>
+      <button onclick="resetAll()">Restaurar padrão</button>
+    </div>
+  </div>
+
+  <div class="summary">
+    <div><span>Itens a comprar</span><strong id="countItems">0</strong></div>
+    <div><span>Itens sem preço</span><strong id="countNoPrice">0</strong></div>
+    <div><span>Total estimado</span><strong id="grandTotal">R$ 0,00</strong></div>
+  </div>
+
+  <div class="notes">
+    <div class="note ask">
+      <h3>Perguntar ao vendedor da esteira antes de comprar o driver</h3>
+      <ul>
+        <li>Tensão do motor (12 V, 24 V ou 127/220 V AC)</li>
+        <li>Corrente nominal e corrente de partida</li>
+        <li>Vem com controlador próprio? Ele tem entrada de liga/desliga?</li>
+        <li>A velocidade é ajustável?</li>
+      </ul>
+    </div>
+    <div class="note avoid">
+      <h3>Não comprar (não funcionam com este projeto)</h3>
+      <ul>
+        <li><b>IRF520</b>: não conduz direito com os 3,3 V do ESP32</li>
+        <li><b>DRV8833</b>: não aguenta motor de 12 V</li>
+        <li><b>E18‑D80NK</b> ou sensores NPN: o circuito espera sensor PNP</li>
+        <li><b>ESP32‑S3 / C3</b>: o firmware é para o ESP32 clássico (WROOM‑32)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="groups"></div>
+
+  <div class="total-row"><span>Total estimado</span><strong id="grandTotal2">R$ 0,00</strong></div>
+  <p class="scenario-note" id="pendingNote"></p>
+
+  <div class="sign">
+    <div>Responsável pela compra</div>
+    <div>Orientador / aprovação</div>
+    <div>Data</div>
+  </div>
+
+  <footer>
+    Base: firmware atual (pinos S1=25, S2=26, emergência=27, servo=18, motor=19 ou 21/22/23) e lista de materiais de 1º/out/2026.
+    A corrente da fonte (12 V 10 A) é provisória: refazer a conta quando souber a corrente do motor.
+  </footer>
+</div>
+
+<script>
+  const SCENARIOS = [
+    { id: 'indef', label: 'Ainda não definido', note: 'Mostrando todas as opções de driver. Elas ficam fora do total até a escolha do motor.' },
+    { id: 'onoff', label: 'DC 12/24 V, só liga/desliga', note: 'Firmware: driver 1 (padrão), GPIO 19. Se o motor for 24 V, troque a fonte para 24 V e confirme a entrada do PC817.' },
+    { id: 'pwm', label: 'DC 12/24 V, com velocidade', note: 'Firmware: driver 2 (BTS7960), GPIO 21/22/23. Se o motor for 24 V, troque a fonte para 24 V e confirme a entrada do PC817.' },
+    { id: 'ctrl', label: 'Esteira com controlador próprio', note: 'O relé aciona a entrada de liga/desliga do controlador da esteira. Firmware: driver 1, GPIO 19.' },
+    { id: 'ac', label: 'Motor 127/220 V AC', note: 'O relé comanda um contator. A instalação na rede elétrica deve ser feita por alguém habilitado.' },
+  ];
+
+  // [id, item, especificação, qtd, unidade, prioridade, cenário do motor (opcional), marcado por padrão]
+  const GROUPS = [
+    { title: '1. Controle', sub: 'cérebro da bancada', items: [
+      ['esp32', 'ESP32 DevKit V1 (WROOM‑32)', '30 ou 38 pinos; chip USB CP2102 de preferência (CH340 também serve, pede driver). 1 para uso + 1 reserva.', 2, 'un', 'Essencial'],
+      ['usb', 'Cabo USB de dados, 1–2 m', 'Conector igual ao da placa (micro‑USB ou USB‑C). Precisa ser de dados, não só de carga.', 1, 'un', 'Essencial'],
+      ['headers', 'Barra de pinos fêmea 1×40', 'Para encaixar o ESP32 na placa perfurada sem soldar a placa.', 2, 'un', 'Recomendado'],
+    ]},
+    { title: '2. Sensores e segurança', sub: 'detectar o produto e parar tudo com segurança', items: [
+      ['sensor', 'Sensor fotoelétrico M18 PNP NA', 'Difuso, 12–24 V, alcance regulável (ex.: E3F‑DS30P1). S1 + S2 + 1 reserva.', 3, 'un', 'Essencial'],
+      ['pc817', 'Módulo optoacoplador PC817, 4 canais', 'Entrada para 12 V (ou 24 V se a fonte for 24 V). Isola os sensores do ESP32.', 1, 'un', 'Essencial'],
+      ['estop', 'Botão de emergência cogumelo 22 mm', 'Com trava e caixa; contatos 1 NF + 1 NA (NF corta os atuadores, NA avisa o ESP32 no GPIO 27).', 1, 'un', 'Essencial'],
+      ['relay40', 'Relé automotivo 12 V 30/40 A + soquete', '5 terminais. A bobina passa pelo NF do botão: soltou fio ou apertou o botão, os atuadores desligam.', 1, 'un', 'Essencial'],
+      ['d4007', 'Diodo 1N4007', 'Proteção da bobina do relé (pacote).', 10, 'un', 'Essencial'],
+    ]},
+    { title: '3. Servo da pá desviadora', sub: 'separa os rejeitados', items: [
+      ['servo', 'Servo MG996R 180°', 'Engrenagem metálica. 1 para uso + 1 reserva.', 2, 'un', 'Essencial'],
+      ['horn', 'Braço metálico para servo 25T', 'Compatível com MG996R; mais firme que o braço plástico.', 1, 'un', 'Recomendado'],
+      ['xl4015', 'Conversor buck XL4015 5 A', 'Baixa 12 V para 5,5–6 V do servo. Ajustar com multímetro antes de ligar. 1 + 1 reserva.', 2, 'un', 'Essencial'],
+      ['cap', 'Capacitor eletrolítico 1000 µF / 16 V', 'Junto ao servo, segura os picos de corrente.', 2, 'un', 'Essencial'],
+    ]},
+    { title: '4. Motor da esteira', sub: 'driver conforme o motor', motor: true, items: [
+      ['mosfet', 'Módulo MOSFET D4184 (AOD4184) duplo', 'Aciona com 3,3 V, até ~15 A. Liga/desliga o motor DC.', 1, 'un', 'Essencial', 'onoff'],
+      ['schottky', 'Diodo schottky 1N5822 (3 A)', 'Em paralelo com o motor (roda livre). Protege o MOSFET.', 2, 'un', 'Essencial', 'onoff'],
+      ['bts', 'Ponte H BTS7960 (IBT‑2) 43 A', 'Controle de velocidade por PWM. VCC do módulo ligado nos 3,3 V do ESP32.', 1, 'un', 'Essencial', 'pwm'],
+      ['relay1', 'Módulo relé 1 canal, gatilho 3,3 V', 'Com optoacoplador. Fecha a entrada de liga/desliga do controlador da esteira.', 1, 'un', 'Essencial', 'ctrl'],
+      ['relay1ac', 'Módulo relé 1 canal, gatilho 3,3 V', 'Com optoacoplador. Comanda a bobina do contator.', 1, 'un', 'Essencial', 'ac'],
+      ['contator', 'Contator + instalação', 'Dimensionado para o motor. Orçar e instalar com profissional habilitado.', 1, 'un', 'Essencial', 'ac'],
+    ]},
+    { title: '5. Visão computacional', sub: 'imagem padronizada para a IA', items: [
+      ['webcam', 'Webcam USB UVC 1080p', 'Plug‑and‑play no Windows (UVC). Substitui o celular da lista antiga.', 1, 'un', 'Essencial'],
+      ['ledstrip', 'Fita LED branca 12 V, 6000 K', 'Alto IRC (CRI > 90) se possível. Ligada direto no 12 V.', 2, 'm', 'Essencial'],
+      ['perfil', 'Perfil de alumínio com difusor leitoso, 1 m', 'Para a fita LED; reduz reflexo no fruto e na correia.', 1, 'un', 'Essencial'],
+      ['tripod', 'Suporte articulado para webcam', 'Rosca 1/4", com garra ou base fixável na bancada.', 1, 'un', 'Recomendado'],
+    ]},
+    { title: '6. Alimentação e proteção', sub: 'cada circuito protegido', items: [
+      ['fonte', 'Fonte chaveada 12 V 10 A (colmeia)', 'Provisório: refazer a conta com a corrente do motor (motor 24 V → fonte 24 V).', 1, 'un', 'Essencial'],
+      ['forca', 'Cabo de força tripolar com plugue', 'Para ligar a fonte colmeia na tomada (com terra).', 1, 'un', 'Essencial'],
+      ['chave', 'Chave geral (gangorra ou alavanca) 15 A', 'Na saída de 12 V da fonte.', 1, 'un', 'Essencial'],
+      ['portafus', 'Porta‑fusível de lâmina em linha', 'Principal, servo e motor.', 3, 'un', 'Essencial'],
+      ['fusiveis', 'Fusíveis de lâmina sortidos', '3 A (servo), 10 A (principal) e o do motor (1,5–2× a corrente nominal); com reservas.', 1, 'kit', 'Essencial'],
+      ['bornes', 'Bornes de emenda WAGO 221 ou borne barreira', 'Barramentos de 12 V, atuadores e GND.', 1, 'kit', 'Essencial'],
+      ['filtro', 'Filtro de linha com aterramento', 'Notebook e fonte. Produto certificado.', 1, 'un', 'Essencial'],
+    ]},
+    { title: '7. Fios e montagem', sub: 'ligações firmes, sem improviso', items: [
+      ['fiovm', 'Cabo flexível 1,0 mm² vermelho', 'Potência (+). Use mais grosso se o motor pedir.', 5, 'm', 'Essencial'],
+      ['fiopt', 'Cabo flexível 1,0 mm² preto', 'Potência (GND).', 5, 'm', 'Essencial'],
+      ['cabinho', 'Cabinho 0,3–0,5 mm² colorido', 'Sinais: sensores, ESP32, emergência.', 10, 'm', 'Essencial'],
+      ['perf', 'Placa perfurada (ilha) 7×9 cm', 'Montagem definitiva do ESP32 e sinais. Nunca para corrente do motor.', 2, 'un', 'Recomendado'],
+      ['kf301', 'Borne KF301 2 vias (para placa)', 'Conexões parafusadas entre a placa e os cabos.', 10, 'un', 'Recomendado'],
+      ['jumpers', 'Kit jumpers Dupont (M‑M, M‑F, F‑F)', 'Testes na protoboard.', 1, 'kit', 'Essencial'],
+      ['proto', 'Protoboard 830 pontos', 'Só para testar sinais de baixa corrente.', 1, 'un', 'Essencial'],
+      ['ilhos', 'Terminais ilhós sortidos', 'Pontas de fio nos bornes de parafuso.', 1, 'kit', 'Recomendado'],
+      ['termo', 'Termorretrátil sortido', 'Isolar emendas e soldas.', 1, 'kit', 'Recomendado'],
+      ['led', 'LED 5 mm + resistor 330 Ω', 'LED de estado no painel (GPIO 2). Opcional: a placa já tem um LED.', 2, 'un', 'Recomendado'],
+    ]},
+    { title: '8. Ferramentas', sub: 'só se a equipe ainda não tiver', items: [
+      ['multimetro', 'Multímetro digital', 'Indispensável para ajustar o buck do servo e conferir polaridade.', 1, 'un', 'Ferramenta', null, false],
+      ['solda', 'Ferro de solda 40–60 W + estanho', 'Montagem da placa perfurada.', 1, 'kit', 'Ferramenta', null, false],
+      ['crimp', 'Alicate crimpador para ilhós', 'Junto com o kit de ilhós.', 1, 'un', 'Ferramenta', null, false],
+      ['desenc', 'Alicate desencapador', 'Para cabos de 0,3 a 2,5 mm².', 1, 'un', 'Ferramenta', null, false],
+    ]},
+  ];
+
+  const KEY = 'av-compras-eletronica-v1';
+  let state = load();
+
+  function defaults() {
+    const s = { scenario: 'indef', rows: {} };
+    GROUPS.forEach(g => g.items.forEach(([id, , , qty, , , , on]) => {
+      s.rows[id] = { on: on !== false, qty, price: '' };
+    }));
+    return s;
+  }
+  function load() {
+    const d = defaults();
+    try {
+      const saved = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (saved) {
+        d.scenario = saved.scenario || d.scenario;
+        Object.keys(d.rows).forEach(id => { if (saved.rows && saved.rows[id]) Object.assign(d.rows[id], saved.rows[id]); });
+      }
+    } catch (e) {}
+    return d;
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  function resetAll() {
+    if (!confirm('Apagar quantidades, preços e marcações e voltar ao padrão?')) return;
+    state = defaults(); save(); render();
+  }
+
+  const brl = n => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const parsePrice = v => { const n = parseFloat(String(v).replace(/\./g, '').replace(',', '.')); return isNaN(n) ? 0 : n; };
+
+  function render() {
+    const sc = SCENARIOS.find(s => s.id === state.scenario) || SCENARIOS[0];
+    document.getElementById('scenarios').innerHTML = SCENARIOS.map(s =>
+      `<label><input type="radio" name="sc" value="${s.id}" ${s.id === sc.id ? 'checked' : ''}>${s.label}</label>`).join('');
+    document.getElementById('scenarioLabel').textContent = sc.label;
+    document.getElementById('scenarioNote').textContent = sc.note;
+
+    const host = document.getElementById('groups');
+    host.innerHTML = '';
+    GROUPS.forEach(g => {
+      const rows = g.items.filter(it => !it[6] || sc.id === 'indef' || it[6] === sc.id);
+      const sec = document.createElement('section');
+      sec.className = 'group';
+      sec.innerHTML = `<h2>${g.title} <small>${g.sub}${g.motor && sc.id === 'indef' ? ' · escolha UMA opção depois de saber o motor' : ''}</small></h2>
+        <div class="table-wrap"><table><thead><tr>
+          <th></th><th>Item</th><th>Especificação para compra</th><th>Qtd</th><th>Prioridade</th><th>Preço un. (R$)</th><th style="text-align:right">Subtotal</th>
+        </tr></thead><tbody></tbody></table></div>`;
+      const tb = sec.querySelector('tbody');
+      rows.forEach(([id, nome, spec, , un, prio, motor]) => {
+        const r = state.rows[id];
+        const pending = motor && sc.id === 'indef';
+        const optLabel = pending ? `<div class="un">Opção: ${SCENARIOS.find(s => s.id === motor).label}</div>` : '';
+        const tr = document.createElement('tr');
+        tr.dataset.id = id;
+        if (pending) tr.classList.add('pending');
+        tr.innerHTML = `
+          <td class="chk"><input type="checkbox" ${r.on ? 'checked' : ''} aria-label="Comprar ${nome}"></td>
+          <td class="item">${nome}${optLabel}</td>
+          <td class="spec">${spec}</td>
+          <td class="qty"><input class="num q" type="number" min="0" step="1" value="${r.qty}"><span class="un">${un}</span></td>
+          <td class="prio"><span class="tag ${prio}">${prio}</span></td>
+          <td class="price"><input class="num p" inputmode="decimal" placeholder="0,00" value="${r.price}"></td>
+          <td class="sub"></td>`;
+        tb.appendChild(tr);
+      });
+      host.appendChild(sec);
+    });
+    recalc();
+  }
+
+  function recalc() {
+    const sc = state.scenario;
+    let total = 0, items = 0, noPrice = 0;
+    document.querySelectorAll('#groups tr[data-id]').forEach(tr => {
+      const r = state.rows[tr.dataset.id];
+      const pending = tr.classList.contains('pending');
+      tr.classList.toggle('off', !r.on);
+      const sub = (Number(r.qty) || 0) * parsePrice(r.price);
+      const cell = tr.querySelector('td.sub');
+      if (pending) { cell.textContent = 'a definir'; return; }
+      cell.textContent = r.on && sub ? brl(sub) : '—';
+      if (r.on) { total += sub; items++; if (!parsePrice(r.price)) noPrice++; }
+    });
+    document.querySelectorAll('section.group').forEach(s =>
+      s.classList.toggle('empty', !s.querySelector('tr[data-id]:not(.off)')));
+    document.getElementById('countItems').textContent = items;
+    document.getElementById('countNoPrice').textContent = noPrice;
+    document.getElementById('grandTotal').textContent = brl(total);
+    document.getElementById('grandTotal2').textContent = brl(total);
+    document.getElementById('pendingNote').textContent = sc === 'indef'
+      ? 'O total não inclui o driver do motor: escolha o tipo de motor para incluí-lo.' : '';
+  }
+
+  document.getElementById('groups').addEventListener('input', e => {
+    const tr = e.target.closest('tr[data-id]');
+    if (!tr) return;
+    const r = state.rows[tr.dataset.id];
+    if (e.target.type === 'checkbox') r.on = e.target.checked;
+    else if (e.target.classList.contains('q')) r.qty = e.target.value;
+    else if (e.target.classList.contains('p')) r.price = e.target.value;
+    save(); recalc();
+  });
+  document.getElementById('scenarios').addEventListener('change', e => {
+    state.scenario = e.target.value; save(); render();
+  });
+
+  document.getElementById('today').textContent = new Date().toLocaleDateString('pt-BR');
+  render();
+</script>
+</body>
+</html>
